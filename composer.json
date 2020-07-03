@@ -1,0 +1,22 @@
+{
+    "name": "josemmo/einvoicing",
+    "description": "Library for reading and creating European-compliant electronic invoices (EN 16931-1)",
+    "keywords": ["invoicing", "cef", "ubl", "cii"],
+    "license": "MIT",
+    "homepage": "https://github.com/josemmo/einvoicing",
+    "authors": [
+        {
+            "name": "José Miguel Moreno",
+            "email": "josemmo@pm.me",
+            "homepage": "https://github.com/josemmo"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Einvoicing\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.1"
+    }
+}
