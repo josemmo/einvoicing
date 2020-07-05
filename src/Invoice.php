@@ -1,5 +1,5 @@
 <?php
-namespace Einvocing;
+namespace Einvoicing;
 
 class Invoice {
     private $number = null;
