@@ -2,12 +2,22 @@
 namespace Einvocing;
 
 class Party {
+    private $name = null;
+    private $tradingName = null;
+    private $companyId = null;
+    private $vatNumber = null;
+    private $address = [];
+    private $city = null;
+    private $postalCode = null;
+    private $subdivision = null;
+    private $country = null;
+
     /**
      * Get party business name
      * @return string|null Party business name
      */
     public function getName(): ?string {
-        // TODO
+        return $this->name;
     }
 
 
@@ -17,7 +27,7 @@ class Party {
      * @return self              Party instance
      */
     public function setName(?string $name): self {
-        // TODO
+        $this->name = $name;
         return $this;
     }
 
@@ -27,7 +37,7 @@ class Party {
      * @return string|null Party trading name
      */
     public function getTradingName(): ?string {
-        // TODO
+        return $this->tradingName;
     }
 
 
@@ -37,7 +47,7 @@ class Party {
      * @return self                     Party instance
      */
     public function setTradingName(?string $tradingName): self {
-        // TODO
+        $this->tradingName = $tradingName;
         return $this;
     }
 
@@ -47,7 +57,7 @@ class Party {
      * @return string|null Party company ID
      */
     public function getCompanyId(): ?string {
-        // TODO
+        return $this->companyId;
     }
 
 
@@ -57,7 +67,7 @@ class Party {
      * @return self                   Party instance
      */
     public function setCompanyId(?string $companyId): self {
-        // TODO
+        $this->companyId = $companyId;
         return $this;
     }
 
@@ -67,7 +77,7 @@ class Party {
      * @return string|null Party VAT number
      */
     public function getVatNumber(): ?string {
-        // TODO
+        return $this->vatNumber;
     }
 
 
@@ -77,7 +87,7 @@ class Party {
      * @return self                   Party instance
      */
     public function setVatNumber(?string $companyId): self {
-        // TODO
+        $this->companyId = $companyId;
         return $this;
     }
 
@@ -87,7 +97,7 @@ class Party {
      * @return string[] Address lines (up to 3 lines)
      */
     public function getAddress(): array {
-        // TODO
+        return $this->address;
     }
 
 
@@ -95,9 +105,13 @@ class Party {
      * Set address lines
      * @param  string[] $addressLines Address lines (up to 3 lines)
      * @return self                   Party instance
+     * @throws \InvalidArgumentException if more than 3 lines are provided
      */
     public function setAddress(array $addressLines): self {
-        // TODO
+        if (count($addressLines) > 3) {
+            throw new \InvalidArgumentException('Address cannot have more than 3 lines');
+        }
+        $this->address = $addressLines;
         return $this;
     }
 
@@ -107,7 +121,7 @@ class Party {
      * @return string|null City name
      */
     public function getCity(): ?string {
-        // TODO
+        return $this->city;
     }
 
 
@@ -117,7 +131,7 @@ class Party {
      * @return self              Party instance
      */
     public function setCity(?string $city): self {
-        // TODO
+        $this->city = $city;
         return $this;
     }
 
@@ -127,7 +141,7 @@ class Party {
      * @return string|null Postal code
      */
     public function getPostalCode(): ?string {
-        // TODO
+        return $this->postalCode;
     }
 
 
@@ -137,7 +151,7 @@ class Party {
      * @return self                    Party instance
      */
     public function setPostalCode(?string $postalCode): self {
-        // TODO
+        $this->postalCode = $postalCode;
         return $this;
     }
 
@@ -147,17 +161,17 @@ class Party {
      * @return string|null Country subdivision
      */
     public function getSubdivision(): ?string {
-        // TODO
+        return $this->subdivision;
     }
 
 
     /**
      * Set country subdivision (region, province, etc.)
-     * @param  string|null $countrySubdivision Country subdivision
-     * @return self                            Party instance
+     * @param  string|null $subdivision Country subdivision
+     * @return self                     Party instance
      */
-    public function setSubdivision(?string $countrySubdivision): self {
-        // TODO
+    public function setSubdivision(?string $subdivision): self {
+        $this->subdivision = $subdivision;
         return $this;
     }
 
@@ -167,7 +181,7 @@ class Party {
      * @return string|null Country code
      */
     public function getCountry(): ?string {
-        // TODO
+        return $this->country;
     }
 
 
@@ -177,7 +191,7 @@ class Party {
      * @return self                     Party instance
      */
     public function setCountry(?string $countryCode): self {
-        // TODO
+        $this->country = $countryCode;
         return $this;
     }
 }

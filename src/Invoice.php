@@ -2,12 +2,23 @@
 namespace Einvocing;
 
 class Invoice {
+    private $number = null;
+    private $type = 380; // TODO: add constants
+    private $currency = "EUR"; // TODO: add constants
+    private $issueDate = null;
+    private $dueDate = null;
+    private $note = null;
+    private $seller = null;
+    private $buyer = null;
+    private $payee = null;
+    private $lines = [];
+
     /**
      * Get invoice number
      * @return string|null Invoice number
      */
     public function getNumber(): ?string {
-        // TODO
+        return $this->number;
     }
 
 
@@ -17,7 +28,7 @@ class Invoice {
      * @return self           Invoice instance
      */
     public function setNumber(string $number): self {
-        // TODO
+        $this->number = $number;
         return $this;
     }
 
@@ -27,7 +38,7 @@ class Invoice {
      * @return int Invoice type code
      */
     public function getType(): int {
-        // TODO
+        return $this->type;
     }
 
 
@@ -37,7 +48,7 @@ class Invoice {
      * @return self           Invoice instance
      */
     public function setType(int $typeCode): self {
-        // TODO
+        $this->type = $typeCode;
         return $this;
     }
 
@@ -48,7 +59,7 @@ class Invoice {
      * @return string Document currency code
      */
     public function getCurrency(): string {
-        // TODO
+        return $this->currency;
     }
 
 
@@ -58,7 +69,7 @@ class Invoice {
      * @return self                 Invoice instance
      */
     public function setCurrency(string $currencyCode): self {
-        // TODO
+        $this->currency = $currencyCode;
         return $this;
     }
 
@@ -68,7 +79,7 @@ class Invoice {
      * @return \DateTime|null Invoice issue date
      */
     public function getIssueDate(): ?\DateTime {
-        // TODO
+        return $this->issueDate;
     }
 
 
@@ -78,7 +89,7 @@ class Invoice {
      * @return self                 Invoice instance
      */
     public function setIssueDate(\DateTime $issueDate): self {
-        // TODO
+        $this->issueDate = $issueDate;
         return $this;
     }
 
@@ -88,7 +99,7 @@ class Invoice {
      * @return \DateTime|null Payment due date
      */
     public function getDueDate(): ?\DateTime {
-        // TODO
+        return $this->dueDate;
     }
 
 
@@ -98,7 +109,7 @@ class Invoice {
      * @return self                    Invoice instance
      */
     public function setDueDate(?\DateTime $dueDate): self {
-        // TODO
+        $this->dueDate = $dueDate;
         return $this;
     }
 
@@ -108,7 +119,7 @@ class Invoice {
      * @return string|null Invoice note
      */
     public function getNote(): ?string {
-        // TODO
+        return $this->note;
     }
 
 
@@ -118,7 +129,7 @@ class Invoice {
      * @return self              Invoice instance
      */
     public function setNote(?string $note): self {
-        // TODO
+        $this->note = $note;
         return $this;
     }
 
@@ -128,7 +139,7 @@ class Invoice {
      * @return Party|null Seller instance
      */
     public function getSeller(): ?Party {
-        // TODO
+        return $this->seller;
     }
 
 
@@ -138,7 +149,7 @@ class Invoice {
      * @return self          Invoice instance
      */
     public function setSeller(Party $seller): self {
-        // TODO
+        $this->seller = $seller;
         return $this;
     }
 
@@ -148,7 +159,7 @@ class Invoice {
      * @return Party|null Buyer instance
      */
     public function getBuyer(): ?Party {
-        // TODO
+        return $this->buyer;
     }
 
 
@@ -158,7 +169,7 @@ class Invoice {
      * @return self          Invoice instance
      */
     public function setBuyer(Party $buyer): self {
-        // TODO
+        $this->buyer = $buyer;
         return $this;
     }
 
@@ -168,7 +179,7 @@ class Invoice {
      * @return Party|null Payee instance
      */
     public function getPayee(): ?Party {
-        // TODO
+        return $this->payee;
     }
 
 
@@ -178,7 +189,7 @@ class Invoice {
      * @return self              Invoice instance
      */
     public function setPayee(?Party $payee): self {
-        // TODO
+        $this->payee = $payee;
         return $this;
     }
 
@@ -188,7 +199,7 @@ class Invoice {
      * @return InvoiceLine[] Invoice lines
      */
     public function getLines(): array {
-        // TODO
+        return $this->lines;
     }
 
 
@@ -198,7 +209,7 @@ class Invoice {
      * @return self              Invoice instance
      */
     public function addLine(InvoiceLine $line): self {
-        // TODO
+        $this->lines[] = $line;
         return $this;
     }
 
@@ -210,7 +221,10 @@ class Invoice {
      * @throws \OutOfBoundsException if line index is out of bounds
      */
     public function removeLine(int $index): self {
-        // TODO
+        if (($index < 0) || ($index >= count($this->lines))) {
+            throw new \OutOfBoundsException('Could not find line by index inside invoice');
+        }
+        array_splice($this->lines, $index, 1);
         return $this;
     }
 
@@ -220,7 +234,7 @@ class Invoice {
      * @return self Invoice instance
      */
     public function clearLines(): self {
-        // TODO
+        $this->lines = [];
         return $this;
     }
 }

@@ -2,12 +2,21 @@
 namespace Einvocing;
 
 class InvoiceLine {
+    private $name = null;
+    private $description = null;
+    private $quantity = 1;
+    private $unit = "C62"; // TODO: add constants
+    private $price = null;
+    private $baseQuantity = 1;
+    private $vatCategory = "S"; // TODO: add constants
+    private $vatRate = null;
+
     /**
      * Get item name
      * @return string|null Item name
      */
     public function getName(): ?string {
-        // TODO
+        return $this->name;
     }
 
 
@@ -17,7 +26,7 @@ class InvoiceLine {
      * @return self         Invoice line instance
      */
     public function setName(string $name): self {
-        // TODO
+        $this->name = $name;
         return $this;
     }
 
@@ -27,7 +36,7 @@ class InvoiceLine {
      * @return string|null Item description
      */
     public function getDescription(): ?string {
-        // TODO
+        return $this->description;
     }
 
 
@@ -37,7 +46,7 @@ class InvoiceLine {
      * @return self                     Invoice line instance
      */
     public function setDescription(?string $description): self {
-        // TODO
+        $this->description = $description;
         return $this;
     }
 
@@ -47,7 +56,7 @@ class InvoiceLine {
      * @return int|float Quantity
      */
     public function getQuantity() {
-        // TODO
+        return $this->quantity;
     }
 
 
@@ -57,7 +66,7 @@ class InvoiceLine {
      * @return self                Invoice line instance
      */
     public function setQuantity($quantity): self {
-        // TODO
+        $this->quantity = $quantity;
         return $this;
     }
 
@@ -67,7 +76,7 @@ class InvoiceLine {
      * @return string Unit code
      */
     public function getUnit(): string {
-        // TODO
+        return $this->unit;
     }
 
 
@@ -77,7 +86,7 @@ class InvoiceLine {
      * @return self             Invoice line instance
      */
     public function setUnit(string $unitCode): self {
-        // TODO
+        $this->unit = $unitCode;
         return $this;
     }
 
@@ -87,18 +96,21 @@ class InvoiceLine {
      * @return float|null Price
      */
     public function getPrice(): ?float {
-        // TODO
+        return $this->price;
     }
 
 
     /**
      * Set price
-     * @param  float     $price        Price
-     * @param  int|float $baseQuantity Base quantity
-     * @return self                    Invoice line instance
+     * @param  float          $price        Price
+     * @param  int|float|null $baseQuantity Base quantity
+     * @return self                         Invoice line instance
      */
-    public function setPrice(float $price, $baseQuantity=1): self {
-        // TODO
+    public function setPrice(float $price, $baseQuantity=null): self {
+        $this->price = $price;
+        if ($baseQuantity !== null) {
+            $this->setBaseQuantity($baseQuantity);
+        }
         return $this;
     }
 
@@ -108,7 +120,7 @@ class InvoiceLine {
      * @return int|float Base quantity
      */
     public function getBaseQuantity() {
-        // TODO
+        return $this->baseQuantity;
     }
 
 
@@ -118,7 +130,7 @@ class InvoiceLine {
      * @return self                    Invoice line instance
      */
     public function setBaseQuantity($baseQuantity): self {
-        // TODO
+        $this->baseQuantity = $baseQuantity;
         return $this;
     }
 
@@ -128,7 +140,7 @@ class InvoiceLine {
      * @return string VAT category code
      */
     public function getVatCategory(): string {
-        // TODO
+        return $this->vatCategory;
     }
 
 
@@ -138,7 +150,7 @@ class InvoiceLine {
      * @return self                 Invoice line instance
      */
     public function setVatCategory(string $categoryCode): self {
-        // TODO
+        $this->vatCategory = $categoryCode;
         return $this;
     }
 
@@ -148,7 +160,7 @@ class InvoiceLine {
      * @return int|null VAT rate as a percentage
      */
     public function getVatRate(): ?int {
-        // TODO
+        return $this->vatRate;
     }
 
 
@@ -158,7 +170,7 @@ class InvoiceLine {
      * @return self      Invoice line instance
      */
     public function setVatRate(int $rate): self {
-        // TODO
+        $this->vatRate = $rate;
         return $this;
     }
 }
