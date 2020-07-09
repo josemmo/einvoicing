@@ -1,5 +1,7 @@
 <?php
-use Einvoicing\InvoiceLine;
+namespace Tests\InvoiceLine;
+
+use Einvoicing\InvoiceLine\InvoiceLine;
 use PHPUnit\Framework\TestCase;
 
 final class InvoiceLineTest extends TestCase {

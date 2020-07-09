@@ -1,16 +1,16 @@
 <?php
-namespace Einvoicing;
+namespace Einvoicing\Party;
 
 class Party {
-    private $name = null;
-    private $tradingName = null;
-    private $companyId = null;
-    private $vatNumber = null;
-    private $address = [];
-    private $city = null;
-    private $postalCode = null;
-    private $subdivision = null;
-    private $country = null;
+    protected $name = null;
+    protected $tradingName = null;
+    protected $companyId = null;
+    protected $vatNumber = null;
+    protected $address = [];
+    protected $city = null;
+    protected $postalCode = null;
+    protected $subdivision = null;
+    protected $country = null;
 
     /**
      * Get party business name

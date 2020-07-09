@@ -1,5 +1,7 @@
 <?php
-use Einvoicing\Party;
+namespace Tests\Party;
+
+use Einvoicing\Party\Party;
 use PHPUnit\Framework\TestCase;
 
 final class PartyTest extends TestCase {
@@ -16,7 +18,7 @@ final class PartyTest extends TestCase {
     }
 
     public function testCannotHaveAnAddressWithMoreThanThreeLines(): void {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->party->setAddress(['a', 'b', 'c', 'd']);
     }
 }

@@ -1,15 +1,15 @@
 <?php
-namespace Einvoicing;
+namespace Einvoicing\InvoiceLine;
 
 class InvoiceLine {
-    private $name = null;
-    private $description = null;
-    private $quantity = 1;
-    private $unit = "C62"; // TODO: add constants
-    private $price = null;
-    private $baseQuantity = 1;
-    private $vatCategory = "S"; // TODO: add constants
-    private $vatRate = null;
+    protected $name = null;
+    protected $description = null;
+    protected $quantity = 1;
+    protected $unit = "C62"; // TODO: add constants
+    protected $price = null;
+    protected $baseQuantity = 1;
+    protected $vatCategory = "S"; // TODO: add constants
+    protected $vatRate = null;
 
     /**
      * Get item name

@@ -1,17 +1,27 @@
 <?php
-namespace Einvoicing;
+namespace Einvoicing\Invoice;
 
-class Invoice {
-    private $number = null;
-    private $type = 380; // TODO: add constants
-    private $currency = "EUR"; // TODO: add constants
-    private $issueDate = null;
-    private $dueDate = null;
-    private $note = null;
-    private $seller = null;
-    private $buyer = null;
-    private $payee = null;
-    private $lines = [];
+use Einvoicing\InvoiceLine\InvoiceLine;
+use Einvoicing\Party\Party;
+
+abstract class Invoice {
+    protected $number = null;
+    protected $type = 380; // TODO: add constants
+    protected $currency = "EUR"; // TODO: add constants
+    protected $issueDate = null;
+    protected $dueDate = null;
+    protected $note = null;
+    protected $seller = null;
+    protected $buyer = null;
+    protected $payee = null;
+    protected $lines = [];
+
+    /**
+     * Get invoice specification identifier
+     * @return string Invoice specification identifier
+     */
+    public abstract function getSpecificationIdentifier(): string;
+
 
     /**
      * Get invoice number
@@ -51,7 +61,6 @@ class Invoice {
         $this->type = $typeCode;
         return $this;
     }
-
 
 
     /**
@@ -221,7 +230,7 @@ class Invoice {
      * @throws \OutOfBoundsException if line index is out of bounds
      */
     public function removeLine(int $index): self {
-        if (($index < 0) || ($index >= count($this->lines))) {
+        if ($index < 0 || $index >= count($this->lines)) {
             throw new \OutOfBoundsException('Could not find line by index inside invoice');
         }
         array_splice($this->lines, $index, 1);

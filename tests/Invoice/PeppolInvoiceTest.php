@@ -1,14 +1,16 @@
 <?php
-use Einvoicing\Invoice;
-use Einvoicing\InvoiceLine;
+namespace Tests\Invoice;
+
+use Einvoicing\Invoice\PeppolInvoice;
+use Einvoicing\InvoiceLine\InvoiceLine;
 use PHPUnit\Framework\TestCase;
 
-final class InvoiceTest extends TestCase {
-    /** @var Invoice */
+final class PeppolInvoiceTest extends TestCase {
+    /** @var PeppolInvoice */
     private $invoice;
 
     protected function setUp(): void {
-        $this->invoice = new Invoice();
+        $this->invoice = new PeppolInvoice();
     }
 
     public function testCanReadAndWriteLines(): void {
@@ -30,7 +32,7 @@ final class InvoiceTest extends TestCase {
     }
 
     public function testCannotRemoveOutOfBoundsLines(): void {
-        $this->expectException(OutOfBoundsException::class);
+        $this->expectException(\OutOfBoundsException::class);
         $this->invoice->addLine(new InvoiceLine())->removeLine(1);
     }
 }
