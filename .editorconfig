@@ -11,5 +11,8 @@ indent_style = space
 indent_size = 4
 insert_final_newline = false
 
-[*.php]
+[*.yml]
+indent_size = 2
+
+[*.{php,json,yml,xml}]
 insert_final_newline = true

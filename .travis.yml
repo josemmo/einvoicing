@@ -1,0 +1,33 @@
+language: php
+
+jobs:
+  fast_finish: true
+  include:
+    - php: 7.3
+    - php: 7.4
+      env: DEPLOY=true
+    - php: nightly
+  allow_failures:
+    - php: nightly
+
+install:
+  - pecl install ast
+  - composer install --ignore-platform-reqs --no-interaction
+
+script:
+  - vendor/bin/phan
+  - vendor/bin/phpunit --testdox tests
+
+before_deploy:
+  - sudo add-apt-repository universe && sudo apt update && sudo apt install graphviz
+  - wget -q -O ~/phpdoc.phar https://github.com/phpDocumentor/phpDocumentor/releases/download/v3.0.0-rc/phpDocumentor.phar
+  - php ~/phpdoc.phar -d $TRAVIS_BUILD_DIR/src -t $TRAVIS_BUILD_DIR/docs
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: docs
+  on:
+    branch: master
+    condition: $DEPLOY = true
