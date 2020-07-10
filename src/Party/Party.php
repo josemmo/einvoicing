@@ -13,8 +13,8 @@ class Party {
     protected $country = null;
 
     /**
-     * Get party business name
-     * @return string|null Party business name
+     * Get party legal name
+     * @return string|null Party legal name
      */
     public function getName(): ?string {
         return $this->name;
@@ -22,8 +22,8 @@ class Party {
 
 
     /**
-     * Set party business name
-     * @param  string|null $name Party business name
+     * Set party legal name
+     * @param  string|null $name Party legal name
      * @return self              Party instance
      */
     public function setName(?string $name): self {
@@ -33,7 +33,7 @@ class Party {
 
 
     /**
-     * Get party trading name
+     * Get party trading name (also known as business name)
      * @return string|null Party trading name
      */
     public function getTradingName(): ?string {
@@ -42,7 +42,7 @@ class Party {
 
 
     /**
-     * Set party trading name
+     * Set party trading name (also known as business name)
      * @param  string|null $tradingName Party trading name
      * @return self                     Party instance
      */
@@ -86,8 +86,8 @@ class Party {
      * @param  string|null $companyId Party VAT number
      * @return self                   Party instance
      */
-    public function setVatNumber(?string $companyId): self {
-        $this->companyId = $companyId;
+    public function setVatNumber(?string $vatNumber): self {
+        $this->vatNumber = $vatNumber;
         return $this;
     }
 
