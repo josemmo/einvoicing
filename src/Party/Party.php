@@ -83,7 +83,7 @@ class Party {
 
     /**
      * Set party VAT number
-     * @param  string|null $companyId Party VAT number
+     * @param  string|null $vatNumber Party VAT number
      * @return self                   Party instance
      */
     public function setVatNumber(?string $vatNumber): self {
