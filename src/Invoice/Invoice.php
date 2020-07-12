@@ -11,6 +11,7 @@ abstract class Invoice {
     protected $issueDate = null;
     protected $dueDate = null;
     protected $note = null;
+    protected $paidAmount = 0;
     protected $seller = null;
     protected $buyer = null;
     protected $payee = null;
@@ -144,6 +145,26 @@ abstract class Invoice {
 
 
     /**
+     * Get invoice prepaid amount
+     * @return float Invoice prepaid amount
+     */
+    public function getPaidAmount(): float {
+        return $this->paidAmount;
+    }
+
+
+    /**
+     * Set invoice prepaid amount
+     * @param  float $paidAmount Invoice prepaid amount
+     * @return self              Invoice instance
+     */
+    public function setPaidAmount(float $paidAmount): self {
+        $this->paidAmount = $paidAmount;
+        return $this;
+    }
+
+
+    /**
      * Get seller
      * @return Party|null Seller instance
      */
@@ -245,5 +266,51 @@ abstract class Invoice {
     public function clearLines(): self {
         $this->lines = [];
         return $this;
+    }
+
+
+    /**
+     * Get invoice total
+     * @return InvoiceTotals Invoice totals
+     */
+    public function getTotals(): InvoiceTotals {
+        $totals = new InvoiceTotals();
+        $vatMap = [];
+
+        // Process all invoice lines
+        foreach ($this->getLines() as $line) {
+            $lineNetAmount = $line->getNetAmount() ?? 0;
+            $lineVatAmount = $line->getVatAmount() ?? 0;
+
+            // Update invoice totals
+            $totals->netAmount += $lineNetAmount;
+            $totals->vatAmount += $lineVatAmount;
+            // TODO: document level allowances and charges
+
+            // Create or get VAT breakdown instance
+            $lineVatCategory = $line->getVatCategory();
+            $lineVatRate = $line->getVatRate();
+            $vatKey = "$lineVatCategory:$lineVatRate";
+            if (!isset($vatMap[$vatKey])) {
+                $vatMap[$vatKey] = new VatBreakdown();
+                $vatMap[$vatKey]->category = $lineVatCategory;
+                $vatMap[$vatKey]->rate = $lineVatRate;
+            }
+
+            // Update VAT breakdown
+            $vatMap[$vatKey]->taxableAmount += $lineNetAmount;
+            $vatMap[$vatKey]->taxAmount += $lineVatAmount;
+        }
+
+        // Calculate rest of properties
+        $totals->taxExclusiveAmount = $totals->netAmount - $totals->allowancesAmount + $totals->chargesAmount;
+        $totals->taxInclusiveAmount = $totals->taxExclusiveAmount + $totals->vatAmount;
+        $totals->paidAmount = $this->getPaidAmount();
+        $totals->payableAmount = $totals->taxInclusiveAmount - $totals->paidAmount;
+
+        // Attach VAT breakdown
+        $totals->vatBreakdown = array_values($vatMap);
+
+        return $totals;
     }
 }

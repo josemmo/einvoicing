@@ -162,7 +162,7 @@ class InvoiceLine {
 
     /**
      * Get VAT rate
-     * @return int|null VAT rate as a percentage
+     * @return int|null VAT rate as a percentage or NULL when not subject to VAT
      */
     public function getVatRate(): ?int {
         return $this->vatRate;
@@ -181,5 +181,36 @@ class InvoiceLine {
         }
         $this->vatRate = $rate;
         return $this;
+    }
+
+
+    /**
+     * Get total line net amount (without VAT)
+     * NOTE: inclusive of line level allowances and charges
+     * @return float|null Total line net amount
+     */
+    public function getNetAmount(): ?float {
+        if ($this->price === null) {
+            return null;
+        }
+
+        // TODO: implement allowances and charges
+        // TODO: round up to 2 decimals
+        return ($this->price / $this->baseQuantity) * $this->quantity;
+    }
+
+
+    /**
+     * Get VAT amount
+     * @return float|null Line VAT amount
+     */
+    public function getVatAmount(): ?float {
+        $netAmount = $this->getNetAmount();
+        if ($netAmount === null) {
+            return null;
+        }
+
+        $vatRate = $this->vatRate ?? 0;
+        return $netAmount * ($vatRate / 100);
     }
 }
