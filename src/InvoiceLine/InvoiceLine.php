@@ -105,6 +105,7 @@ class InvoiceLine {
      * @param  float          $price        Price
      * @param  int|float|null $baseQuantity Base quantity
      * @return self                         Invoice line instance
+     * @throws \DomainException if base quantity is not greater than zero
      */
     public function setPrice(float $price, $baseQuantity=null): self {
         $this->price = $price;
@@ -128,8 +129,12 @@ class InvoiceLine {
      * Set base quantity
      * @param  int|float $baseQuantity Base quantity
      * @return self                    Invoice line instance
+     * @throws \DomainException if base quantity is not greater than zero
      */
     public function setBaseQuantity($baseQuantity): self {
+        if ($baseQuantity <= 0) {
+            throw new \DomainException('Base quantity must be greater than zero');
+        }
         $this->baseQuantity = $baseQuantity;
         return $this;
     }
@@ -166,10 +171,14 @@ class InvoiceLine {
 
     /**
      * Set VAT rate
-     * @param  int $rate VAT rate as a percentage
-     * @return self      Invoice line instance
+     * @param  int|null $rate VAT rate as a percentage or NULL when not subject to VAT
+     * @return self           Invoice line instance
+     * @throws \DomainException if VAT rate is negative
      */
-    public function setVatRate(int $rate): self {
+    public function setVatRate(?int $rate): self {
+        if ($rate < 0) {
+            throw new \DomainException('VAT rate cannot be negative');
+        }
         $this->vatRate = $rate;
         return $this;
     }
