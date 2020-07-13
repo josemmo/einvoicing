@@ -1,6 +1,7 @@
 <?php
 namespace Einvoicing\Invoice;
 
+use Einvoicing\AllowanceCharge\AllowanceChargeTrait;
 use Einvoicing\InvoiceLine\InvoiceLine;
 use Einvoicing\Party\Party;
 
@@ -16,6 +17,8 @@ abstract class Invoice {
     protected $buyer = null;
     protected $payee = null;
     protected $lines = [];
+
+    use AllowanceChargeTrait;
 
     /**
      * Get invoice specification identifier
@@ -285,7 +288,6 @@ abstract class Invoice {
             // Update invoice totals
             $totals->netAmount += $lineNetAmount;
             $totals->vatAmount += $lineVatAmount;
-            // TODO: document level allowances and charges
 
             // Create or get VAT breakdown instance
             $lineVatCategory = $line->getVatCategory();
@@ -301,6 +303,10 @@ abstract class Invoice {
             $vatMap[$vatKey]->taxableAmount += $lineNetAmount;
             $vatMap[$vatKey]->taxAmount += $lineVatAmount;
         }
+
+        // Apply allowance and charge totals
+        $totals->allowancesAmount = $this->getAllowancesChargesAmount($this->allowances, $totals->netAmount);
+        $totals->chargesAmount = $this->getAllowancesChargesAmount($this->charges, $totals->netAmount);
 
         // Calculate rest of properties
         $totals->taxExclusiveAmount = $totals->netAmount - $totals->allowancesAmount + $totals->chargesAmount;

@@ -1,6 +1,8 @@
 <?php
 namespace Einvoicing\InvoiceLine;
 
+use Einvoicing\AllowanceCharge\AllowanceChargeTrait;
+
 class InvoiceLine {
     protected $name = null;
     protected $description = null;
@@ -10,6 +12,8 @@ class InvoiceLine {
     protected $baseQuantity = 1;
     protected $vatCategory = "S"; // TODO: add constants
     protected $vatRate = null;
+
+    use AllowanceChargeTrait;
 
     /**
      * Get item name
@@ -185,23 +189,59 @@ class InvoiceLine {
 
 
     /**
-     * Get total line net amount (without VAT)
-     * NOTE: inclusive of line level allowances and charges
-     * @return float|null Total line net amount
+     * Get total net amount (without VAT) before allowances/charges
+     * @return float|null Net amount before allowances/charges
      */
-    public function getNetAmount(): ?float {
+    public function getNetAmountBeforeAllowancesCharges(): ?float {
         if ($this->price === null) {
             return null;
         }
 
-        // TODO: implement allowances and charges
         // TODO: round up to 2 decimals
         return ($this->price / $this->baseQuantity) * $this->quantity;
     }
 
 
     /**
+     * Get allowances total amount
+     * @return float Allowances total amount
+     */
+    public function getAllowancesAmount(): float {
+        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0;
+        return $this->getAllowancesChargesAmount($this->allowances, $baseAmount);
+    }
+
+
+    /**
+     * Get charges total amount
+     * @return float Charges total amount
+     */
+    public function getChargesAmount(): float {
+        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0;
+        return $this->getAllowancesChargesAmount($this->charges, $baseAmount);
+    }
+
+
+    /**
+     * Get total net amount (without VAT)
+     * NOTE: inclusive of line level allowances and charges
+     * @return float|null Net amount
+     */
+    public function getNetAmount(): ?float {
+        $netAmount = $this->getNetAmountBeforeAllowancesCharges();
+        if ($netAmount === null) {
+            return null;
+        }
+
+        $netAmount -= $this->getAllowancesAmount();
+        $netAmount += $this->getChargesAmount();
+        return $netAmount;
+    }
+
+
+    /**
      * Get VAT amount
+     * NOTE: not rounded, as precise as possible
      * @return float|null Line VAT amount
      */
     public function getVatAmount(): ?float {
