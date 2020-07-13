@@ -1,6 +1,8 @@
 <?php
 namespace Tests\InvoiceLine;
 
+use Einvoicing\AllowanceCharge\Allowance;
+use Einvoicing\AllowanceCharge\Charge;
 use Einvoicing\InvoiceLine\InvoiceLine;
 use PHPUnit\Framework\TestCase;
 
@@ -32,5 +34,21 @@ final class InvoiceLineTest extends TestCase {
     public function testCannotSetNegativeBaseQuantity(): void {
         $this->expectException(\DomainException::class);
         $this->line->setBaseQuantity(-1);
+    }
+
+    public function testTotalAmountsAreCalculatedCorrectly(): void {
+        $allowance = (new Allowance)->setAmount(20.20);
+        $charge = (new Charge)->setAmount(5)->markAsPercentage();
+        $this->line
+            ->setPrice(50, 2)
+            ->setQuantity(10)
+            ->setVatRate(21)
+            ->addAllowance($allowance)
+            ->addCharge($charge);
+        $this->assertEquals(250,    $this->line->getNetAmountBeforeAllowancesCharges());
+        $this->assertEquals(20.20,  $this->line->getAllowancesAmount());
+        $this->assertEquals(12.5,   $this->line->getChargesAmount());
+        $this->assertEquals(242.3,  $this->line->getNetAmount());
+        $this->assertEquals(50.883, $this->line->getVatAmount());
     }
 }
