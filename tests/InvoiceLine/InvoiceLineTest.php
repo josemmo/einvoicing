@@ -49,6 +49,5 @@ final class InvoiceLineTest extends TestCase {
         $this->assertEquals(20.20,  $this->line->getAllowancesAmount());
         $this->assertEquals(12.5,   $this->line->getChargesAmount());
         $this->assertEquals(242.3,  $this->line->getNetAmount());
-        $this->assertEquals(50.883, $this->line->getVatAmount());
     }
 }

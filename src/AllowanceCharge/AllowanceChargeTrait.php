@@ -99,17 +99,17 @@ trait AllowanceChargeTrait {
      * Get allowances/charges total amount
      * @param  AllowanceChargeBase[] $items      List of items
      * @param  float                 $baseAmount Base amount for percentage allowances/charges
+     * @param  int                   $decimals   Number of decimal places
      * @return float                             Allowances/charges total amount
      */
-    protected function getAllowancesChargesAmount(array $items, float $baseAmount): float {
+    protected function getAllowancesChargesAmount(array $items, float $baseAmount, int $decimals): float {
         $amount = 0;
         foreach ($items as $allowance) {
             $itemAmount = $allowance->getAmount();
             if ($allowance->isPercentage()) {
                 $itemAmount = $baseAmount * ($itemAmount / 100);
             }
-            // TODO: round each item amount to 2 decimals
-            $amount += $itemAmount;
+            $amount += round($itemAmount, $decimals);
         }
         return $amount;
     }

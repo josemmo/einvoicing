@@ -28,6 +28,14 @@ abstract class Invoice {
 
 
     /**
+     * Get number of decimal places for a given field
+     * @param  string $field Field name
+     * @return int           Number of decimal places
+     */
+    protected abstract function getDecimals(string $field): int;
+
+
+    /**
      * Get invoice number
      * @return string|null Invoice number
      */
@@ -149,10 +157,11 @@ abstract class Invoice {
 
     /**
      * Get invoice prepaid amount
+     * NOTE: may be rounded according to the CIUS specification
      * @return float Invoice prepaid amount
      */
     public function getPaidAmount(): float {
-        return $this->paidAmount;
+        return round($this->paidAmount, $this->getDecimals('invoice/paidAmount'));
     }
 
 
@@ -282,12 +291,10 @@ abstract class Invoice {
 
         // Process all invoice lines
         foreach ($this->getLines() as $line) {
-            $lineNetAmount = $line->getNetAmount() ?? 0;
-            $lineVatAmount = $line->getVatAmount() ?? 0;
+            $lineNetAmount = $line->getNetAmount($this->getDecimals('line/netAmount')) ?? 0;
 
             // Update invoice totals
             $totals->netAmount += $lineNetAmount;
-            $totals->vatAmount += $lineVatAmount;
 
             // Create or get VAT breakdown instance
             $lineVatCategory = $line->getVatCategory();
@@ -301,12 +308,26 @@ abstract class Invoice {
 
             // Update VAT breakdown
             $vatMap[$vatKey]->taxableAmount += $lineNetAmount;
-            $vatMap[$vatKey]->taxAmount += $lineVatAmount;
+        }
+
+        // Calculate VAT amounts
+        foreach ($vatMap as $item) {
+            $item->taxAmount = $item->taxableAmount * ($item->rate / 100);
+            $item->taxAmount = round($item->taxAmount, $this->getDecimals('invoice/taxAmount'));
+            $totals->vatAmount += $item->taxAmount;
         }
 
         // Apply allowance and charge totals
-        $totals->allowancesAmount = $this->getAllowancesChargesAmount($this->allowances, $totals->netAmount);
-        $totals->chargesAmount = $this->getAllowancesChargesAmount($this->charges, $totals->netAmount);
+        $totals->allowancesAmount = $this->getAllowancesChargesAmount(
+            $this->allowances,
+            $totals->netAmount,
+            $this->getDecimals('invoice/allowancesAmount')
+        );
+        $totals->chargesAmount = $this->getAllowancesChargesAmount(
+            $this->charges,
+            $totals->netAmount,
+            $this->getDecimals('invoice/chargesAmount')
+        );
 
         // Calculate rest of properties
         $totals->taxExclusiveAmount = $totals->netAmount - $totals->allowancesAmount + $totals->chargesAmount;

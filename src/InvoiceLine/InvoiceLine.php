@@ -4,6 +4,8 @@ namespace Einvoicing\InvoiceLine;
 use Einvoicing\AllowanceCharge\AllowanceChargeTrait;
 
 class InvoiceLine {
+    const DEFAULT_DECIMALS = 8;
+
     protected $name = null;
     protected $description = null;
     protected $quantity = 1;
@@ -190,67 +192,53 @@ class InvoiceLine {
 
     /**
      * Get total net amount (without VAT) before allowances/charges
-     * @return float|null Net amount before allowances/charges
+     * @param  int        $decimals Number of decimal places
+     * @return float|null           Net amount before allowances/charges
      */
-    public function getNetAmountBeforeAllowancesCharges(): ?float {
+    public function getNetAmountBeforeAllowancesCharges(int $decimals=self::DEFAULT_DECIMALS): ?float {
         if ($this->price === null) {
             return null;
         }
-
-        // TODO: round up to 2 decimals
-        return ($this->price / $this->baseQuantity) * $this->quantity;
+        return round(($this->price / $this->baseQuantity) * $this->quantity, $decimals);
     }
 
 
     /**
      * Get allowances total amount
-     * @return float Allowances total amount
+     * @param  int   $decimals Number of decimal places
+     * @return float           Allowances total amount
      */
-    public function getAllowancesAmount(): float {
-        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0;
-        return $this->getAllowancesChargesAmount($this->allowances, $baseAmount);
+    public function getAllowancesAmount(int $decimals=self::DEFAULT_DECIMALS): float {
+        $baseAmount = $this->getNetAmountBeforeAllowancesCharges($decimals) ?? 0;
+        return $this->getAllowancesChargesAmount($this->allowances, $baseAmount, $decimals);
     }
 
 
     /**
      * Get charges total amount
-     * @return float Charges total amount
+     * @param  int   $decimals Number of decimal places
+     * @return float           Charges total amount
      */
-    public function getChargesAmount(): float {
-        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0;
-        return $this->getAllowancesChargesAmount($this->charges, $baseAmount);
+    public function getChargesAmount(int $decimals=self::DEFAULT_DECIMALS): float {
+        $baseAmount = $this->getNetAmountBeforeAllowancesCharges($decimals) ?? 0;
+        return $this->getAllowancesChargesAmount($this->charges, $baseAmount, $decimals);
     }
 
 
     /**
      * Get total net amount (without VAT)
      * NOTE: inclusive of line level allowances and charges
-     * @return float|null Net amount
+     * @param  int        $decimals Number of decimal places
+     * @return float|null           Net amount
      */
-    public function getNetAmount(): ?float {
-        $netAmount = $this->getNetAmountBeforeAllowancesCharges();
+    public function getNetAmount(int $decimals=self::DEFAULT_DECIMALS): ?float {
+        $netAmount = $this->getNetAmountBeforeAllowancesCharges($decimals);
         if ($netAmount === null) {
             return null;
         }
 
-        $netAmount -= $this->getAllowancesAmount();
-        $netAmount += $this->getChargesAmount();
+        $netAmount -= $this->getAllowancesAmount($decimals);
+        $netAmount += $this->getChargesAmount($decimals);
         return $netAmount;
-    }
-
-
-    /**
-     * Get VAT amount
-     * NOTE: not rounded, as precise as possible
-     * @return float|null Line VAT amount
-     */
-    public function getVatAmount(): ?float {
-        $netAmount = $this->getNetAmount();
-        if ($netAmount === null) {
-            return null;
-        }
-
-        $vatRate = $this->vatRate ?? 0;
-        return $netAmount * ($vatRate / 100);
     }
 }

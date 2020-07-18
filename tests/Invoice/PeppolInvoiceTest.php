@@ -51,15 +51,15 @@ final class PeppolInvoiceTest extends TestCase {
             ->addCharge($charge);
 
         $totals = $this->invoice->getTotals();
-        $this->assertEquals(300.5,    $totals->netAmount);
-        $this->assertEquals(12.34,    $totals->allowancesAmount);
-        $this->assertEquals(22.5375,  $totals->chargesAmount);
-        $this->assertEquals(52.105,   $totals->vatAmount);
-        $this->assertEquals(310.6975, $totals->taxExclusiveAmount);
-        $this->assertEquals(362.8025, $totals->taxInclusiveAmount);
-        $this->assertEquals(10.20,    $totals->paidAmount);
-        $this->assertEquals(352.6025, $totals->payableAmount);
-        $this->assertEquals(10,       $totals->vatBreakdown[0]->taxAmount);
-        $this->assertEquals(42.105,   $totals->vatBreakdown[1]->taxAmount);
+        $this->assertEquals(300.5,  $totals->netAmount);
+        $this->assertEquals(12.34,  $totals->allowancesAmount);
+        $this->assertEquals(22.54,  $totals->chargesAmount);
+        $this->assertEquals(52.11,  $totals->vatAmount);
+        $this->assertEquals(310.7,  $totals->taxExclusiveAmount);
+        $this->assertEquals(362.81, $totals->taxInclusiveAmount);
+        $this->assertEquals(10.20,  $totals->paidAmount);
+        $this->assertEquals(352.61, $totals->payableAmount);
+        $this->assertEquals(10,     $totals->vatBreakdown[0]->taxAmount);
+        $this->assertEquals(42.11,  $totals->vatBreakdown[1]->taxAmount);
     }
 }
