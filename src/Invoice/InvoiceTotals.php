@@ -45,6 +45,12 @@ class InvoiceTotals {
     public $paidAmount = 0;
 
     /** 
+     * The amount to be added to the invoice total to round the amount to be paid
+     * @var float
+     */
+    public $roundingAmount = 0;
+
+    /** 
      * Amount due for payment
      * @var float
      */

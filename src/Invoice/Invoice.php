@@ -13,6 +13,7 @@ abstract class Invoice {
     protected $dueDate = null;
     protected $note = null;
     protected $paidAmount = 0;
+    protected $roundingAmount = 0;
     protected $seller = null;
     protected $buyer = null;
     protected $payee = null;
@@ -177,6 +178,27 @@ abstract class Invoice {
 
 
     /**
+     * Get invoice rounding amount
+     * NOTE: may be rounded according to the CIUS specification
+     * @return float Invoice rounding amount
+     */
+    public function getRoundingAmount(): float {
+        return round($this->roundingAmount, $this->getDecimals('invoice/roundingAmount'));
+    }
+
+
+    /**
+     * Set invoice rounding amount
+     * @param  float $roundingAmount Invoice rounding amount
+     * @return self                  Invoice instance
+     */
+    public function setRoundingAmount(float $roundingAmount): self {
+        $this->roundingAmount = $roundingAmount;
+        return $this;
+    }
+
+
+    /**
      * Get seller
      * @return Party|null Seller instance
      */
@@ -333,7 +355,8 @@ abstract class Invoice {
         $totals->taxExclusiveAmount = $totals->netAmount - $totals->allowancesAmount + $totals->chargesAmount;
         $totals->taxInclusiveAmount = $totals->taxExclusiveAmount + $totals->vatAmount;
         $totals->paidAmount = $this->getPaidAmount();
-        $totals->payableAmount = $totals->taxInclusiveAmount - $totals->paidAmount;
+        $totals->roundingAmount = $this->getRoundingAmount();
+        $totals->payableAmount = $totals->taxInclusiveAmount - $totals->paidAmount + $totals->roundingAmount;
 
         // Attach VAT breakdown
         $totals->vatBreakdown = array_values($vatMap);
