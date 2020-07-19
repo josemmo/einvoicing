@@ -2,6 +2,12 @@
 namespace Einvoicing\Invoice;
 
 class InvoiceTotals {
+    /**
+     * Totals currency code
+     * @var string
+     */
+    public $currency;
+
     /** 
      * Sum of all invoice line net amounts
      * @var float

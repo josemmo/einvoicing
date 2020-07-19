@@ -32,8 +32,11 @@ abstract class Invoice {
      * Get number of decimal places for a given field
      * @param  string $field Field name
      * @return int           Number of decimal places
+     * @suppress PhanUnusedProtectedNoOverrideMethodParameter
      */
-    protected abstract function getDecimals(string $field): int;
+    protected function getDecimals(string $field): int {
+        return 2;
+    }
 
 
     /**
@@ -310,6 +313,9 @@ abstract class Invoice {
     public function getTotals(): InvoiceTotals {
         $totals = new InvoiceTotals();
         $vatMap = [];
+
+        // Set currency code
+        $totals->currency = $this->getCurrency();
 
         // Process all invoice lines
         foreach ($this->getLines() as $line) {
