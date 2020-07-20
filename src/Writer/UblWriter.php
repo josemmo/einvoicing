@@ -83,7 +83,7 @@ class UblWriter extends XmlWriter {
         }
 
         // Allowances and charges
-        foreach ([...$invoice->getAllowances(), ...$invoice->getCharges()] as $item) {
+        foreach (array_merge($invoice->getAllowances(), $invoice->getCharges()) as $item) {
             $root->appendChild($this->getAllowanceChargeNode($item, $invoice, null, $doc));
         }
 
