@@ -284,7 +284,7 @@ class UblWriter extends XmlWriter {
         $xml->appendChild($this->getAmountNode('cbc:LineExtensionAmount', $netAmount, $invoice->getCurrency(), $doc));
 
         // Allowances and charges
-        foreach ([...$line->getAllowances(), ...$line->getCharges()] as $item) {
+        foreach (array_merge($line->getAllowances(), $line->getCharges()) as $item) {
             $xml->appendChild($this->getAllowanceChargeNode($item, $invoice, $line, $doc));
         }
 
