@@ -320,22 +320,21 @@ abstract class Invoice {
         // Process all invoice lines
         foreach ($this->getLines() as $line) {
             $lineNetAmount = $line->getNetAmount($this->getDecimals('line/netAmount')) ?? 0;
-
-            // Update invoice totals
             $totals->netAmount += $lineNetAmount;
+            $this->updateVatMap($vatMap, $line->getVatCategory(), $line->getVatRate(), $lineNetAmount);
+        }
 
-            // Create or get VAT breakdown instance
-            $lineVatCategory = $line->getVatCategory();
-            $lineVatRate = $line->getVatRate();
-            $vatKey = "$lineVatCategory:$lineVatRate";
-            if (!isset($vatMap[$vatKey])) {
-                $vatMap[$vatKey] = new VatBreakdown();
-                $vatMap[$vatKey]->category = $lineVatCategory;
-                $vatMap[$vatKey]->rate = $lineVatRate;
-            }
-
-            // Update VAT breakdown
-            $vatMap[$vatKey]->taxableAmount += $lineNetAmount;
+        // Apply allowance and charge totals
+        $allowancesChargesDecimals = $this->getDecimals('invoice/allowancesChargesAmount');
+        foreach ($this->getAllowances() as $item) {
+            $allowanceAmount = $item->getEffectiveAmount($totals->netAmount, $allowancesChargesDecimals);
+            $totals->allowancesAmount += $allowanceAmount;
+            $this->updateVatMap($vatMap, $item->getVatCategory(), $item->getVatRate(), -$allowanceAmount);
+        }
+        foreach ($this->getCharges() as $item) {
+            $chargeAmount = $item->getEffectiveAmount($totals->netAmount, $allowancesChargesDecimals);
+            $totals->chargesAmount += $chargeAmount;
+            $this->updateVatMap($vatMap, $item->getVatCategory(), $item->getVatRate(), $chargeAmount);
         }
 
         // Calculate VAT amounts
@@ -344,18 +343,6 @@ abstract class Invoice {
             $item->taxAmount = round($item->taxAmount, $this->getDecimals('invoice/taxAmount'));
             $totals->vatAmount += $item->taxAmount;
         }
-
-        // Apply allowance and charge totals
-        $totals->allowancesAmount = $this->getAllowancesChargesAmount(
-            $this->allowances,
-            $totals->netAmount,
-            $this->getDecimals('invoice/allowancesAmount')
-        );
-        $totals->chargesAmount = $this->getAllowancesChargesAmount(
-            $this->charges,
-            $totals->netAmount,
-            $this->getDecimals('invoice/chargesAmount')
-        );
 
         // Calculate rest of properties
         $totals->taxExclusiveAmount = $totals->netAmount - $totals->allowancesAmount + $totals->chargesAmount;
@@ -368,5 +355,24 @@ abstract class Invoice {
         $totals->vatBreakdown = array_values($vatMap);
 
         return $totals;
+    }
+
+
+    /**
+     * Update VAT map
+     * NOTE: used to calculate invoice totals
+     * @param array    &$vatMap          VAT map reference
+     * @param string   $category         VAT category
+     * @param int|null $rate             VAT rate
+     * @param float    $addTaxableAmount Taxable amount to add
+     */
+    private function updateVatMap(array &$vatMap, string $category, ?int $rate, float $addTaxableAmount) {
+        $key = "$category:$rate";
+        if (!isset($vatMap[$key])) {
+            $vatMap[$key] = new VatBreakdown();
+            $vatMap[$key]->category = $category;
+            $vatMap[$key]->rate = $rate;
+        }
+        $vatMap[$key]->taxableAmount += $addTaxableAmount;
     }
 }

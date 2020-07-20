@@ -165,8 +165,12 @@ class InvoiceLine {
      * @return float           Allowances total amount
      */
     public function getAllowancesAmount(int $decimals=self::DEFAULT_DECIMALS): float {
+        $allowancesAmount = 0;
         $baseAmount = $this->getNetAmountBeforeAllowancesCharges($decimals) ?? 0;
-        return $this->getAllowancesChargesAmount($this->allowances, $baseAmount, $decimals);
+        foreach ($this->getAllowances() as $item) {
+            $allowancesAmount += $item->getEffectiveAmount($baseAmount, $decimals);
+        }
+        return $allowancesAmount;
     }
 
 
@@ -176,8 +180,12 @@ class InvoiceLine {
      * @return float           Charges total amount
      */
     public function getChargesAmount(int $decimals=self::DEFAULT_DECIMALS): float {
+        $chargesAmount = 0;
         $baseAmount = $this->getNetAmountBeforeAllowancesCharges($decimals) ?? 0;
-        return $this->getAllowancesChargesAmount($this->charges, $baseAmount, $decimals);
+        foreach ($this->getCharges() as $item) {
+            $chargesAmount += $item->getEffectiveAmount($baseAmount, $decimals);
+        }
+        return $chargesAmount;
     }
 
 

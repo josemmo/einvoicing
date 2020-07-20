@@ -98,4 +98,20 @@ abstract class AllowanceChargeBase {
         $this->isPercentage = false;
         return $this;
     }
+
+
+    /**
+     * Get effective amount relative to base amount
+     * @param  float $baseAmount Base amount
+     * @param  int   $decimals   Number of decimal places
+     * @return float             Effective amount
+     */
+    public function getEffectiveAmount(float $baseAmount, int $decimals): float {
+        $amount = $this->getAmount();
+        if ($this->isPercentage()) {
+            $amount = $baseAmount * ($amount / 100);
+        }
+        $amount = round($amount, $decimals);
+        return $amount;
+    }
 }
