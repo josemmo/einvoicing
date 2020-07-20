@@ -1,11 +1,15 @@
 <?php
 namespace Einvoicing\AllowanceCharge;
 
+use Einvoicing\Common\VatTrait;
+
 abstract class AllowanceChargeBase {
     protected $reasonCode = null;
     protected $reason = null;
     protected $amount = null;
     protected $isPercentage = false;
+
+    use VatTrait;
 
     /**
      * Get reason code

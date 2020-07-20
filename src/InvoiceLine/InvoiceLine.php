@@ -2,6 +2,7 @@
 namespace Einvoicing\InvoiceLine;
 
 use Einvoicing\AllowanceCharge\AllowanceChargeTrait;
+use Einvoicing\Common\VatTrait;
 
 class InvoiceLine {
     const DEFAULT_DECIMALS = 8;
@@ -12,9 +13,8 @@ class InvoiceLine {
     protected $unit = "C62"; // TODO: add constants
     protected $price = null;
     protected $baseQuantity = 1;
-    protected $vatCategory = "S"; // TODO: add constants
-    protected $vatRate = null;
 
+    use VatTrait;
     use AllowanceChargeTrait;
 
     /**
@@ -142,50 +142,6 @@ class InvoiceLine {
             throw new \DomainException('Base quantity must be greater than zero');
         }
         $this->baseQuantity = $baseQuantity;
-        return $this;
-    }
-
-
-    /**
-     * Get VAT category code
-     * @return string VAT category code
-     */
-    public function getVatCategory(): string {
-        return $this->vatCategory;
-    }
-
-
-    /**
-     * Set VAT category code
-     * @param  string $categoryCode VAT category code
-     * @return self                 Invoice line instance
-     */
-    public function setVatCategory(string $categoryCode): self {
-        $this->vatCategory = $categoryCode;
-        return $this;
-    }
-
-
-    /**
-     * Get VAT rate
-     * @return int|null VAT rate as a percentage or NULL when not subject to VAT
-     */
-    public function getVatRate(): ?int {
-        return $this->vatRate;
-    }
-
-
-    /**
-     * Set VAT rate
-     * @param  int|null $rate VAT rate as a percentage or NULL when not subject to VAT
-     * @return self           Invoice line instance
-     * @throws \DomainException if VAT rate is negative
-     */
-    public function setVatRate(?int $rate): self {
-        if ($rate < 0) {
-            throw new \DomainException('VAT rate cannot be negative');
-        }
-        $this->vatRate = $rate;
         return $this;
     }
 
