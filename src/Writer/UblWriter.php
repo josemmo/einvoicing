@@ -101,12 +101,6 @@ class UblWriter extends XmlWriter {
             $root->appendChild($this->getLineNode($line, $i+1, $invoice, $doc));
         }
 
-        // Sign invoice (if possible)
-        if ($this->canSign()) {
-            $signature = $this->getSignatureNode($doc);
-            $root->appendChild($signature);
-        }
-
         return $doc->saveXML();
     }
 
