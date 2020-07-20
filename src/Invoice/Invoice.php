@@ -32,9 +32,9 @@ abstract class Invoice {
      * Get number of decimal places for a given field
      * @param  string $field Field name
      * @return int           Number of decimal places
-     * @suppress PhanUnusedProtectedNoOverrideMethodParameter
+     * @suppress PhanUnusedPublicNoOverrideMethodParameter
      */
-    protected function getDecimals(string $field): int {
+    public function getDecimals(string $field): int {
         return 2;
     }
 
