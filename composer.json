@@ -1,7 +1,7 @@
 {
     "name": "josemmo/einvoicing",
     "description": "Library for reading and creating European-compliant electronic invoices (EN 16931-1)",
-    "keywords": ["invoicing", "cef", "ubl", "cii"],
+    "keywords": ["invoicing", "invoice", "peppol", "ubl", "cii"],
     "license": "MIT",
     "homepage": "https://github.com/josemmo/einvoicing",
     "authors": [
@@ -25,6 +25,7 @@
         "php": ">=7.1"
     },
     "require-dev": {
+        "ext-openssl": "*",
         "phpunit/phpunit": "^9",
         "phan/phan": "^3.0"
     },
