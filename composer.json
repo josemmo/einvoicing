@@ -1,6 +1,6 @@
 {
     "name": "josemmo/einvoicing",
-    "description": "Library for reading and creating European-compliant electronic invoices (EN 16931-1)",
+    "description": "Library for reading and creating European-compliant electronic invoices (EN 16931)",
     "keywords": ["invoicing", "invoice", "peppol", "ubl", "cii"],
     "license": "MIT",
     "homepage": "https://github.com/josemmo/einvoicing",
