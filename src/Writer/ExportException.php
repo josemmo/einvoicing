@@ -27,7 +27,7 @@ class ExportException extends \Exception {
     /**
      * @inheritdoc
      */
-    public function __toString() {
+    public function __toString(): string {
         return __CLASS__ . ": [{$this->getBusinessRuleId()}] - {$this->message}\n";
     }
 }
