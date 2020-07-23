@@ -6,10 +6,10 @@ class ExportException extends \Exception {
 
     /**
      * Class constructor
-     * @param string $brId     Business rule ID
-     * @param string $message  Exception message
+     * @param string      $message Exception message
+     * @param string|null $brId    Business rule ID
      */
-    public function __construct(string $brId, string $message) {
+    public function __construct(string $message, ?string $brId=null) {
         $this->businessRuleId = $brId;
         parent::__construct($message);
     }
@@ -17,17 +17,9 @@ class ExportException extends \Exception {
 
     /**
      * Get business rule ID
-     * @return string Business rule ID
+     * @return string|null Business rule ID
      */
-    public function getBusinessRuleId(): string {
+    public function getBusinessRuleId(): ?string {
         return $this->businessRuleId;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function __toString(): string {
-        return __CLASS__ . ": [{$this->getBusinessRuleId()}] - {$this->message}\n";
     }
 }

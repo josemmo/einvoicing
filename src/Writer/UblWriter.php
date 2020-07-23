@@ -33,14 +33,14 @@ class UblWriter extends XmlWriter {
         // BT-1: Invoice number
         $number = $invoice->getNumber();
         if ($number === null) {
-            throw new ExportException('BR-2', 'An Invoice shall have an Invoice number (BT-1)');
+            throw new ExportException('An Invoice shall have an Invoice number (BT-1)', 'BR-2');
         }
         $root->appendChild($doc->createElement('cbc:ID', $number));
 
         // BT-2: Issue date
         $issueDate = $invoice->getIssueDate();
         if ($issueDate === null) {
-            throw new ExportException('BR-3', 'An Invoice shall have an Invoice issue date (BT-2)');
+            throw new ExportException('An Invoice shall have an Invoice issue date (BT-2)', 'BR-3');
         }
         $root->appendChild($doc->createElement('cbc:IssueDate', $issueDate->format('Y-m-d')));
 
@@ -65,14 +65,14 @@ class UblWriter extends XmlWriter {
         // Seller node
         $seller = $invoice->getSeller();
         if ($seller === null) {
-            throw new ExportException('BR-6', 'An Invoice shall contain the Seller name (BT-27)');
+            throw new ExportException('An Invoice shall contain the Seller name (BT-27)', 'BR-6');
         }
         $root->appendChild($this->getSellerOrBuyerNode($seller, $doc, true));
 
         // Buyer node
         $buyer = $invoice->getBuyer();
         if ($buyer === null) {
-            throw new ExportException('BR-7', 'An Invoice shall contain the Buyer name (BT-44)');
+            throw new ExportException('An Invoice shall contain the Buyer name (BT-44)', 'BR-7');
         }
         $root->appendChild($this->getSellerOrBuyerNode($buyer, $doc, false));
 
@@ -95,7 +95,7 @@ class UblWriter extends XmlWriter {
         // Invoice lines
         $lines = $invoice->getLines();
         if (empty($lines)) {
-            throw new ExportException('BR-16', 'An Invoice shall have at least one Invoice line (BG-25)');
+            throw new ExportException('An Invoice shall have at least one Invoice line (BG-25)', 'BR-16');
         }
         foreach ($lines as $i=>$line) {
             $root->appendChild($this->getLineNode($line, $i+1, $invoice, $doc));
@@ -168,9 +168,9 @@ class UblWriter extends XmlWriter {
         $country = $party->getCountry();
         if ($country === null) {
             throw new ExportException(
-                $isSeller ? 'BR-9' : 'BR-11',
                 $isSeller ? 'The Seller postal address (BG-5) shall contain a Seller country code (BT-40)' :
-                            'The Buyer postal address shall contain a Buyer country code (BT-55)'
+                            'The Buyer postal address shall contain a Buyer country code (BT-55)',
+                $isSeller ? 'BR-9' : 'BR-11'
             );
         }
         $countryNode = $doc->createElement('cac:Country');
@@ -180,7 +180,7 @@ class UblWriter extends XmlWriter {
         // VAT number
         $vatNumber = $party->getVatNumber();
         if ($isSeller && $vatNumber === null) {
-            throw new ExportException('BR-CO-9', 'The Seller VAT identifier (BT-31) shall be present');
+            throw new ExportException('The Seller VAT identifier (BT-31) shall be present', 'BR-CO-9');
         }
         if ($vatNumber !== null) {
             $taxNode = $doc->createElement('cac:PartyTaxScheme');
@@ -199,9 +199,9 @@ class UblWriter extends XmlWriter {
         $legalName = $party->getName();
         if ($legalName === null) {
             throw new ExportException(
-                $isSeller ? 'BR-6' : 'BR-7',
                 $isSeller ? 'An Invoice shall contain the Seller name (BT-27)' :
-                            'An Invoice shall contain the Buyer name (BT-44)'
+                            'An Invoice shall contain the Buyer name (BT-44)',
+                $isSeller ? 'BR-6' : 'BR-7'
             );
         }
         $legalEntityNode->appendChild($doc->createElement('cbc:RegistrationName', $legalName));
@@ -232,7 +232,7 @@ class UblWriter extends XmlWriter {
         // Party name
         $name = $party->getName();
         if ($name === null) {
-            throw new ExportException('BR-17', 'The Payee name (BT-59) shall be provided in the Invoice');
+            throw new ExportException('The Payee name (BT-59) shall be provided in the Invoice', 'BR-17');
         }
         $partyNameNode = $doc->createElement('cac:PartyName');
         $partyNameNode->appendChild($doc->createElement('cbc:Name', $name));
@@ -273,7 +273,7 @@ class UblWriter extends XmlWriter {
         // BT-131: Line net amount
         $netAmount = $line->getNetAmount($invoice->getDecimals('line/netAmount'));
         if ($netAmount === null) {
-            throw new ExportException('BR-24', 'Each Invoice line shall have an Invoice line net amount (BT-131)');
+            throw new ExportException('Each Invoice line shall have an Invoice line net amount (BT-131)', 'BR-24');
         }
         $xml->appendChild($this->getAmountNode('cbc:LineExtensionAmount', $netAmount, $invoice->getCurrency(), $doc));
 
@@ -295,7 +295,7 @@ class UblWriter extends XmlWriter {
         // BT-153: Item name
         $name = $line->getName();
         if ($name === null) {
-            throw new ExportException('BR-25', 'Each Invoice line shall contain the Item name (BT-153)');
+            throw new ExportException('Each Invoice line shall contain the Item name (BT-153)', 'BR-25');
         }
         $itemNode->appendChild($doc->createElement('cbc:Name', $name));
 
@@ -351,10 +351,10 @@ class UblWriter extends XmlWriter {
         $reasonText = $item->getReason();
         if ($reasonCode === null && $reasonText === null) {
             throw new ExportException(
-                $atDocumentLevel ? 'BR-33' : 'BR-42',
                 $atDocumentLevel ?
                     'Each Document level allowance/charge shall have a reason (BT-97) or a reason code (BT-98)' :
-                    'Each Invoice line allowance/charge shall have a reason (BT-139) or a reason code (BT-140)'
+                    'Each Invoice line allowance/charge shall have a reason (BT-139) or a reason code (BT-140)',
+                $atDocumentLevel ? 'BR-33' : 'BR-42'
             );
         }
 
