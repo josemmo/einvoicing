@@ -10,9 +10,10 @@ abstract class AbstractWriter {
     const ALGORITHM_SHA384 = "sha384";
     const ALGORITHM_SHA512 = "sha512";
 
-    protected $publicKey;
-    protected $privateKey;
+    protected $publicKey = null;
+    protected $privateKey = null;
     protected $digestAlgorithm = self::ALGORITHM_SHA256;
+    protected $signingTime = null;
 
     /**
      * Set signing certificate
@@ -78,6 +79,18 @@ abstract class AbstractWriter {
      */
     public function setDigestAlgorithm(string $algorithm) {
         $this->digestAlgorithm = $algorithm;
+        return $this;
+    }
+
+
+    /**
+     * Set signing time
+     * NOTE: if not specified, it will use the current time
+     * @param  \DateTime|null $signingTime Signing time
+     * @return self                        Writer instance
+     */
+    public function setSigningTime(?\DateTime $signingTime) {
+        $this->signingTime = $signingTime;
         return $this;
     }
 
