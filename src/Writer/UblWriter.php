@@ -12,6 +12,9 @@ class UblWriter extends XmlWriter {
     const NS_INVOICE = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
     const NS_CAC = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
     const NS_CBC = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
+    const NS_EXT = "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2";
+    const NS_SIG = "urn:oasis:names:specification:ubl:schema:xsd:CommonSignatureComponents-2";
+    const NS_SAC = "urn:oasis:names:specification:ubl:schema:xsd:SignatureAggregateComponents-2";
 
     /**
      * @inheritdoc
@@ -99,6 +102,11 @@ class UblWriter extends XmlWriter {
         }
         foreach ($lines as $i=>$line) {
             $root->appendChild($this->getLineNode($line, $i+1, $invoice, $doc));
+        }
+
+        // Sign invoice (if possible)
+        if ($this->canSign()) {
+            $this->signDocument($doc);
         }
 
         return $doc->saveXML();
@@ -508,5 +516,50 @@ class UblWriter extends XmlWriter {
         $xml = $doc->createElement($name, (string) $amount);
         $xml->setAttribute('currencyID', $currency);
         return $xml;
+    }
+
+
+    /**
+     * Sign document
+     * @param \DOMDocument $doc DOM Document
+     * @throws ExportException if failed to sign document
+     */
+    private function signDocument(\DOMDocument $doc) {
+        // TODO: remove
+        // $ublNode = $doc->createElement('cac:Signature');
+        // $ublRefNode = $doc->getElementsByTagName('cac:AccountingSupplierParty')->item(0);
+        // $doc->documentElement->insertBefore($ublNode, $ublRefNode);
+
+        // $ublIdNode = $doc->createElement('cbc:ID', 'urn:oasis:names:specification:ubl:signature:Invoice');
+        // $ublNode->appendChild($ublIdNode);
+
+        // $ublMethodNode = $doc->createElement('cbc:SignatureMethod', 'urn:oasis:names:specification:ubl:dsig:enveloped');
+        // $ublNode->appendChild($ublMethodNode);
+
+        $xml = $doc->documentElement;
+        $xml->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ext', self::NS_EXT);
+
+        // Extensions node
+        $extsNode = $doc->createElement('ext:UBLExtensions');
+        $xml->insertBefore($extsNode, $xml->firstChild);
+
+        // Extension node wrapping the signature
+        $extNode = $doc->createElement('ext:UBLExtension');
+        $extNode->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:sig', self::NS_SIG);
+        $extNode->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:sac', self::NS_SAC);
+        $extsNode->appendChild($extNode);
+
+        // UBLExtension > ExtensionContent
+        $extContentNode = $doc->createElement('ext:ExtensionContent');
+        $extNode->appendChild($extContentNode);
+
+        // UBLExtension > ExtensionContent > UBLDocumentSignatures
+        $docSignaturesNode = $doc->createElement('sig:UBLDocumentSignatures');
+        $extContentNode->appendChild($docSignaturesNode);
+
+        // UBLExtension > ExtensionContent > UBLDocumentSignatures > SignatureInformation
+        $sigInfoNode = $doc->createElement('sac:SignatureInformation');
+        $sigInfoNode->appendChild($this->getSignatureNode($doc));
+        $docSignaturesNode->appendChild($sigInfoNode);
     }
 }

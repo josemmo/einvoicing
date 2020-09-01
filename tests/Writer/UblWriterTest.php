@@ -87,7 +87,8 @@ final class UblWriterTest extends TestCase {
             ->addAllowance((new Allowance)->setReason('5% discount')->setAmount(5)->markAsPercentage()->setVatRate(21));
 
         // Validate invoice
-        $contents = $this->writer->export($inv);
+        $contents = $this->writer->setSigningCertificate(__DIR__ . '/certificate.pfx', 'password')->export($inv);
+        file_put_contents(__DIR__ . '/salida.xml', $contents); exit;
         $this->assertTrue($this->validateInvoice($contents, 'ubl'));
     }
 }
