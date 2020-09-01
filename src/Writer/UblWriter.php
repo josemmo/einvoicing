@@ -8,7 +8,7 @@ use Einvoicing\Invoice\InvoiceTotals;
 use Einvoicing\InvoiceLine\InvoiceLine;
 use Einvoicing\Party\Party;
 
-class UblWriter extends XmlWriter {
+class UblWriter implements Writer {
     const NS_INVOICE = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
     const NS_CAC = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
     const NS_CBC = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";

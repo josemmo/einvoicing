@@ -30,7 +30,6 @@
         "phan/phan": "^3.0"
     },
     "suggest": {
-        "lib-libxml": "For reading and writing UBL/CII invoices",
-        "ext-openssl": "For signing and verifying invoices"
+        "lib-libxml": "For reading and writing UBL/CII invoices"
     }
 }

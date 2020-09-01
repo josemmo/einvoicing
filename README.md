@@ -15,7 +15,6 @@ First of all, make sure your environment meets the following requirements:
 
 - PHP 7.1 or higher
 - [SimpleXML extension](https://www.php.net/book.simplexml) for reading and exporting UBL/CII invoices
-- [OpenSSL extension](https://www.php.net/book.openssl) for signing and verifying invoices
 
 Then, you should be able to install this library using Composer:
 
