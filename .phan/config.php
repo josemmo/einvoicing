@@ -49,5 +49,25 @@ return [
         'vendor/'
     ],
 
-    'unused_variable_detection' => true
+    // Set to true in order to attempt to detect unused variables.
+    // `dead_code_detection` will also enable unused variable detection.
+    //
+    // This has a few known false positives, e.g. for loops or branches.
+    'unused_variable_detection' => true,
+
+    // If enabled, warn about throw statement where the exception types
+    // are not documented in the PHPDoc of functions, methods, and closures.
+    'warn_about_undocumented_throw_statements' => true,
+
+    // If enabled (and warn_about_undocumented_throw_statements is enabled),
+    // warn about function/closure/method calls that have (at)throws
+    // without the invoking method documenting that exception.
+    'warn_about_undocumented_exceptions_thrown_by_invoked_functions' => true,
+
+    // A list of plugin files to execute
+    // NOTE: values can be the base name without the extension for plugins bundled with Phan (E.g. 'AlwaysReturnPlugin')
+    // or relative/absolute paths to the plugin (Relative to the project root).
+    'plugins' => [
+        'PreferNamespaceUsePlugin',
+    ]
 ];
