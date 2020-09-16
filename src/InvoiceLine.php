@@ -1,8 +1,10 @@
 <?php
 namespace Einvoicing;
 
+use DomainException;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\VatTrait;
+use function round;
 
 class InvoiceLine {
     const DEFAULT_DECIMALS = 8;
@@ -111,7 +113,7 @@ class InvoiceLine {
      * @param  float          $price        Price
      * @param  int|float|null $baseQuantity Base quantity
      * @return self                         Invoice line instance
-     * @throws \DomainException if base quantity is not greater than zero
+     * @throws DomainException if base quantity is not greater than zero
      */
     public function setPrice(float $price, $baseQuantity=null): self {
         $this->price = $price;
@@ -135,11 +137,11 @@ class InvoiceLine {
      * Set base quantity
      * @param  int|float $baseQuantity Base quantity
      * @return self                    Invoice line instance
-     * @throws \DomainException if base quantity is not greater than zero
+     * @throws DomainException if base quantity is not greater than zero
      */
     public function setBaseQuantity($baseQuantity): self {
         if ($baseQuantity <= 0) {
-            throw new \DomainException('Base quantity must be greater than zero');
+            throw new DomainException('Base quantity must be greater than zero');
         }
         $this->baseQuantity = $baseQuantity;
         return $this;
@@ -200,7 +202,6 @@ class InvoiceLine {
         if ($netAmount === null) {
             return null;
         }
-
         $netAmount -= $this->getAllowancesAmount($decimals);
         $netAmount += $this->getChargesAmount($decimals);
         return $netAmount;

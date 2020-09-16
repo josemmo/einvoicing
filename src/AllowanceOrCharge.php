@@ -2,6 +2,7 @@
 namespace Einvoicing;
 
 use Einvoicing\Traits\VatTrait;
+use function round;
 
 class AllowanceOrCharge {
     protected $reasonCode = null;

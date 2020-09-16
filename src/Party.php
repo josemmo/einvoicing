@@ -1,6 +1,9 @@
 <?php
 namespace Einvoicing;
 
+use InvalidArgumentException;
+use function count;
+
 class Party {
     protected $name = null;
     protected $tradingName = null;
@@ -105,11 +108,11 @@ class Party {
      * Set address lines
      * @param  string[] $addressLines Address lines (up to 3 lines)
      * @return self                   Party instance
-     * @throws \InvalidArgumentException if more than 3 lines are provided
+     * @throws InvalidArgumentException if more than 3 lines are provided
      */
     public function setAddress(array $addressLines): self {
         if (count($addressLines) > 3) {
-            throw new \InvalidArgumentException('Address cannot have more than 3 lines');
+            throw new InvalidArgumentException('Address cannot have more than 3 lines');
         }
         $this->address = $addressLines;
         return $this;

@@ -1,6 +1,8 @@
 <?php
 namespace Einvoicing\Traits;
 
+use DomainException;
+
 trait VatTrait {
     protected $vatCategory = "S"; // TODO: add constants
     protected $vatRate = null;
@@ -38,11 +40,11 @@ trait VatTrait {
      * Set VAT rate
      * @param  int|null $rate VAT rate as a percentage or NULL when not subject to VAT
      * @return self           This instance
-     * @throws \DomainException if VAT rate is negative
+     * @throws DomainException if VAT rate is negative
      */
     public function setVatRate(?int $rate): self {
         if ($rate < 0) {
-            throw new \DomainException('VAT rate cannot be negative');
+            throw new DomainException('VAT rate cannot be negative');
         }
         $this->vatRate = $rate;
         return $this;

@@ -1,9 +1,15 @@
 <?php
 namespace Einvoicing;
 
+use DateTime;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Models\VatBreakdown;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
+use OutOfBoundsException;
+use function array_splice;
+use function array_values;
+use function count;
+use function round;
 
 class Invoice {
     protected $number = null;
@@ -104,19 +110,19 @@ class Invoice {
 
     /**
      * Get invoice issue date
-     * @return \DateTime|null Invoice issue date
+     * @return DateTime|null Invoice issue date
      */
-    public function getIssueDate(): ?\DateTime {
+    public function getIssueDate(): ?DateTime {
         return $this->issueDate;
     }
 
 
     /**
      * Set invoice issue date
-     * @param  \DateTime $issueDate Invoice issue date
-     * @return self                 Invoice instance
+     * @param  DateTime $issueDate Invoice issue date
+     * @return self                Invoice instance
      */
-    public function setIssueDate(\DateTime $issueDate): self {
+    public function setIssueDate(DateTime $issueDate): self {
         $this->issueDate = $issueDate;
         return $this;
     }
@@ -124,19 +130,19 @@ class Invoice {
 
     /**
      * Get payment due date
-     * @return \DateTime|null Payment due date
+     * @return DateTime|null Payment due date
      */
-    public function getDueDate(): ?\DateTime {
+    public function getDueDate(): ?DateTime {
         return $this->dueDate;
     }
 
 
     /**
      * Set payment due date
-     * @param  \DateTime|null $dueDate Payment due date
-     * @return self                    Invoice instance
+     * @param  DateTime|null $dueDate Payment due date
+     * @return self                   Invoice instance
      */
-    public function setDueDate(?\DateTime $dueDate): self {
+    public function setDueDate(?DateTime $dueDate): self {
         $this->dueDate = $dueDate;
         return $this;
     }
@@ -288,11 +294,11 @@ class Invoice {
      * Remove invoice line
      * @param  int  $index Invoice line index
      * @return self        Invoice instance
-     * @throws \OutOfBoundsException if line index is out of bounds
+     * @throws OutOfBoundsException if line index is out of bounds
      */
     public function removeLine(int $index): self {
         if ($index < 0 || $index >= count($this->lines)) {
-            throw new \OutOfBoundsException('Could not find line by index inside invoice');
+            throw new OutOfBoundsException('Could not find line by index inside invoice');
         }
         array_splice($this->lines, $index, 1);
         return $this;

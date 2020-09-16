@@ -2,6 +2,9 @@
 namespace Einvoicing\Traits;
 
 use Einvoicing\AllowanceOrCharge;
+use OutOfBoundsException;
+use function array_splice;
+use function count;
 
 trait AllowanceOrChargeTrait {
     protected $allowances = [];
@@ -31,11 +34,11 @@ trait AllowanceOrChargeTrait {
      * Remove allowance
      * @param  int  $index Allowance index
      * @return self        This instance
-     * @throws \OutOfBoundsException if allowance index is out of bounds
+     * @throws OutOfBoundsException if allowance index is out of bounds
      */
     public function removeAllowance(int $index): self {
         if ($index < 0 || $index >= count($this->allowances)) {
-            throw new \OutOfBoundsException('Could not find allowance by index');
+            throw new OutOfBoundsException('Could not find allowance by index');
         }
         array_splice($this->allowances, $index, 1);
         return $this;
@@ -76,11 +79,11 @@ trait AllowanceOrChargeTrait {
      * Remove charge
      * @param  int  $index Charge index
      * @return self        This instance
-     * @throws \OutOfBoundsException if charge index is out of bounds
+     * @throws OutOfBoundsException if charge index is out of bounds
      */
     public function removeCharge(int $index): self {
         if ($index < 0 || $index >= count($this->charges)) {
-            throw new \OutOfBoundsException('Could not find charge by index');
+            throw new OutOfBoundsException('Could not find charge by index');
         }
         array_splice($this->charges, $index, 1);
         return $this;
