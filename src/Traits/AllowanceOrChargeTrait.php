@@ -1,13 +1,15 @@
 <?php
-namespace Einvoicing\AllowanceCharge;
+namespace Einvoicing\Traits;
 
-trait AllowanceChargeTrait {
+use Einvoicing\AllowanceOrCharge;
+
+trait AllowanceOrChargeTrait {
     protected $allowances = [];
     protected $charges = [];
 
     /**
      * Get allowances
-     * @return Allowance[] Array of allowances
+     * @return AllowanceOrCharge[] Array of allowances
      */
     public function getAllowances(): array {
         return $this->allowances;
@@ -16,10 +18,10 @@ trait AllowanceChargeTrait {
 
     /**
      * Add allowance
-     * @param  Allowance $allowance Allowance instance
-     * @return self                 This instance
+     * @param  AllowanceOrCharge $allowance Allowance instance
+     * @return self                         This instance
      */
-    public function addAllowance(Allowance $allowance): self {
+    public function addAllowance(AllowanceOrCharge $allowance): self {
         $this->allowances[] = $allowance;
         return $this;
     }
@@ -52,7 +54,7 @@ trait AllowanceChargeTrait {
 
     /**
      * Get charges
-     * @return Charge[] Array of charges
+     * @return AllowanceOrCharge[] Array of charges
      */
     public function getCharges(): array {
         return $this->charges;
@@ -61,10 +63,10 @@ trait AllowanceChargeTrait {
 
     /**
      * Add charge
-     * @param  Charge $charge Charge instance
-     * @return self           This instance
+     * @param  AllowanceOrCharge $charge Charge instance
+     * @return self                      This instance
      */
-    public function addCharge(Charge $charge): self {
+    public function addCharge(AllowanceOrCharge $charge): self {
         $this->charges[] = $charge;
         return $this;
     }

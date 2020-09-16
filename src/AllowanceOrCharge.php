@@ -1,9 +1,9 @@
 <?php
-namespace Einvoicing\AllowanceCharge;
+namespace Einvoicing;
 
-use Einvoicing\Common\VatTrait;
+use Einvoicing\Traits\VatTrait;
 
-abstract class AllowanceChargeBase {
+class AllowanceOrCharge {
     protected $reasonCode = null;
     protected $reason = null;
     protected $amount = null;

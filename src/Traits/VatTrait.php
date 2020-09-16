@@ -1,5 +1,5 @@
 <?php
-namespace Einvoicing\Common;
+namespace Einvoicing\Traits;
 
 trait VatTrait {
     protected $vatCategory = "S"; // TODO: add constants

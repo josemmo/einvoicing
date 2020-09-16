@@ -1,8 +1,8 @@
 <?php
-namespace Einvoicing\InvoiceLine;
+namespace Einvoicing;
 
-use Einvoicing\AllowanceCharge\AllowanceChargeTrait;
-use Einvoicing\Common\VatTrait;
+use Einvoicing\Traits\AllowanceOrChargeTrait;
+use Einvoicing\Traits\VatTrait;
 
 class InvoiceLine {
     const DEFAULT_DECIMALS = 8;
@@ -14,8 +14,8 @@ class InvoiceLine {
     protected $price = null;
     protected $baseQuantity = 1;
 
+    use AllowanceOrChargeTrait;
     use VatTrait;
-    use AllowanceChargeTrait;
 
     /**
      * Get item name

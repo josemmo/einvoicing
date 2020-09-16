@@ -1,5 +1,5 @@
 <?php
-namespace Einvoicing\Invoice;
+namespace Einvoicing\Models;
 
 class InvoiceTotals {
     /**

@@ -1,5 +1,5 @@
 <?php
-namespace Einvoicing\Party;
+namespace Einvoicing;
 
 class Party {
     protected $name = null;

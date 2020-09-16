@@ -1,11 +1,11 @@
 <?php
-namespace Einvoicing\Invoice;
+namespace Einvoicing;
 
-use Einvoicing\AllowanceCharge\AllowanceChargeTrait;
-use Einvoicing\InvoiceLine\InvoiceLine;
-use Einvoicing\Party\Party;
+use Einvoicing\Models\InvoiceTotals;
+use Einvoicing\Models\VatBreakdown;
+use Einvoicing\Traits\AllowanceOrChargeTrait;
 
-abstract class Invoice {
+class Invoice {
     protected $number = null;
     protected $type = 380; // TODO: add constants
     protected $currency = "EUR"; // TODO: add constants
@@ -19,13 +19,16 @@ abstract class Invoice {
     protected $payee = null;
     protected $lines = [];
 
-    use AllowanceChargeTrait;
+    use AllowanceOrChargeTrait;
 
     /**
      * Get invoice specification identifier
      * @return string Invoice specification identifier
      */
-    public abstract function getSpecificationIdentifier(): string;
+    public function getSpecificationIdentifier(): string {
+        // TODO: redesign implementation
+        return "urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0";
+    }
 
 
     /**
@@ -34,7 +37,7 @@ abstract class Invoice {
      * @return int           Number of decimal places
      * @suppress PhanUnusedPublicNoOverrideMethodParameter
      */
-    public function getDecimals(string $field): int {
+    public function getDecimals(string $field): int { // TODO: redesign implementation
         return 2;
     }
 
