@@ -12,6 +12,8 @@ jobs:
 
 install:
   - pecl install ast
+  - phpenv config-rm xdebug.ini
+  - composer validate --strict
   - composer install --ignore-platform-reqs --no-interaction
 
 script:
