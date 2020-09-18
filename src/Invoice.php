@@ -14,6 +14,7 @@ class Invoice {
 
     protected $roundingMatrix = null;
     protected $specification = null;
+    protected $businessProcess = null;
     protected $number = null;
     protected $type = 380; // TODO: add constants
     protected $currency = "EUR"; // TODO: add constants
@@ -66,6 +67,26 @@ class Invoice {
      */
     public function setSpecification(string $specification): self {
         $this->specification = $specification;
+        return $this;
+    }
+
+
+    /**
+     * Get business process type
+     * @return string|null Business process type
+     */
+    public function getBusinessProcess(): ?string {
+        return $this->businessProcess;
+    }
+
+
+    /**
+     * Set business process type
+     * @param  string|null $businessProcess Business process type
+     * @return self                         Invoice instance
+     */
+    public function setBusinessProcess(?string $businessProcess): self {
+        $this->businessProcess = $businessProcess;
         return $this;
     }
 
