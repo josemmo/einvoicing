@@ -7,8 +7,6 @@ use Einvoicing\Traits\VatTrait;
 use function round;
 
 class InvoiceLine {
-    const DEFAULT_DECIMALS = 8;
-
     protected $name = null;
     protected $description = null;
     protected $quantity = 1;
@@ -153,7 +151,7 @@ class InvoiceLine {
      * @param  int        $decimals Number of decimal places
      * @return float|null           Net amount before allowances/charges
      */
-    public function getNetAmountBeforeAllowancesCharges(int $decimals=self::DEFAULT_DECIMALS): ?float {
+    public function getNetAmountBeforeAllowancesCharges(int $decimals=Invoice::DEFAULT_DECIMALS): ?float {
         if ($this->price === null) {
             return null;
         }
@@ -166,7 +164,7 @@ class InvoiceLine {
      * @param  int   $decimals Number of decimal places
      * @return float           Allowances total amount
      */
-    public function getAllowancesAmount(int $decimals=self::DEFAULT_DECIMALS): float {
+    public function getAllowancesAmount(int $decimals=Invoice::DEFAULT_DECIMALS): float {
         $allowancesAmount = 0;
         $baseAmount = $this->getNetAmountBeforeAllowancesCharges($decimals) ?? 0;
         foreach ($this->getAllowances() as $item) {
@@ -181,7 +179,7 @@ class InvoiceLine {
      * @param  int   $decimals Number of decimal places
      * @return float           Charges total amount
      */
-    public function getChargesAmount(int $decimals=self::DEFAULT_DECIMALS): float {
+    public function getChargesAmount(int $decimals=Invoice::DEFAULT_DECIMALS): float {
         $chargesAmount = 0;
         $baseAmount = $this->getNetAmountBeforeAllowancesCharges($decimals) ?? 0;
         foreach ($this->getCharges() as $item) {
@@ -197,7 +195,7 @@ class InvoiceLine {
      * @param  int        $decimals Number of decimal places
      * @return float|null           Net amount
      */
-    public function getNetAmount(int $decimals=self::DEFAULT_DECIMALS): ?float {
+    public function getNetAmount(int $decimals=Invoice::DEFAULT_DECIMALS): ?float {
         $netAmount = $this->getNetAmountBeforeAllowancesCharges($decimals);
         if ($netAmount === null) {
             return null;

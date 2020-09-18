@@ -12,6 +12,10 @@ use function count;
 use function round;
 
 class Invoice {
+    const DEFAULT_DECIMALS = 8;
+
+    protected $roundingMatrix = null;
+    protected $specification = null;
     protected $number = null;
     protected $type = 380; // TODO: add constants
     protected $currency = "EUR"; // TODO: add constants
@@ -28,23 +32,43 @@ class Invoice {
     use AllowanceOrChargeTrait;
 
     /**
-     * Get invoice specification identifier
-     * @return string Invoice specification identifier
+     * Get number of decimal places for a given field
+     * @param  string $field Field name
+     * @return int           Number of decimal places
      */
-    public function getSpecificationIdentifier(): string {
-        // TODO: redesign implementation
-        return "urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0";
+    protected function getDecimals(string $field): int {
+        return $this->roundingMatrix[$field] ?? $this->roundingMatrix[null] ?? self::DEFAULT_DECIMALS;
     }
 
 
     /**
-     * Get number of decimal places for a given field
-     * @param  string $field Field name
-     * @return int           Number of decimal places
-     * @suppress PhanUnusedPublicNoOverrideMethodParameter
+     * Set rounding matrix
+     * @param  array $matrix Rounding matrix
+     * @return self          Invoice instance
      */
-    public function getDecimals(string $field): int { // TODO: redesign implementation
-        return 2;
+    public function setRoundingMatrix(array $matrix): self {
+        $this->roundingMatrix = $matrix;
+        return $this;
+    }
+
+
+    /**
+     * Get specification identifier
+     * @return string|null Specification identifier
+     */
+    public function getSpecification(): ?string {
+        return $this->specification;
+    }
+
+
+    /**
+     * Set specification identifier
+     * @param  string $specification Specification identifier
+     * @return self                  Invoice instance
+     */
+    public function setSpecification(string $specification): self {
+        $this->specification = $specification;
+        return $this;
     }
 
 
