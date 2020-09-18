@@ -1,9 +1,9 @@
 <?php
-namespace Tests\InvoiceLine;
+namespace Tests;
 
-use Einvoicing\AllowanceCharge\Allowance;
-use Einvoicing\AllowanceCharge\Charge;
-use Einvoicing\InvoiceLine\InvoiceLine;
+use DomainException;
+use Einvoicing\AllowanceOrCharge;
+use Einvoicing\InvoiceLine;
 use PHPUnit\Framework\TestCase;
 
 final class InvoiceLineTest extends TestCase {
@@ -22,32 +22,32 @@ final class InvoiceLineTest extends TestCase {
     }
 
     public function testCannotSetNegativeVatRate(): void {
-        $this->expectException(\DomainException::class);
+        $this->expectException(DomainException::class);
         $this->line->setVatRate(-10);
     }
 
     public function testCannotSetZeroBaseQuantity(): void {
-        $this->expectException(\DomainException::class);
+        $this->expectException(DomainException::class);
         $this->line->setPrice(123, 0);
     }
 
     public function testCannotSetNegativeBaseQuantity(): void {
-        $this->expectException(\DomainException::class);
+        $this->expectException(DomainException::class);
         $this->line->setBaseQuantity(-1);
     }
 
     public function testTotalAmountsAreCalculatedCorrectly(): void {
-        $allowance = (new Allowance)->setAmount(20.20);
-        $charge = (new Charge)->setAmount(5)->markAsPercentage();
+        $allowance = (new AllowanceOrCharge)->setAmount(20.2);
+        $charge = (new AllowanceOrCharge)->setAmount(5)->markAsPercentage();
         $this->line
             ->setPrice(50, 2)
             ->setQuantity(10)
             ->setVatRate(21)
             ->addAllowance($allowance)
             ->addCharge($charge);
-        $this->assertEquals(250,    $this->line->getNetAmountBeforeAllowancesCharges());
-        $this->assertEquals(20.20,  $this->line->getAllowancesAmount());
-        $this->assertEquals(12.5,   $this->line->getChargesAmount());
-        $this->assertEquals(242.3,  $this->line->getNetAmount());
+        $this->assertEquals(250,   $this->line->getNetAmountBeforeAllowancesCharges());
+        $this->assertEquals(20.2,  $this->line->getAllowancesAmount());
+        $this->assertEquals(12.5,  $this->line->getChargesAmount());
+        $this->assertEquals(242.3, $this->line->getNetAmount());
     }
 }
