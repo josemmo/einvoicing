@@ -5,6 +5,7 @@ use InvalidArgumentException;
 use function count;
 
 class Party {
+    protected $electronicAddress = null;
     protected $name = null;
     protected $tradingName = null;
     protected $companyId = null;
@@ -14,6 +15,26 @@ class Party {
     protected $postalCode = null;
     protected $subdivision = null;
     protected $country = null;
+
+    /**
+     * Get electronic address
+     * @return Identifier|null Electronic address
+     */
+    public function getElectronicAddress(): ?Identifier {
+        return $this->electronicAddress;
+    }
+
+
+    /**
+     * Set electronic address
+     * @param  Identifier|null $electronicAddress Electronic address
+     * @return self                               Party instance
+     */
+    public function setElectronicAddress(?Identifier $electronicAddress): self {
+        $this->electronicAddress = $electronicAddress;
+        return $this;
+    }
+
 
     /**
      * Get party legal name
@@ -56,20 +77,20 @@ class Party {
 
     
     /**
-     * Get party company ID
-     * @return string|null Party company ID
+     * Get party company legal ID
+     * @return Identifier|null Party company legal ID
      */
-    public function getCompanyId(): ?string {
+    public function getCompanyId(): ?Identifier {
         return $this->companyId;
     }
 
 
     /**
-     * Set party company ID
-     * @param  string|null $companyId Party company ID
-     * @return self                   Party instance
+     * Set party company legal ID
+     * @param  Identifier|null $companyId Party company legal ID
+     * @return self                       Party instance
      */
-    public function setCompanyId(?string $companyId): self {
+    public function setCompanyId(?Identifier $companyId): self {
         $this->companyId = $companyId;
         return $this;
     }
