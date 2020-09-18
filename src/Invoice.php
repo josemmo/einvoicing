@@ -4,6 +4,7 @@ namespace Einvoicing;
 use DateTime;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
+use Einvoicing\Traits\InvoiceFactoryTrait;
 use OutOfBoundsException;
 use function array_splice;
 use function count;
@@ -29,6 +30,7 @@ class Invoice {
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
+    use InvoiceFactoryTrait;
 
     /**
      * Get number of decimal places for a given field
