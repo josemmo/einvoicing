@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Invoice;
+namespace Tests;
 
 use Einvoicing\AllowanceOrCharge;
 use Einvoicing\Invoice;

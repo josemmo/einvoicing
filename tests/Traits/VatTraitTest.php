@@ -1,5 +1,5 @@
 <?php
-namespace Tests\AllowanceCharge;
+namespace Tests\Traits;
 
 use DomainException;
 use Einvoicing\InvoiceLine;
