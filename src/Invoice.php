@@ -22,6 +22,7 @@ class Invoice {
     protected $issueDate = null;
     protected $dueDate = null;
     protected $note = null;
+    protected $buyerReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -209,6 +210,26 @@ class Invoice {
      */
     public function setNote(?string $note): self {
         $this->note = $note;
+        return $this;
+    }
+
+
+    /**
+     * Get buyer reference
+     * @return string|null Buyer reference
+     */
+    public function getBuyerReference(): ?string {
+        return $this->buyerReference;
+    }
+
+
+    /**
+     * Set buyer reference
+     * @param  string|null $buyerReference Buyer reference
+     * @return self                        Invoice instance
+     */
+    public function setBuyerReference(?string $buyerReference): self {
+        $this->buyerReference = $buyerReference;
         return $this;
     }
 
