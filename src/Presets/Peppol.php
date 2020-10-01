@@ -5,6 +5,7 @@ use Einvoicing\Invoice;
 
 /**
  * PEPPOL BIS Billing 3.0
+ * @author OpenPEPPOL
  * @link https://docs.peppol.eu/poacc/billing/3.0/
  */
 class Peppol extends AbstractPreset {
