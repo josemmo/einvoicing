@@ -71,6 +71,12 @@ class UblWriter extends AbstractWriter {
         // BT-5: Invoice currency code
         $xml->add('cbc:DocumentCurrencyCode', $invoice->getCurrency());
 
+        // BT-10: Buyer reference
+        $buyerReference = $invoice->getBuyerReference();
+        if ($buyerReference !== null) {
+            $xml->add('cbc:BuyerReference', $buyerReference);
+        }
+
         // Seller node
         $seller = $invoice->getSeller();
         if ($seller === null) {
@@ -174,6 +180,12 @@ class UblWriter extends AbstractWriter {
      */
     private function addSellerOrBuyerNode(UxmlElement $parent, Party $party, bool $isSeller) {
         $xml = $parent->add($isSeller ? 'cac:AccountingSupplierParty' : 'cac:AccountingCustomerParty')->add('cac:Party');
+
+        // Electronic address
+        $electronicAddress = $party->getElectronicAddress();
+        if ($electronicAddress !== null) {
+            $this->addIdentifierNode($xml, 'cbc:EndpointID', $electronicAddress);
+        }
 
         // Trading name
         $tradingName = $party->getTradingName();

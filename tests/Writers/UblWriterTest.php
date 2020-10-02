@@ -32,6 +32,7 @@ final class UblWriterTest extends TestCase {
 
     private function getSampleInvoice(): Invoice {
         $seller = (new Party)
+            ->setElectronicAddress(new Identifier('9482348239847239874', '0088'))
             ->setCompanyId(new Identifier('COMPANY_ID', '0183'))
             ->setName('Seller Name Ltd.')
             ->setTradingName('Seller Name')
@@ -41,6 +42,7 @@ final class UblWriterTest extends TestCase {
             ->setCountry('ES');
 
         $buyer = (new Party)
+            ->setElectronicAddress(new Identifier('ES12345', '0002'))
             ->setName('Buyer Name Ltd.')
             ->setCountry('ES');
         
@@ -56,6 +58,7 @@ final class UblWriterTest extends TestCase {
         $invoice->setNumber('ABC-123')
             ->setIssueDate(new DateTime('-3 days'))
             ->setDueDate(new DateTime('+30 days'))
+            ->setBuyerReference('REF-0172637')
             ->setSeller($seller)
             ->setBuyer($buyer)
             ->addLine($complexLine)
