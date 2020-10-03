@@ -26,11 +26,13 @@ composer require josemmo/einvoicing
 I intend to create a complete manual with examples and a Quick Start guide once the project gets closer to release.
 For now, here's the [phpDoc documentation](https://josemmo.github.io/einvoicing/).
 
-## Checklist
+## Roadmap
 These are the expected features for the library and how's it going so far:
 
 - [x] Representation of invoices, parties and invoice lines as objects
-- [ ] Export invoices to UBL/CII documents
-- [ ] Import invoices from UBL/CII documents
-- [ ] Compatibility with the most used [CIUS and extensions](https://ec.europa.eu/cefdigital/wiki/x/5xLoAg)
+- [x] Compatibility with the most used [CIUS and extensions](https://ec.europa.eu/cefdigital/wiki/x/5xLoAg)
+- [x] Export invoices to UBL documents
+- [ ] Import invoices from UBL documents
+- [ ] Export invoices to CII documents
+- [ ] Import invoices from CII documents
 - [ ] Proper documentation
