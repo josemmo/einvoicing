@@ -29,20 +29,20 @@ trait VatTrait {
 
     /**
      * Get VAT rate
-     * @return int|null VAT rate as a percentage or NULL when not subject to VAT
+     * @return float|null VAT rate as a percentage or NULL when not subject to VAT
      */
-    public function getVatRate(): ?int {
+    public function getVatRate(): ?float {
         return $this->vatRate;
     }
 
 
     /**
      * Set VAT rate
-     * @param  int|null $rate VAT rate as a percentage or NULL when not subject to VAT
-     * @return self           This instance
+     * @param  float|null $rate VAT rate as a percentage or NULL when not subject to VAT
+     * @return self             This instance
      * @throws DomainException if VAT rate is negative
      */
-    public function setVatRate(?int $rate): self {
+    public function setVatRate(?float $rate): self {
         if ($rate < 0) {
             throw new DomainException('VAT rate cannot be negative');
         }
