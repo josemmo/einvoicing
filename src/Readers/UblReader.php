@@ -31,7 +31,14 @@ class UblReader extends AbstractReader {
         // BT-24: Specification indentifier
         $specificationNode = $xml->get("{{$cbc}}CustomizationID");
         if ($specificationNode !== null) {
-            $invoice->setSpecification($specificationNode->asText());
+            $specification = $specificationNode->asText();
+            $invoice->setSpecification($specification);
+
+            // Try to create from preset
+            $presetClassname = Invoice::findPreset($specification);
+            if ($presetClassname !== null) {
+                $invoice = Invoice::fromPreset($presetClassname);
+            }
         }
 
         // BT-23: Business process type
