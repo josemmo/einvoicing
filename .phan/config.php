@@ -25,7 +25,8 @@ return [
     // Thus, both first-party and third-party code being used by
     // your application should be included in this list.
     'directory_list' => [
-        'src'
+        'src',
+        'vendor/josemmo/uxml'
     ],
 
     // A regex used to match every file name that you want to

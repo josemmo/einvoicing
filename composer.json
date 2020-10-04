@@ -22,14 +22,12 @@
         }
     },
     "require": {
-        "php": ">=7.1"
+        "php": ">=7.1",
+        "josemmo/uxml": "^0.0.1"
     },
     "require-dev": {
         "ext-openssl": "*",
         "phpunit/phpunit": "^9",
         "phan/phan": "^3.0"
-    },
-    "suggest": {
-        "lib-libxml": "For reading and writing UBL/CII invoices"
     }
 }

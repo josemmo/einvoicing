@@ -8,7 +8,7 @@ use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Party;
-use Einvoicing\Utils\UxmlElement;
+use UXML\UXML;
 
 class UblWriter extends AbstractWriter {
     const NS_INVOICE = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
@@ -20,7 +20,7 @@ class UblWriter extends AbstractWriter {
      * @throws ExportException if failed to export invoice
      */
     public function export(Invoice $invoice): string {
-        $xml = new UxmlElement('Invoice', null, [
+        $xml = UXML::newInstance('Invoice', null, [
             'xmlns' => self::NS_INVOICE,
             'xmlns:cac' => self::NS_CAC,
             'xmlns:cbc' => self::NS_CBC
@@ -125,11 +125,11 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add identifier node
-     * @param UxmlElement $parent     Parent element
-     * @param string      $name       New node name
-     * @param Identifier  $identifier Identifier instance
+     * @param UXML       $parent     Parent element
+     * @param string     $name       New node name
+     * @param Identifier $identifier Identifier instance
      */
-    private function addIdentifierNode(UxmlElement $parent, string $name, Identifier $identifier) {
+    private function addIdentifierNode(UXML $parent, string $name, Identifier $identifier) {
         $scheme = $identifier->getScheme();
         $attrs = ($scheme === null) ? [] : ['schemeID' => $scheme];
         $parent->add($name, $identifier->getValue(), $attrs);
@@ -138,24 +138,24 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add amount node
-     * @param UxmlElement $parent   Parent element
-     * @param string      $name     New node name
-     * @param float       $amount   Amount
-     * @param string      $currency Currency code
+     * @param UXML   $parent   Parent element
+     * @param string $name     New node name
+     * @param float  $amount   Amount
+     * @param string $currency Currency code
      */
-    private function addAmountNode(UxmlElement $parent, string $name, float $amount, string $currency) {
+    private function addAmountNode(UXML $parent, string $name, float $amount, string $currency) {
         $parent->add($name, (string) $amount, ['currencyID' => $currency]);
     }
 
 
     /**
      * Add VAT node
-     * @param UxmlElement $parent   Parent element
-     * @param string      $name     New node name
-     * @param string      $category VAT category
-     * @param int|null    $rate     VAT rate
+     * @param UXML     $parent   Parent element
+     * @param string   $name     New node name
+     * @param string   $category VAT category
+     * @param int|null $rate     VAT rate
      */
-    private function addVatNode(UxmlElement $parent, string $name, string $category, ?int $rate) {
+    private function addVatNode(UXML $parent, string $name, string $category, ?int $rate) {
         $xml = $parent->add($name);
 
         // VAT category
@@ -173,12 +173,12 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add seller or buyer node
-     * @param  UxmlElement  $parent   Invoice element
-     * @param  Party        $party    Party instance
-     * @param  boolean      $isSeller Is seller
+     * @param UXML    $parent   Invoice element
+     * @param Party   $party    Party instance
+     * @param boolean $isSeller Is seller
      * @throws ExportException if failed to generate party node
      */
-    private function addSellerOrBuyerNode(UxmlElement $parent, Party $party, bool $isSeller) {
+    private function addSellerOrBuyerNode(UXML $parent, Party $party, bool $isSeller) {
         $xml = $parent->add($isSeller ? 'cac:AccountingSupplierParty' : 'cac:AccountingCustomerParty')->add('cac:Party');
 
         // Electronic address
@@ -276,11 +276,11 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add payee node
-     * @param  UxmlElement $parent Invoice element
-     * @param  Party       $party  Party instance
+     * @param UXML  $parent Invoice element
+     * @param Party $party  Party instance
      * @throws ExportException if failed to generate party node
      */
-    private function addPayeeNode(UxmlElement $parent, Party $party) {
+    private function addPayeeNode(UXML $parent, Party $party) {
         $xml = $parent->add('cac:PayeeParty');
 
         // Party name
@@ -301,15 +301,15 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add allowance or charge
-     * @param  UxmlElement       $parent   Parent element
-     * @param  AllowanceOrCharge $item     Allowance or charge instance
-     * @param  boolean           $isCharge Is charge (TRUE) or allowance (FALSE)
-     * @param  Invoice           $invoice  Invoice instance
-     * @param  InvoiceLine|null  $line     Invoice line or NULL in case of at document level
+     * @param UXML              $parent   Parent element
+     * @param AllowanceOrCharge $item     Allowance or charge instance
+     * @param boolean           $isCharge Is charge (TRUE) or allowance (FALSE)
+     * @param Invoice           $invoice  Invoice instance
+     * @param InvoiceLine|null  $line     Invoice line or NULL in case of at document level
      * @throws ExportException if failed to generate node
      */
     private function addAllowanceOrCharge(
-        UxmlElement $parent,
+        UXML $parent,
         AllowanceOrCharge $item,
         bool $isCharge,
         Invoice $invoice,
@@ -369,10 +369,10 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add tax total node
-     * @param UxmlElement   $parent Parent element
+     * @param UXML          $parent Parent element
      * @param InvoiceTotals $totals Invoice totals
      */
-    private function addTaxTotalNode(UxmlElement $parent, InvoiceTotals $totals) {
+    private function addTaxTotalNode(UXML $parent, InvoiceTotals $totals) {
         $xml = $parent->add('cac:TaxTotal');
 
         // Add tax amount
@@ -390,10 +390,10 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add document totals node
-     * @param UxmlElement   $parent Parent element
+     * @param UXML          $parent Parent element
      * @param InvoiceTotals $totals Invoice totals
      */
-    private function addDocumentTotalsNode(UxmlElement $parent, InvoiceTotals $totals) {
+    private function addDocumentTotalsNode(UXML $parent, InvoiceTotals $totals) {
         $xml = $parent->add('cac:LegalMonetaryTotal');
         
         // Build totals matrix
@@ -425,13 +425,13 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add invoice line
-     * @param  UxmlElement $parent  Parent XML element
-     * @param  InvoiceLine $line    Invoice line
-     * @param  int         $index   Invoice line index
-     * @param  Invoice     $invoice Invoice instance
+     * @param UXML        $parent  Parent XML element
+     * @param InvoiceLine $line    Invoice line
+     * @param int         $index   Invoice line index
+     * @param Invoice     $invoice Invoice instance
      * @throws ExportException if failed to generate node
      */
-    private function addLineNode(UxmlElement $parent, InvoiceLine $line, int $index, Invoice $invoice) {
+    private function addLineNode(UXML $parent, InvoiceLine $line, int $index, Invoice $invoice) {
         $xml = $parent->add('cac:InvoiceLine');
 
         // BT-126: Line ID
