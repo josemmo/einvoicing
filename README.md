@@ -1,8 +1,8 @@
 # European Invoicing (eInvoicing)
 [![Build Status](https://travis-ci.com/josemmo/einvoicing.svg?branch=master)](https://travis-ci.com/josemmo/einvoicing)
-[![Latest Version](https://poser.pugx.org/josemmo/einvoicing/version)](https://packagist.org/packages/josemmo/einvoicing)
+[![Latest Version](https://img.shields.io/packagist/v/josemmo/einvoicing?include_prereleases)](https://packagist.org/packages/josemmo/einvoicing)
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/josemmo/einvoicing)](#installation)
-[![License](https://poser.pugx.org/josemmo/einvoicing/license)](LICENSE)
+[![License](https://img.shields.io/github/license/josemmo/einvoicing)](LICENSE)
 
 eInvoicing is a PHP library for creating and reading electronic invoices according to the [eInvoicing Directive and European standard](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eInvoicing).
 
