@@ -15,9 +15,9 @@ final class VatTraitTest extends TestCase {
 
     public function testCanReadAndWriteRate(): void {
         $this->line->setVatRate(10);
-        $this->assertSame(10, $this->line->getVatRate());
+        $this->assertEquals(10, $this->line->getVatRate());
         $this->line->setVatRate(0);
-        $this->assertSame(0, $this->line->getVatRate());
+        $this->assertEquals(0, $this->line->getVatRate());
     }
 
     public function testCannotSetNegativeRate(): void {
