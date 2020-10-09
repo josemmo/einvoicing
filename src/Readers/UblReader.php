@@ -37,7 +37,7 @@ class UblReader extends AbstractReader {
             // Try to create from preset
             $presetClassname = $this->getPresetFromSpecification($specification);
             if ($presetClassname !== null) {
-                $invoice = Invoice::fromPreset($presetClassname);
+                $invoice = new Invoice($presetClassname);
             }
         }
 

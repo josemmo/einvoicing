@@ -3,16 +3,19 @@ namespace Einvoicing;
 
 use DateTime;
 use Einvoicing\Models\InvoiceTotals;
+use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
-use Einvoicing\Traits\InvoiceHelpersTrait;
+use InvalidArgumentException;
 use OutOfBoundsException;
 use function array_splice;
 use function count;
+use function is_subclass_of;
 use function round;
 
 class Invoice {
     const DEFAULT_DECIMALS = 8;
 
+    protected $preset = null;
     protected $roundingMatrix = null;
     protected $specification = null;
     protected $businessProcess = null;
@@ -31,7 +34,27 @@ class Invoice {
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
-    use InvoiceHelpersTrait;
+
+    /**
+     * Invoice constructor
+     * @param string|null $preset Preset classname or NULL for blank invoice
+     * @throws InvalidArgumentException if not a valid preset
+     */
+    public function __construct(?string $preset=null) {
+        if ($preset === null) return;
+
+        // Validate preset classname
+        if (!is_subclass_of($preset, AbstractPreset::class)) {
+            throw new InvalidArgumentException("$preset is not a valid invoice preset");
+        }
+        /** @var AbstractPreset */
+        $this->preset = new $preset();
+
+        // Initialize instance from preset
+        $this->setSpecification($this->preset->getSpecification());
+        $this->preset->setupInvoice($this);
+    }
+
 
     /**
      * Get number of decimal places for a given field

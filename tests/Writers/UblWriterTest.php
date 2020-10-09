@@ -54,7 +54,7 @@ final class UblWriterTest extends TestCase {
             ->setVatRate(21)
             ->addCharge((new AllowanceOrCharge)->setReason('Handling and shipping')->setAmount(10.1234));
 
-        $invoice = Invoice::fromPreset(Peppol::class);
+        $invoice = new Invoice(Peppol::class);
         $invoice->setNumber('ABC-123')
             ->setIssueDate(new DateTime('-3 days'))
             ->setDueDate(new DateTime('+30 days'))

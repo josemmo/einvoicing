@@ -4,6 +4,8 @@ namespace Tests;
 use Einvoicing\AllowanceOrCharge;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
+use Einvoicing\Presets\Peppol;
+use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 
@@ -17,6 +19,16 @@ final class InvoiceTest extends TestCase {
     protected function setUp(): void {
         $this->invoice = (new Invoice)->setRoundingMatrix([null => 2]);
         $this->line = new InvoiceLine();
+    }
+
+    public function testCanCreateInvoiceFromPreset(): void {
+        $invoice = new Invoice(Peppol::class);
+        $this->assertEquals((new Peppol)->getSpecification(), $invoice->getSpecification());
+    }
+
+    public function testCannotCreateInvoiceFromInvalidPreset(): void {
+        $this->expectException(InvalidArgumentException::class);
+        new Invoice(self::class);
     }
 
     public function testCanReadAndWriteLines(): void {
