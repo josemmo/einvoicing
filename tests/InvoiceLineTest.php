@@ -1,7 +1,6 @@
 <?php
 namespace Tests;
 
-use DomainException;
 use Einvoicing\AllowanceOrCharge;
 use Einvoicing\InvoiceLine;
 use PHPUnit\Framework\TestCase;
@@ -19,21 +18,6 @@ final class InvoiceLineTest extends TestCase {
         $this->assertEquals(5, $this->line->getBaseQuantity());
         $this->line->setPrice(543.21, 2);
         $this->assertEquals(2, $this->line->getBaseQuantity());
-    }
-
-    public function testCannotSetNegativeVatRate(): void {
-        $this->expectException(DomainException::class);
-        $this->line->setVatRate(-10);
-    }
-
-    public function testCannotSetZeroBaseQuantity(): void {
-        $this->expectException(DomainException::class);
-        $this->line->setPrice(123, 0);
-    }
-
-    public function testCannotSetNegativeBaseQuantity(): void {
-        $this->expectException(DomainException::class);
-        $this->line->setBaseQuantity(-1);
     }
 
     public function testTotalAmountsAreCalculatedCorrectly(): void {
