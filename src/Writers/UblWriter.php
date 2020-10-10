@@ -75,13 +75,13 @@ class UblWriter extends AbstractWriter {
         // Seller node
         $seller = $invoice->getSeller();
         if ($seller !== null) {
-            $this->addSellerOrBuyerNode($xml, $seller, true);
+            $this->addSellerOrBuyerNode($xml->add('cac:AccountingSupplierParty'), $seller);
         }
 
         // Buyer node
         $buyer = $invoice->getBuyer();
         if ($buyer !== null) {
-            $this->addSellerOrBuyerNode($xml, $buyer, false);
+            $this->addSellerOrBuyerNode($xml->add('cac:AccountingCustomerParty'), $buyer);
         }
 
         // Payee node
@@ -163,12 +163,11 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add seller or buyer node
-     * @param UXML    $parent   Invoice element
-     * @param Party   $party    Party instance
-     * @param boolean $isSeller Is seller
+     * @param UXML  $parent Invoice element
+     * @param Party $party  Party instance
      */
-    private function addSellerOrBuyerNode(UXML $parent, Party $party, bool $isSeller) {
-        $xml = $parent->add($isSeller ? 'cac:AccountingSupplierParty' : 'cac:AccountingCustomerParty')->add('cac:Party');
+    private function addSellerOrBuyerNode(UXML $parent, Party $party) {
+        $xml = $parent->add('cac:Party');
 
         // Electronic address
         $electronicAddress = $party->getElectronicAddress();
