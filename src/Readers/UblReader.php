@@ -2,7 +2,6 @@
 namespace Einvoicing\Readers;
 
 use DateTime;
-use DomainException;
 use Einvoicing\AllowanceOrCharge;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
@@ -18,7 +17,6 @@ class UblReader extends AbstractReader {
     /**
      * @inheritdoc
      * @throws InvalidArgumentException if failed to parse XML
-     * @throws DomainException if VAT rate is not valid
      */
     public function import(string $document): Invoice {
         $invoice = new Invoice();
@@ -244,7 +242,6 @@ class UblReader extends AbstractReader {
      * Set VAT attributes
      * @param AllowanceOrCharge|InvoiceLine $target Target instance
      * @param UXML                          $xml    XML node
-     * @throws DomainException if VAT rate is not valid
      */
     private function setVatAttributes($target, UXML $xml) {
         $cbc = UblWriter::NS_CBC;
@@ -267,7 +264,6 @@ class UblReader extends AbstractReader {
      * Add allowance or charge
      * @param Invoice|InvoiceLine $target Target instance
      * @param UXML                $xml    XML node
-     * @throws DomainException if VAT rate is not valid
      */
     private function addAllowanceOrCharge($target, UXML $xml) {
         $allowanceOrCharge = new AllowanceOrCharge();
@@ -315,7 +311,6 @@ class UblReader extends AbstractReader {
      * Parse invoice line
      * @param  UXML        $xml XML node
      * @return InvoiceLine      Invoice line instance
-     * @throws DomainException if VAT rate is not valid
      */
     private function parseInvoiceLine(UXML $xml): InvoiceLine {
         $line = new InvoiceLine();

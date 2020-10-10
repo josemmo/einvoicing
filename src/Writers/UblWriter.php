@@ -2,7 +2,6 @@
 namespace Einvoicing\Writers;
 
 use Einvoicing\AllowanceOrCharge;
-use Einvoicing\Exceptions\ExportException;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
@@ -17,7 +16,6 @@ class UblWriter extends AbstractWriter {
 
     /**
      * @inheritdoc
-     * @throws ExportException if failed to export invoice
      */
     public function export(Invoice $invoice): string {
         $xml = UXML::newInstance('Invoice', null, [
@@ -28,10 +26,9 @@ class UblWriter extends AbstractWriter {
 
         // BT-24: Specification indentifier
         $specificationIdentifier = $invoice->getSpecification();
-        if ($specificationIdentifier === null) {
-            throw new ExportException('An Invoice shall have a Specification identifier (BT-24)', 'BR-1');
+        if ($specificationIdentifier !== null) {
+            $xml->add('cbc:CustomizationID', $specificationIdentifier);
         }
-        $xml->add('cbc:CustomizationID', $specificationIdentifier);
 
         // BT-23: Business process type
         $businessProcessType = $invoice->getBusinessProcess();
@@ -41,17 +38,15 @@ class UblWriter extends AbstractWriter {
 
         // BT-1: Invoice number
         $number = $invoice->getNumber();
-        if ($number === null) {
-            throw new ExportException('An Invoice shall have an Invoice number (BT-1)', 'BR-2');
+        if ($number !== null) {
+            $xml->add('cbc:ID', $number);
         }
-        $xml->add('cbc:ID', $number);
 
         // BT-2: Issue date
         $issueDate = $invoice->getIssueDate();
-        if ($issueDate === null) {
-            throw new ExportException('An Invoice shall have an Invoice issue date (BT-2)', 'BR-3');
+        if ($issueDate !== null) {
+            $xml->add('cbc:IssueDate', $issueDate->format('Y-m-d'));
         }
-        $xml->add('cbc:IssueDate', $issueDate->format('Y-m-d'));
 
         // BT-9: Due date
         $dueDate = $invoice->getDueDate();
@@ -79,17 +74,15 @@ class UblWriter extends AbstractWriter {
 
         // Seller node
         $seller = $invoice->getSeller();
-        if ($seller === null) {
-            throw new ExportException('Missing seller from invoice');
+        if ($seller !== null) {
+            $this->addSellerOrBuyerNode($xml, $seller, true);
         }
-        $this->addSellerOrBuyerNode($xml, $seller, true);
 
         // Buyer node
         $buyer = $invoice->getBuyer();
-        if ($buyer === null) {
-            throw new ExportException('Missing buyer from invoice');
+        if ($buyer !== null) {
+            $this->addSellerOrBuyerNode($xml, $buyer, false);
         }
-        $this->addSellerOrBuyerNode($xml, $buyer, false);
 
         // Payee node
         $payee = $invoice->getPayee();
@@ -112,9 +105,6 @@ class UblWriter extends AbstractWriter {
 
         // Invoice lines
         $lines = $invoice->getLines();
-        if (empty($lines)) {
-            throw new ExportException('An Invoice shall have at least one Invoice line (BG-25)', 'BR-16');
-        }
         foreach ($lines as $i=>$line) {
             $this->addLineNode($xml, $line, $i+1, $invoice);
         }
@@ -176,7 +166,6 @@ class UblWriter extends AbstractWriter {
      * @param UXML    $parent   Invoice element
      * @param Party   $party    Party instance
      * @param boolean $isSeller Is seller
-     * @throws ExportException if failed to generate party node
      */
     private function addSellerOrBuyerNode(UXML $parent, Party $party, bool $isSeller) {
         $xml = $parent->add($isSeller ? 'cac:AccountingSupplierParty' : 'cac:AccountingCustomerParty')->add('cac:Party');
@@ -232,20 +221,12 @@ class UblWriter extends AbstractWriter {
 
         // Country
         $country = $party->getCountry();
-        if ($country === null) {
-            throw new ExportException(
-                $isSeller ? 'The Seller postal address (BG-5) shall contain a Seller country code (BT-40)' :
-                            'The Buyer postal address shall contain a Buyer country code (BT-55)',
-                $isSeller ? 'BR-9' : 'BR-11'
-            );
+        if ($country !== null) {
+            $addressNode->add('cac:Country')->add('cbc:IdentificationCode', $country);
         }
-        $addressNode->add('cac:Country')->add('cbc:IdentificationCode', $country);
 
         // VAT number
         $vatNumber = $party->getVatNumber();
-        if ($isSeller && $vatNumber === null) {
-            throw new ExportException('The Seller VAT identifier (BT-31) shall be present', 'BR-CO-9');
-        }
         if ($vatNumber !== null) {
             $taxNode = $xml->add('cac:PartyTaxScheme');
             $taxNode->add('cbc:CompanyID', $vatNumber);
@@ -257,14 +238,9 @@ class UblWriter extends AbstractWriter {
 
         // Legal name
         $legalName = $party->getName();
-        if ($legalName === null) {
-            throw new ExportException(
-                $isSeller ? 'An Invoice shall contain the Seller name (BT-27)' :
-                            'An Invoice shall contain the Buyer name (BT-44)',
-                $isSeller ? 'BR-6' : 'BR-7'
-            );
+        if ($legalName !== null) {
+            $legalEntityNode->add('cbc:RegistrationName', $legalName);
         }
-        $legalEntityNode->add('cbc:RegistrationName', $legalName);
 
         // Company ID
         $companyId = $party->getCompanyId();
@@ -278,17 +254,15 @@ class UblWriter extends AbstractWriter {
      * Add payee node
      * @param UXML  $parent Invoice element
      * @param Party $party  Party instance
-     * @throws ExportException if failed to generate party node
      */
     private function addPayeeNode(UXML $parent, Party $party) {
         $xml = $parent->add('cac:PayeeParty');
 
         // Party name
         $name = $party->getName();
-        if ($name === null) {
-            throw new ExportException('The Payee name (BT-59) shall be provided in the Invoice', 'BR-17');
+        if ($name !== null) {
+            $xml->add('cac:PartyName')->add('cbc:Name', $name);
         }
-        $xml->add('cac:PartyName')->add('cbc:Name', $name);
 
         // Company ID
         $companyId = $party->getCompanyId();
@@ -306,7 +280,6 @@ class UblWriter extends AbstractWriter {
      * @param boolean           $isCharge Is charge (TRUE) or allowance (FALSE)
      * @param Invoice           $invoice  Invoice instance
      * @param InvoiceLine|null  $line     Invoice line or NULL in case of at document level
-     * @throws ExportException if failed to generate node
      */
     private function addAllowanceOrCharge(
         UXML $parent,
@@ -321,24 +294,14 @@ class UblWriter extends AbstractWriter {
         // Charge indicator
         $xml->add('cbc:ChargeIndicator', $isCharge ? 'true' : 'false');
 
-        // Validate reason code and text
-        $reasonCode = $item->getReasonCode();
-        $reasonText = $item->getReason();
-        if ($reasonCode === null && $reasonText === null) {
-            throw new ExportException(
-                $atDocumentLevel ?
-                    'Each Document level allowance/charge shall have a reason (BT-97) or a reason code (BT-98)' :
-                    'Each Invoice line allowance/charge shall have a reason (BT-139) or a reason code (BT-140)',
-                $atDocumentLevel ? 'BR-33' : 'BR-42'
-            );
-        }
-
         // Reason code
+        $reasonCode = $item->getReasonCode();
         if ($reasonCode !== null) {
             $xml->add('cbc:AllowanceChargeReasonCode', $reasonCode);
         }
 
         // Reason text
+        $reasonText = $item->getReason();
         if ($reasonText !== null) {
             $xml->add('cbc:AllowanceChargeReason', $reasonText);
         }
@@ -429,7 +392,6 @@ class UblWriter extends AbstractWriter {
      * @param InvoiceLine $line    Invoice line
      * @param int         $index   Invoice line index
      * @param Invoice     $invoice Invoice instance
-     * @throws ExportException if failed to generate node
      */
     private function addLineNode(UXML $parent, InvoiceLine $line, int $index, Invoice $invoice) {
         $xml = $parent->add('cac:InvoiceLine');
@@ -442,10 +404,9 @@ class UblWriter extends AbstractWriter {
 
         // BT-131: Line net amount
         $netAmount = $line->getNetAmount($invoice->getDecimals('line/netAmount'));
-        if ($netAmount === null) {
-            throw new ExportException('Each Invoice line shall have an Invoice line net amount (BT-131)', 'BR-24');
+        if ($netAmount !== null) {
+            $this->addAmountNode($xml, 'cbc:LineExtensionAmount', $netAmount, $invoice->getCurrency());
         }
-        $this->addAmountNode($xml, 'cbc:LineExtensionAmount', $netAmount, $invoice->getCurrency());
 
         // Allowances and charges
         foreach ($line->getAllowances() as $item) {
@@ -466,10 +427,9 @@ class UblWriter extends AbstractWriter {
 
         // BT-153: Item name
         $name = $line->getName();
-        if ($name === null) {
-            throw new ExportException('Each Invoice line shall contain the Item name (BT-153)', 'BR-25');
+        if ($name !== null) {
+            $itemNode->add('cbc:Name', $name);
         }
-        $itemNode->add('cbc:Name', $name);
 
         // VAT node
         $this->addVatNode($itemNode, 'cac:ClassifiedTaxCategory', $line->getVatCategory(), $line->getVatRate());
@@ -478,12 +438,14 @@ class UblWriter extends AbstractWriter {
         $priceNode = $xml->add('cac:Price');
 
         // Price amount
-        // @phan-suppress-next-line PhanTypeMismatchArgumentNullable
-        $this->addAmountNode($priceNode, 'cbc:PriceAmount', $line->getPrice(), $invoice->getCurrency());
+        $price = $line->getPrice();
+        if ($price !== null) {
+            $this->addAmountNode($priceNode, 'cbc:PriceAmount', $price, $invoice->getCurrency());
+        }
 
         // Base quantity
         $baseQuantity = $line->getBaseQuantity();
-        if ($baseQuantity > 1) {
+        if ($baseQuantity != 1) {
             $priceNode->add('cbc:BaseQuantity', (string) $baseQuantity, ['unitCode' => $line->getUnit()]);
         }
 
