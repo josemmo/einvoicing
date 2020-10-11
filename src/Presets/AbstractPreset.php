@@ -12,6 +12,15 @@ abstract class AbstractPreset {
 
 
     /**
+     * Get additional validation rules
+     * @return array Map of <string,callable> rules
+     */
+    public function getRules(): array {
+        return [];
+    }
+
+
+    /**
      * Setup invoice
      * @param Invoice $invoice Invoice instance
      */

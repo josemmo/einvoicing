@@ -5,6 +5,7 @@ use DateTime;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
+use Einvoicing\Traits\InvoiceValidationTrait;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use function array_splice;
@@ -34,6 +35,7 @@ class Invoice {
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
+    use InvoiceValidationTrait;
 
     /**
      * Invoice constructor

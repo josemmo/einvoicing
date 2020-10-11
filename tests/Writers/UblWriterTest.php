@@ -101,7 +101,9 @@ final class UblWriterTest extends TestCase {
     }
 
     public function testCanGenerateValidInvoice(): void {
-        $contents = $this->writer->export($this->getSampleInvoice());
+        $invoice = $this->getSampleInvoice();
+        $invoice->validate();
+        $contents = $this->writer->export($invoice);
         $this->assertTrue($this->validateInvoice($contents, 'ubl'));
     }
 }

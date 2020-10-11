@@ -3,7 +3,7 @@ namespace Einvoicing\Exceptions;
 
 use Exception;
 
-class ExportException extends Exception {
+class ValidationException extends Exception {
     protected $businessRuleId;
 
     /**
