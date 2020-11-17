@@ -1,9 +1,13 @@
 <?php
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
+use phpDocumentor\Reflection\DocBlock\Tags\Throws;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\File\LocalFile;
 use phpDocumentor\Reflection\Php\Class_;
+use phpDocumentor\Reflection\Php\Constant;
 use phpDocumentor\Reflection\Php\Method;
+use phpDocumentor\Reflection\Php\Property;
 use phpDocumentor\Reflection\Php\Trait_;
 use phpDocumentor\Reflection\Php\ProjectFactory;
 use phpDocumentor\Reflection\Php\Project;
@@ -48,30 +52,32 @@ function getProjectFiles(): array {
 
 
 /**
- * Get public methods
- * @param  Class_          $class   Class instance
- * @param  Element[string] $project Project files
- * @return Method[]                 Public methods
+ * Get class public elements
+ * @param  Class_                         $class    Class instance
+ * @param  string                         $type     Element type ("constants", "properties" or "methods")
+ * @param  Element[string]                &$project Project files
+ * @return Constant[]|Property[]|Method[]           Public elements
  */
-function getPublicMethods(Class_ $class, array $project): array {
-    $methods = $class->getMethods();
+function getPublicElements(Class_ $class, string $type, array &$project): array {
+    $fn = "get" . ucfirst($type);
+    $res = $class->{$fn}();
 
-    // Methods from traits
+    // Elements from traits
     foreach ($class->getUsedTraits() as $traitFqsen) {
         /** @var Trait_ */
         $trait = $project[(string) $traitFqsen];
-        $methods = array_merge($methods, $trait->getMethods());
+        $res = array_merge($res, $trait->{$fn}());
     }
 
-    // Methods from parent class
+    // Elements from parent class
     /** @var Class_|null */
     $parentClass = $project[(string) $class->getParent()] ?? null;
     if ($parentClass !== null) {
-        $methods = array_merge($methods, getPublicMethods($parentClass, $project));
+        $res = array_merge($res, getPublicElements($parentClass, $type, $project));
     }
 
-    return array_filter($methods, function($method) {
-        return ($method->getVisibility() == Visibility::PUBLIC_);
+    return array_filter($res, function($item) {
+        return ($item->getVisibility() == Visibility::PUBLIC_);
     });
 }
 
@@ -93,18 +99,56 @@ function getClassUrl(string $fqsen): string {
 
 /**
  * Render class
- * @param  Class_          $class   Class instance
- * @param  Element[string] $project Project files
- * @return string                   Markdown documentation
+ * @param  Class_          $class    Class instance
+ * @param  Element[string] &$project Project files
+ * @return string                    Markdown documentation
  */
-function renderClass(Class_ $class, array $project): string {
+function renderClass(Class_ $class, array &$project): string {
     $doc = "# {$class->getFqsen()}\n\n";
 
+    // Public properties
+    $properties = [];
+    foreach (getPublicElements($class, 'properties', $project) as $property) {
+        $properties[] = renderProperty($property, $class);
+    }
+    $doc .= implode("\n---\n\n", $properties);
+
+    // Public methods
     $methods = [];
-    foreach (getPublicMethods($class, $project) as $method) {
+    foreach (getPublicElements($class, 'methods', $project) as $method) {
         $methods[] = renderMethod($method, $class);
     }
     $doc .= implode("\n---\n\n", $methods);
+
+    return $doc;
+}
+
+
+/**
+ * Render property
+ * @param  Property $property Property instance
+ * @param  Class_   $class    Class instance
+ * @return string             Rendered method in markdown
+ */
+function renderProperty(Property $property, Class_ $class): string {
+    $docblock = $property->getDocBlock();
+    /** @var Var_ */
+    $varTag = $docblock->getTagsByName('var')[0];
+    $defaultValue = $property->getDefault();
+
+    // Property summary
+    $doc = "## \${$property->getName()}\n";
+    $doc .= $docblock->getSummary() . "\n";
+
+    // Signature
+    $doc .= "\n```php\n";
+    $doc .= "public " . ($property->isStatic() ? "static " : "");
+    $doc .= renderType($varTag->getType(), $class, false) . " ";
+    $doc .= "$" . $property->getName();
+    if ($defaultValue !== null) {
+        $doc .= " = $defaultValue";
+    }
+    $doc .= "\n```\n";
 
     return $doc;
 }
@@ -126,8 +170,8 @@ function renderMethod(Method $method, Class_ $class): string {
 
     // Method summary
     $doc = "## `{$method->getName()}()`\n";
-    $doc .= $docblock->getSummary();
-    
+    $doc .= $docblock->getSummary() . "\n";
+
     // Signature
     $doc .= "\n```php\n";
     $doc .= "public " . ($method->isStatic() ? "static " : "") . $method->getName() . "(";
@@ -145,18 +189,29 @@ function renderMethod(Method $method, Class_ $class): string {
     // Parameters
     if (!empty($params)) {
         $doc .= "\n";
-        $doc .= "### Parameters\n";
+        $doc .= "<h3>Parameters</h3>\n\n";
         foreach ($params as $param) {
             $doc .= "- `\${$param->getVariableName()}`: " . renderType($param->getType(), $class);
-            $doc .= "\\\n   {$param->getDescription()}\n";
+            $doc .= " — {$param->getDescription()}\n";
         }
     }
 
     // Return type
     if ($return !== null) {
         $doc .= "\n";
-        $doc .= "### Returns\n";
-        $doc .= "- " . renderType($return->getType(), $class) . "\\\n   {$return->getDescription()}\n";
+        $doc .= "<h3>Returns</h3>\n\n";
+        $doc .= "- " . renderType($return->getType(), $class) . " — {$return->getDescription()}\n";
+    }
+
+    // Throws
+    /** @var Throws[] */
+    $throws = $docblock->getTagsByName('throws');
+    if (!empty($throws)) {
+        $doc .= "\n";
+        $doc .= "<h3>Throws</h3>\n\n";
+        foreach ($throws as $item) {
+            $doc .= "- " . renderType($item->getType(), $class) . " {$item->getDescription()}\n";
+        }
     }
 
     return $doc;
