@@ -1,0 +1,43 @@
+# Project configuration
+site_name: eInvoicing
+site_url: https://josemmo.github.io/einvoicing/
+repo_name: josemmo/einvoicing
+repo_url: https://github.com/josemmo/einvoicing
+
+# Theme customization
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    scheme: slate
+    primary: light blue
+    accent: yellow
+  features:
+    - navigation.tabs
+
+# Plugins
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+# Extensions
+markdown_extensions:
+  - attr_list
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+  - pymdownx.superfences
+
+# Table of Contents
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - EU e-Invoicing core concepts: getting-started/eu-einvoicing-concepts.md
