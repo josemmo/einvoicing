@@ -16,13 +16,14 @@ To create a minimal valid invoice, you'll need four elements:
 
 Start by creating the invoice instance:
 ```php
+use DateTime;
 use Einvoicing\Invoice;
 use Einvoicing\Presets;
 
 $inv = new Invoice(Presets\Peppol::class);
 $inv->setNumber('F-202000012')
-    ->setIssueDate(new \DateTime('2020-11-01'))
-    ->setDueDate(new \DateTime('2020-11-30'));
+    ->setIssueDate(new DateTime('2020-11-01'))
+    ->setDueDate(new DateTime('2020-11-30'));
 ```
 
 !!! note
@@ -50,11 +51,13 @@ $seller->setElectronicAddress(new Identifier('9482348239847239874', '0088'))
     ->setAddress(['Fake Street 123', 'Apartment Block 2B'])
     ->setCity('Springfield')
     ->setCountry('DE');
+$inv->setSeller($seller);
 
 $buyer = new Party();
 $buyer->setElectronicAddress(new Identifier('ES12345', '0002'))
     ->setName('Buyer Name Ltd.')
     ->setCountry('FR');
+$inv->setBuyer($buyer);
 ```
 
 Lastly, add the invoice lines:
