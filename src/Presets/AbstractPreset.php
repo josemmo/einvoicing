@@ -13,7 +13,7 @@ abstract class AbstractPreset {
 
     /**
      * Get additional validation rules
-     * @return array Map of <string,callable> rules
+     * @return array<string,callable> Map of rules
      */
     public function getRules(): array {
         return [];
