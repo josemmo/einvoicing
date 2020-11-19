@@ -8,6 +8,7 @@ countries and business sectors, but you can use any preset defined in the `\Einv
 create a custom one yourself.
 
 To create a minimal valid invoice, you'll need four elements:
+
 - The invoice instance ([`Invoice`](../reference/invoice.md))
 - A seller party ([`Party`](../reference/party.md))
 - A buyer party ([`Party`](../reference/party.md))

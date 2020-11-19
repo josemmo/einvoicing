@@ -31,12 +31,14 @@ If the document you're importing has a custom CIUS/extension not supported by th
 preset implementing that specification when instantiating the reader:
 ```php
 use Einvoicing\Readers\UblReader;
-use ACME\Invoicing\Presets\CustomPreset;
+use Acme\Invoicing\Presets\CustomPreset;
 
 $reader = new UblReader();
 $reader->registerPreset(CustomPreset::class);
 $inv = $reader->import($document);
 ```
+
+Check the [Creating custom presets](creating-custom-presets.md) page for more information.
 
 ## Validating invoices
 It is good practice to validate an invoice against the business rules defined in the European standard and its preset
