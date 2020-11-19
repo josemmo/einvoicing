@@ -1,4 +1,5 @@
 <?php
+use phpDocumentor\Reflection\DocBlock;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws;
@@ -40,7 +41,6 @@ function getProjectFiles(): array {
     $res = [];
     foreach ($project->getFiles() as $file) {
         foreach ($file->getClasses() as $class) {
-            if ($class->isAbstract()) continue;
             $res[(string) $class->getFqsen()] = $class;
         }
         foreach ($file->getTraits() as $trait) {
@@ -76,9 +76,12 @@ function getPublicElements(Class_ $class, string $type, array &$project): array 
         $res = array_merge($res, getPublicElements($parentClass, $type, $project));
     }
 
-    return array_filter($res, function($item) {
+    // Filter non-public elements
+    $res = array_filter($res, function($item) {
         return ($item->getVisibility() == Visibility::PUBLIC_);
     });
+
+    return $res;
 }
 
 
@@ -105,21 +108,28 @@ function getClassUrl(string $fqsen): string {
  */
 function renderClass(Class_ $class, array &$project): string {
     $doc = "# {$class->getFqsen()}\n\n";
+    $docItems = [];
 
     // Public properties
-    $properties = [];
     foreach (getPublicElements($class, 'properties', $project) as $property) {
-        $properties[] = renderProperty($property, $class);
+        $docItems[] = renderProperty($property, $class);
     }
-    $doc .= implode("\n---\n\n", $properties);
 
     // Public methods
-    $methods = [];
+    $methodsMap = [];
     foreach (getPublicElements($class, 'methods', $project) as $method) {
-        $methods[] = renderMethod($method, $class);
+        $name = $method->getFqsen()->getName();
+        if ($method->getDocBlock()->hasTag('inheritdoc')) {
+            $methodsMap[$name]['additional'][] = $method->getDocBlock();
+        } else {
+            $methodsMap[$name]['main'] = $method;
+        }
     }
-    $doc .= implode("\n---\n\n", $methods);
+    foreach ($methodsMap as &$item) {
+        $docItems[] = renderMethod($item['main'], $item['additional'] ?? [], $class);
+    }
 
+    $doc .= implode("\n---\n\n", $docItems);
     return $doc;
 }
 
@@ -156,11 +166,12 @@ function renderProperty(Property $property, Class_ $class): string {
 
 /**
  * Render method
- * @param  Method $method Method instance
- * @param  Class_ $class  Class instance
- * @return string         Rendered method in markdown
+ * @param  Method     $method       Method instance
+ * @param  DocBlock[] $addDocblocks Additional DocBlocks (for inheritance)
+ * @param  Class_     $class        Class instance
+ * @return string                   Rendered method in markdown
  */
-function renderMethod(Method $method, Class_ $class): string {
+function renderMethod(Method $method, array $addDocblocks=[], Class_ $class): string {
     $docblock = $method->getDocBlock();
     /** @var Param[] */
     $params = $docblock->getTagsByName('param');
@@ -206,6 +217,9 @@ function renderMethod(Method $method, Class_ $class): string {
     // Throws
     /** @var Throws[] */
     $throws = $docblock->getTagsByName('throws');
+    foreach ($addDocblocks as $elem) {
+        $throws = array_merge($throws, $elem->getTagsByName('throws'));
+    }
     if (!empty($throws)) {
         $doc .= "\n";
         $doc .= "<h3>Throws</h3>\n\n";
@@ -256,13 +270,13 @@ function renderType(Type $type, Class_ $ctx, bool $md=true): string {
 $project = getProjectFiles();
 $toc = [];
 foreach ($project as $fqsen=>$file) {
-    if ($file instanceof Class_) {
-        $destPath = DOCS_DIR . "/reference/" . getClassUrl($fqsen);
-        $doc = renderClass($file, $project);
-        file_put_contents($destPath, $doc);
-        $toc[] = substr($fqsen, strlen(BASE_NAMESPACE)) . ": reference/" . getClassUrl($fqsen);
-        echo "[i] Generated documentation for $fqsen\n";
-    }
+    if (!$file instanceof Class_) continue;
+    if ($file->isAbstract()) continue;
+    $destPath = DOCS_DIR . "/reference/" . getClassUrl($fqsen);
+    $doc = renderClass($file, $project);
+    file_put_contents($destPath, $doc);
+    $toc[] = substr($fqsen, strlen(BASE_NAMESPACE)) . ": reference/" . getClassUrl($fqsen);
+    echo "[i] Generated documentation for $fqsen\n";
 }
 
 // Update Table of Contents
