@@ -160,8 +160,8 @@ class UblReader extends AbstractReader {
         }
 
         // Additional identifiers
-        foreach ($xml->getAll("{{$cac}}PartyIdentification") as $identifierNode) {
-            $party->addIdentifier($this->parseIdentifierNode($identifierNode->get("{{$cbc}}ID")));
+        foreach ($xml->getAll("{{$cac}}PartyIdentification/{{$cbc}}ID") as $identifierNode) {
+            $party->addIdentifier($this->parseIdentifierNode($identifierNode));
         }
 
         // Trading name
