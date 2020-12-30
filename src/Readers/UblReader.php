@@ -87,6 +87,12 @@ class UblReader extends AbstractReader {
             $invoice->setCurrency($currencyNode->asText());
         }
 
+        // BT-19: Buyer accounting reference
+        $buyerAccountingReferenceNode = $xml->get("{{$cbc}}AccountingCost");
+        if ($buyerAccountingReferenceNode !== null) {
+            $invoice->setBuyerAccountingReference($buyerAccountingReferenceNode->asText());
+        }
+
         // BT-10: Buyer reference
         $buyerReferenceNode = $xml->get("{{$cbc}}BuyerReference");
         if ($buyerReferenceNode !== null) {

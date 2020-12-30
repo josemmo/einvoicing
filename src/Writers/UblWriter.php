@@ -72,6 +72,12 @@ class UblWriter extends AbstractWriter {
         // BT-5: Invoice currency code
         $xml->add('cbc:DocumentCurrencyCode', $invoice->getCurrency());
 
+        // BT-19: Buyer accounting reference
+        $buyerAccountingReference = $invoice->getBuyerAccountingReference();
+        if ($buyerAccountingReference !== null) {
+            $xml->add('cbc:AccountingCost', $buyerAccountingReference);
+        }
+
         // BT-10: Buyer reference
         $buyerReference = $invoice->getBuyerReference();
         if ($buyerReference !== null) {
