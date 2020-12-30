@@ -187,6 +187,12 @@ class UblWriter extends AbstractWriter {
             $this->addIdentifierNode($xml, 'cbc:EndpointID', $electronicAddress);
         }
 
+        // Additional identifiers
+        foreach ($party->getIdentifiers() as $identifier) {
+            $identifierNode = $xml->add('cac:PartyIdentification');
+            $this->addIdentifierNode($identifierNode, 'cbc:ID', $identifier);
+        }
+
         // Trading name
         $tradingName = $party->getTradingName();
         if ($tradingName !== null) {

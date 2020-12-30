@@ -159,6 +159,11 @@ class UblReader extends AbstractReader {
             $party->setElectronicAddress($this->parseIdentifierNode($electronicAddressNode));
         }
 
+        // Additional identifiers
+        foreach ($xml->getAll("{{$cac}}PartyIdentification") as $identifierNode) {
+            $party->addIdentifier($this->parseIdentifierNode($identifierNode->get("{{$cbc}}ID")));
+        }
+
         // Trading name
         $tradingNameNode = $xml->get("{{$cac}}PartyName/{{$cbc}}Name");
         if ($tradingNameNode !== null) {
@@ -200,7 +205,6 @@ class UblReader extends AbstractReader {
         if ($countryNode !== null) {
             $party->setCountry($countryNode->asText());
         }
-        
 
         // VAT number
         $vatNumberNode = $xml->get("{{$cac}}PartyTaxScheme/{{$cbc}}CompanyID");

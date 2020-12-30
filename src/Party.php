@@ -1,6 +1,7 @@
 <?php
 namespace Einvoicing;
 
+use Einvoicing\Traits\IdentifiersTrait;
 use InvalidArgumentException;
 use function count;
 
@@ -15,6 +16,8 @@ class Party {
     protected $postalCode = null;
     protected $subdivision = null;
     protected $country = null;
+
+    use IdentifiersTrait;
 
     /**
      * Get electronic address
