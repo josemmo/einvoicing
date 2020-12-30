@@ -63,6 +63,12 @@ class UblWriter extends AbstractWriter {
             $xml->add('cbc:Note', $note);
         }
 
+        // BT-7: Tax point date
+        $taxPointDate = $invoice->getTaxPointDate();
+        if ($taxPointDate !== null) {
+            $xml->add('cbc:TaxPointDate', $taxPointDate->format('Y-m-d'));
+        }
+
         // BT-5: Invoice currency code
         $xml->add('cbc:DocumentCurrencyCode', $invoice->getCurrency());
 

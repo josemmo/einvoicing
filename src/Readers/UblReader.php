@@ -75,6 +75,12 @@ class UblReader extends AbstractReader {
             $invoice->setNote($noteNode->asText());
         }
 
+        // BT-7: Tax point date
+        $taxPointDateNode = $xml->get("{{$cbc}}TaxPointDate");
+        if ($taxPointDateNode !== null) {
+            $invoice->setTaxPointDate(new DateTime($taxPointDateNode->asText()));
+        }
+
         // BT-5: Invoice currency code
         $currencyNode = $xml->get("{{$cbc}}DocumentCurrencyCode");
         if ($currencyNode !== null) {

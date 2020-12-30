@@ -25,6 +25,7 @@ class Invoice {
     protected $currency = "EUR"; // TODO: add constants
     protected $issueDate = null;
     protected $dueDate = null;
+    protected $taxPointDate = null;
     protected $note = null;
     protected $buyerReference = null;
     protected $paidAmount = 0;
@@ -215,6 +216,26 @@ class Invoice {
      */
     public function setDueDate(?DateTime $dueDate): self {
         $this->dueDate = $dueDate;
+        return $this;
+    }
+
+
+    /**
+     * Get tax point date
+     * @return DateTime|null Tax point date
+     */
+    public function getTaxPointDate(): ?DateTime {
+        return $this->taxPointDate;
+    }
+
+
+    /**
+     * Set tax point date
+     * @param  DateTime|null $taxPointDate Tax point date
+     * @return self                        Invoice instance
+     */
+    public function setTaxPointDate(?DateTime $taxPointDate): self {
+        $this->taxPointDate = $taxPointDate;
         return $this;
     }
 
