@@ -275,6 +275,12 @@ class UblWriter extends AbstractWriter {
     private function addPayeeNode(UXML $parent, Party $party) {
         $xml = $parent->add('cac:PayeeParty');
 
+        // Additional identifiers
+        foreach ($party->getIdentifiers() as $identifier) {
+            $identifierNode = $xml->add('cac:PartyIdentification');
+            $this->addIdentifierNode($identifierNode, 'cbc:ID', $identifier);
+        }
+
         // Party name
         $name = $party->getName();
         if ($name !== null) {

@@ -238,6 +238,11 @@ class UblReader extends AbstractReader {
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
 
+        // Additional identifiers
+        foreach ($xml->getAll("{{$cac}}PartyIdentification/{{$cbc}}ID") as $identifierNode) {
+            $party->addIdentifier($this->parseIdentifierNode($identifierNode));
+        }
+
         // Party name
         $nameNode = $xml->get("{{$cac}}PartyName/{{$cbc}}Name");
         if ($nameNode !== null) {
