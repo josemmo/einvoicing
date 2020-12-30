@@ -16,6 +16,9 @@ class Party {
     protected $postalCode = null;
     protected $subdivision = null;
     protected $country = null;
+    protected $contactName = null;
+    protected $contactPhone = null;
+    protected $contactEmail = null;
 
     use IdentifiersTrait;
 
@@ -220,5 +223,74 @@ class Party {
     public function setCountry(?string $countryCode): self {
         $this->country = $countryCode;
         return $this;
+    }
+
+
+    /**
+     * Get contact point name
+     * @return string|null Contact name
+     */
+    public function getContactName(): ?string {
+        return $this->contactName;
+    }
+
+
+    /**
+     * Set contact point name
+     * @param  string|null $contactName Contact name
+     * @return self                     This instance
+     */
+    public function setContactName(?string $contactName): self {
+        $this->contactName = $contactName;
+        return $this;
+    }
+
+
+    /**
+     * Get contact point phone number
+     * @return string|null Contact phone number
+     */
+    public function getContactPhone(): ?string {
+        return $this->contactPhone;
+    }
+
+
+    /**
+     * Set contact point phone number
+     * @param  string|null $contactPhone Contact phone number
+     * @return self                      This instance
+     */
+    public function setContactPhone(?string $contactPhone): self {
+        $this->contactPhone = $contactPhone;
+        return $this;
+    }
+
+
+    /**
+     * Get contact point email addresss
+     * @return string|null Contact email address
+     */
+    public function getContactEmail(): ?string {
+        return $this->contactEmail;
+    }
+
+
+    /**
+     * Set contact point email address
+     * @param  string|null $contactEmail Contact email address
+     * @return self                      This instance
+     */
+    public function setContactEmail(?string $contactEmail): self {
+        $this->contactEmail = $contactEmail;
+        return $this;
+    }
+
+
+    /**
+     * Has contact information
+     * @return boolean TRUE if party has any contact information, FALSE otherwise
+     */
+    public function hasContactInformation(): bool {
+        return ($this->contactName !== null) || ($this->contactPhone !== null) || ($this->contactEmail !== null);
     }
 }

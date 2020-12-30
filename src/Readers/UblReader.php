@@ -224,6 +224,24 @@ class UblReader extends AbstractReader {
             $party->setCompanyId($this->parseIdentifierNode($companyIdNode));
         }
 
+        // Contact name
+        $contactNameNode = $xml->get("{{$cac}}Contact/{{$cbc}}Name");
+        if ($contactNameNode !== null) {
+            $party->setContactName($contactNameNode->asText());
+        }
+
+        // Contact phone
+        $contactPhoneNode = $xml->get("{{$cac}}Contact/{{$cbc}}Telephone");
+        if ($contactPhoneNode !== null) {
+            $party->setContactPhone($contactPhoneNode->asText());
+        }
+
+        // Contact email
+        $contactEmailNode = $xml->get("{{$cac}}Contact/{{$cbc}}ElectronicMail");
+        if ($contactEmailNode !== null) {
+            $party->setContactEmail($contactEmailNode->asText());
+        }
+
         return $party;
     }
 

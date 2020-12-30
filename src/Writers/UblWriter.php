@@ -264,6 +264,26 @@ class UblWriter extends AbstractWriter {
         if ($companyId !== null) {
             $this->addIdentifierNode($legalEntityNode, 'cbc:CompanyID', $companyId);
         }
+
+        // Contact point
+        if ($party->hasContactInformation()) {
+            $contactNode = $xml->add('cac:Contact');
+            
+            $contactName = $party->getContactName();
+            if ($contactName !== null) {
+                $contactNode->add('cbc:Name', $contactName);
+            }
+
+            $contactPhone = $party->getContactPhone();
+            if ($contactPhone !== null) {
+                $contactNode->add('cbc:Telephone', $contactPhone);
+            }
+
+            $contactEmail = $party->getContactEmail();
+            if ($contactEmail !== null) {
+                $contactNode->add('cbc:ElectronicMail', $contactEmail);
+            }
+        }
     }
 
 
