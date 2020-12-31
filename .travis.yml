@@ -6,6 +6,7 @@ jobs:
     - php: 7.3
     - php: 7.4
       env: DEPLOY=true
+    - php: 8.0
     - php: nightly
   allow_failures:
     - php: nightly
@@ -18,7 +19,7 @@ install:
 
 script:
   - vendor/bin/phan
-  - vendor/bin/phpunit --testdox tests
+  - vendor/bin/phpunit --testdox
 
 before_deploy:
   - php ./scripts/build-docs.php
