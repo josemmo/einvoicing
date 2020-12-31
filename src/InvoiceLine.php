@@ -3,6 +3,7 @@ namespace Einvoicing;
 
 use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\BuyerAccountingReferenceTrait;
+use Einvoicing\Traits\ClassificationIdentifiersTrait;
 use Einvoicing\Traits\VatTrait;
 use function round;
 
@@ -20,6 +21,7 @@ class InvoiceLine {
 
     use AllowanceOrChargeTrait;
     use BuyerAccountingReferenceTrait;
+    use ClassificationIdentifiersTrait;
     use VatTrait;
 
     /**

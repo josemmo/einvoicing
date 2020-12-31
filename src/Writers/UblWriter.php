@@ -130,10 +130,11 @@ class UblWriter extends AbstractWriter {
      * @param UXML       $parent     Parent element
      * @param string     $name       New node name
      * @param Identifier $identifier Identifier instance
+     * @param string     $schemeAttr Scheme attribute name
      */
-    private function addIdentifierNode(UXML $parent, string $name, Identifier $identifier) {
+    private function addIdentifierNode(UXML $parent, string $name, Identifier $identifier, string $schemeAttr="schemeID") {
         $scheme = $identifier->getScheme();
-        $attrs = ($scheme === null) ? [] : ['schemeID' => $scheme];
+        $attrs = ($scheme === null) ? [] : ["$schemeAttr" => $scheme];
         $parent->add($name, $identifier->getValue(), $attrs);
     }
 
@@ -502,6 +503,12 @@ class UblWriter extends AbstractWriter {
         $originCountry = $line->getOriginCountry();
         if ($originCountry !== null) {
             $itemNode->add('cac:OriginCountry')->add('cbc:IdentificationCode', $originCountry);
+        }
+
+        // BT-158: Item classification identifiers
+        foreach ($line->getClassificationIdentifiers() as $identifier) {
+            $classNode = $itemNode->add('cac:CommodityClassification');
+            $this->addIdentifierNode($classNode, 'cbc:ItemClassificationCode', $identifier, 'listID');
         }
 
         // VAT node

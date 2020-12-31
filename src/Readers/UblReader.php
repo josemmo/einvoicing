@@ -133,12 +133,13 @@ class UblReader extends AbstractReader {
 
     /**
      * Parse identifier node
-     * @param  UXML       $xml XML node
-     * @return Identifier      Identifier instance
+     * @param  UXML       $xml        XML node
+     * @param  string     $schemeAttr Scheme attribute name
+     * @return Identifier             Identifier instance
      */
-    private function parseIdentifierNode(UXML $xml): Identifier {
+    private function parseIdentifierNode(UXML $xml, string $schemeAttr="schemeID"): Identifier {
         $value = $xml->asText();
-        $scheme = $xml->element()->hasAttribute('schemeID') ? $xml->element()->getAttribute('schemeID') : null;
+        $scheme = $xml->element()->hasAttribute($schemeAttr) ? $xml->element()->getAttribute($schemeAttr) : null;
         return new Identifier($value, $scheme);
     }
 
@@ -408,6 +409,12 @@ class UblReader extends AbstractReader {
         $originCountryNode = $xml->get("{{$cac}}Item/{{$cac}}OriginCountry/{{$cbc}}IdentificationCode");
         if ($originCountryNode !== null) {
             $line->setOriginCountry($originCountryNode->asText());
+        }
+
+        // BT-158: Item classification identifiers
+        $classNodes = $xml->getAll("{{$cac}}Item/{{$cac}}CommodityClassification/{{$cbc}}ItemClassificationCode");
+        foreach ($classNodes as $classNode) {
+            $line->addClassificationIdentifier($this->parseIdentifierNode($classNode, 'listID'));
         }
 
         // Price amount

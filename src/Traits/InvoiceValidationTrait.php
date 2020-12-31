@@ -177,6 +177,15 @@ trait InvoiceValidationTrait {
                 }
             }
         };
+        $res['BR-65'] = static function(Invoice $inv) {
+            foreach ($inv->getLines() as $line) {
+                foreach ($line->getClassificationIdentifiers() as $identifier) {
+                    if ($identifier->getScheme() === null) {
+                        return "The Item classification identifier (BT-158) shall have a Scheme identifier";
+                    }
+                }
+            }
+        };
 
         return $res;
     }
