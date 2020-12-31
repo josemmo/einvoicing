@@ -386,6 +386,12 @@ class UblReader extends AbstractReader {
             $line->setBuyerAccountingReference($buyerAccountingReferenceNode->asText());
         }
 
+        // BT-159: Item origin country
+        $originCountryNode = $xml->get("{{$cac}}Item/{{$cac}}OriginCountry/{{$cbc}}IdentificationCode");
+        if ($originCountryNode !== null) {
+            $line->setOriginCountry($originCountryNode->asText());
+        }
+
         // Price amount
         $priceNode = $xml->get("{{$cac}}Price/{{$cbc}}PriceAmount");
         if ($priceNode !== null) {

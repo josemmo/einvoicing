@@ -480,6 +480,12 @@ class UblWriter extends AbstractWriter {
             $itemNode->add('cbc:Name', $name);
         }
 
+        // BT-159: Item origin country
+        $originCountry = $line->getOriginCountry();
+        if ($originCountry !== null) {
+            $itemNode->add('cac:OriginCountry')->add('cbc:IdentificationCode', $originCountry);
+        }
+
         // VAT node
         $this->addVatNode($itemNode, 'cac:ClassifiedTaxCategory', $line->getVatCategory(), $line->getVatRate());
 

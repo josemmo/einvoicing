@@ -9,6 +9,7 @@ use function round;
 class InvoiceLine {
     protected $name = null;
     protected $description = null;
+    protected $originCountry = null;
     protected $quantity = 1;
     protected $unit = "C62"; // TODO: add constants
     protected $price = null;
@@ -54,6 +55,26 @@ class InvoiceLine {
      */
     public function setDescription(?string $description): self {
         $this->description = $description;
+        return $this;
+    }
+
+
+    /**
+     * Get item origin country
+     * @return string|null Item origin country code
+     */
+    public function getOriginCountry(): ?string {
+        return $this->originCountry;
+    }
+
+
+    /**
+     * Set item origin country
+     * @param  string|null $originCountry Item origin country code
+     * @return self                       Invoice line instance
+     */
+    public function setOriginCountry(?string $originCountry): self {
+        $this->originCountry = $originCountry;
         return $this;
     }
 
