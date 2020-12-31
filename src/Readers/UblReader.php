@@ -363,6 +363,12 @@ class UblReader extends AbstractReader {
             $line->setUnit($quantityNode->element()->getAttribute('unitCode'));
         }
 
+        // BT-133: Buyer accounting reference
+        $buyerAccountingReferenceNode = $xml->get("{{$cbc}}AccountingCost");
+        if ($buyerAccountingReferenceNode !== null) {
+            $line->setBuyerAccountingReference($buyerAccountingReferenceNode->asText());
+        }
+
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
             $this->addAllowanceOrCharge($line, $node);
@@ -380,10 +386,22 @@ class UblReader extends AbstractReader {
             $line->setName($nameNode->asText());
         }
 
-        // BT-133: Buyer accounting reference
-        $buyerAccountingReferenceNode = $xml->get("{{$cbc}}AccountingCost");
-        if ($buyerAccountingReferenceNode !== null) {
-            $line->setBuyerAccountingReference($buyerAccountingReferenceNode->asText());
+        // BT-156: Buyer identifier
+        $buyerIdentifierNode = $xml->get("{{$cac}}Item/{{$cac}}BuyersItemIdentification/{{$cbc}}ID");
+        if ($buyerIdentifierNode !== null) {
+            $line->setBuyerIdentifier($this->parseIdentifierNode($buyerIdentifierNode));
+        }
+
+        // BT-155: Seller identifier
+        $sellerIdentifierNode = $xml->get("{{$cac}}Item/{{$cac}}SellersItemIdentification/{{$cbc}}ID");
+        if ($sellerIdentifierNode !== null) {
+            $line->setSellerIdentifier($this->parseIdentifierNode($sellerIdentifierNode));
+        }
+
+        // BT-157: Standard identifier
+        $standardIdentifierNode = $xml->get("{{$cac}}Item/{{$cac}}StandardItemIdentification/{{$cbc}}ID");
+        if ($standardIdentifierNode !== null) {
+            $line->setStandardIdentifier($this->parseIdentifierNode($standardIdentifierNode));
         }
 
         // BT-159: Item origin country

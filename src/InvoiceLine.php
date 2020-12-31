@@ -10,6 +10,9 @@ class InvoiceLine {
     protected $name = null;
     protected $description = null;
     protected $originCountry = null;
+    protected $standardIdentifier = null;
+    protected $buyerIdentifier = null;
+    protected $sellerIdentifier = null;
     protected $quantity = 1;
     protected $unit = "C62"; // TODO: add constants
     protected $price = null;
@@ -75,6 +78,66 @@ class InvoiceLine {
      */
     public function setOriginCountry(?string $originCountry): self {
         $this->originCountry = $originCountry;
+        return $this;
+    }
+
+
+    /**
+     * Get item standard identifier
+     * @return Identifier|null Item standard identifier
+     */
+    public function getStandardIdentifier(): ?Identifier {
+        return $this->standardIdentifier;
+    }
+
+
+    /**
+     * Set item standard identifier
+     * @param  Identifier|null $identifier Item standard identifier
+     * @return self                        Invoice line instance
+     */
+    public function setStandardIdentifier(?Identifier $identifier): self {
+        $this->standardIdentifier = $identifier;
+        return $this;
+    }
+
+
+    /**
+     * Get buyer identifier
+     * @return Identifier|null Buyer identifier
+     */
+    public function getBuyerIdentifier(): ?Identifier {
+        return $this->buyerIdentifier;
+    }
+
+
+    /**
+     * Set buyer identifier
+     * @param  Identifier|null $identifier Buyer identifier
+     * @return self                        Invoice line instance
+     */
+    public function setBuyerIdentifier(?Identifier $identifier): self {
+        $this->buyerIdentifier = $identifier;
+        return $this;
+    }
+
+
+    /**
+     * Get seller identifier
+     * @return Identifier|null Seller identifier
+     */
+    public function getSellerIdentifier(): ?Identifier {
+        return $this->sellerIdentifier;
+    }
+
+
+    /**
+     * Set seller identifier
+     * @param  Identifier|null $identifier Seller identifier
+     * @return self                        Invoice line instance
+     */
+    public function setSellerIdentifier(?Identifier $identifier): self {
+        $this->sellerIdentifier = $identifier;
         return $this;
     }
 

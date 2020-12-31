@@ -480,6 +480,24 @@ class UblWriter extends AbstractWriter {
             $itemNode->add('cbc:Name', $name);
         }
 
+        // BT-156: Buyer identifier
+        $buyerIdentifier = $line->getBuyerIdentifier();
+        if ($buyerIdentifier !== null) {
+            $this->addIdentifierNode($itemNode->add('cac:BuyersItemIdentification'), 'cbc:ID', $buyerIdentifier);
+        }
+
+        // BT-155: Seller identifier
+        $sellerIdentifier = $line->getSellerIdentifier();
+        if ($sellerIdentifier !== null) {
+            $this->addIdentifierNode($itemNode->add('cac:SellersItemIdentification'), 'cbc:ID', $sellerIdentifier);
+        }
+
+        // BT-157: Standard identifier
+        $standardIdentifier = $line->getStandardIdentifier();
+        if ($standardIdentifier !== null) {
+            $this->addIdentifierNode($itemNode->add('cac:StandardItemIdentification'), 'cbc:ID', $standardIdentifier);
+        }
+
         // BT-159: Item origin country
         $originCountry = $line->getOriginCountry();
         if ($originCountry !== null) {

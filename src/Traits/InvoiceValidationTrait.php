@@ -169,6 +169,14 @@ trait InvoiceValidationTrait {
                 }
             }
         };
+        $res['BR-64'] = static function(Invoice $inv) {
+            foreach ($inv->getLines() as $line) {
+                if ($line->getStandardIdentifier() === null) continue;
+                if ($line->getStandardIdentifier()->getScheme() === null) {
+                    return "The Item standard identifier (BT-157) shall have a Scheme identifier";
+                }
+            }
+        };
 
         return $res;
     }
