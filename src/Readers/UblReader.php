@@ -390,13 +390,13 @@ class UblReader extends AbstractReader {
         // BT-156: Buyer identifier
         $buyerIdentifierNode = $xml->get("{{$cac}}Item/{{$cac}}BuyersItemIdentification/{{$cbc}}ID");
         if ($buyerIdentifierNode !== null) {
-            $line->setBuyerIdentifier($this->parseIdentifierNode($buyerIdentifierNode));
+            $line->setBuyerIdentifier($buyerIdentifierNode->asText());
         }
 
         // BT-155: Seller identifier
         $sellerIdentifierNode = $xml->get("{{$cac}}Item/{{$cac}}SellersItemIdentification/{{$cbc}}ID");
         if ($sellerIdentifierNode !== null) {
-            $line->setSellerIdentifier($this->parseIdentifierNode($sellerIdentifierNode));
+            $line->setSellerIdentifier($sellerIdentifierNode->asText());
         }
 
         // BT-157: Standard identifier

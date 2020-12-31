@@ -484,13 +484,13 @@ class UblWriter extends AbstractWriter {
         // BT-156: Buyer identifier
         $buyerIdentifier = $line->getBuyerIdentifier();
         if ($buyerIdentifier !== null) {
-            $this->addIdentifierNode($itemNode->add('cac:BuyersItemIdentification'), 'cbc:ID', $buyerIdentifier);
+            $itemNode->add('cac:BuyersItemIdentification')->add('cbc:ID', $buyerIdentifier);
         }
 
         // BT-155: Seller identifier
         $sellerIdentifier = $line->getSellerIdentifier();
         if ($sellerIdentifier !== null) {
-            $this->addIdentifierNode($itemNode->add('cac:SellersItemIdentification'), 'cbc:ID', $sellerIdentifier);
+            $itemNode->add('cac:SellersItemIdentification')->add('cbc:ID', $sellerIdentifier);
         }
 
         // BT-157: Standard identifier

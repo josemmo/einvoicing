@@ -106,19 +106,19 @@ class InvoiceLine {
 
     /**
      * Get buyer identifier
-     * @return Identifier|null Buyer identifier
+     * @return string|null Buyer identifier
      */
-    public function getBuyerIdentifier(): ?Identifier {
+    public function getBuyerIdentifier(): ?string {
         return $this->buyerIdentifier;
     }
 
 
     /**
      * Set buyer identifier
-     * @param  Identifier|null $identifier Buyer identifier
-     * @return self                        Invoice line instance
+     * @param  string|null $identifier Buyer identifier
+     * @return self                    Invoice line instance
      */
-    public function setBuyerIdentifier(?Identifier $identifier): self {
+    public function setBuyerIdentifier(?string $identifier): self {
         $this->buyerIdentifier = $identifier;
         return $this;
     }
@@ -126,19 +126,19 @@ class InvoiceLine {
 
     /**
      * Get seller identifier
-     * @return Identifier|null Seller identifier
+     * @return string|null Seller identifier
      */
-    public function getSellerIdentifier(): ?Identifier {
+    public function getSellerIdentifier(): ?string {
         return $this->sellerIdentifier;
     }
 
 
     /**
      * Set seller identifier
-     * @param  Identifier|null $identifier Seller identifier
-     * @return self                        Invoice line instance
+     * @param  string|null $identifier Seller identifier
+     * @return self                    Invoice line instance
      */
-    public function setSellerIdentifier(?Identifier $identifier): self {
+    public function setSellerIdentifier(?string $identifier): self {
         $this->sellerIdentifier = $identifier;
         return $this;
     }
