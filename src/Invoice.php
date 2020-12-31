@@ -5,6 +5,7 @@ use DateTime;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
+use Einvoicing\Traits\BuyerAccountingReferenceTrait;
 use Einvoicing\Traits\InvoiceValidationTrait;
 use InvalidArgumentException;
 use OutOfBoundsException;
@@ -27,7 +28,6 @@ class Invoice {
     protected $dueDate = null;
     protected $taxPointDate = null;
     protected $note = null;
-    protected $buyerAccountingReference = null;
     protected $buyerReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
@@ -37,6 +37,7 @@ class Invoice {
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
+    use BuyerAccountingReferenceTrait;
     use InvoiceValidationTrait;
 
     /**
@@ -257,26 +258,6 @@ class Invoice {
      */
     public function setNote(?string $note): self {
         $this->note = $note;
-        return $this;
-    }
-
-
-    /**
-     * Get buyer accounting reference
-     * @return string|null Buyer accounting reference
-     */
-    public function getBuyerAccountingReference(): ?string {
-        return $this->buyerAccountingReference;
-    }
-
-
-    /**
-     * Set buyer accounting reference
-     * @param  string|null $buyerAccountingReference Buyer accounting reference
-     * @return self                                  Invoice instance
-     */
-    public function setBuyerAccountingReference(?string $buyerAccountingReference): self {
-        $this->buyerAccountingReference = $buyerAccountingReference;
         return $this;
     }
 

@@ -451,6 +451,12 @@ class UblWriter extends AbstractWriter {
             $this->addAmountNode($xml, 'cbc:LineExtensionAmount', $netAmount, $invoice->getCurrency());
         }
 
+        // BT-133: Buyer accounting reference
+        $buyerAccountingReference = $line->getBuyerAccountingReference();
+        if ($buyerAccountingReference !== null) {
+            $xml->add('cbc:AccountingCost', $buyerAccountingReference);
+        }
+
         // Allowances and charges
         foreach ($line->getAllowances() as $item) {
             $this->addAllowanceOrCharge($xml, $item, false, $invoice, $line);

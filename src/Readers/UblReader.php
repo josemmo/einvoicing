@@ -380,6 +380,12 @@ class UblReader extends AbstractReader {
             $line->setName($nameNode->asText());
         }
 
+        // BT-133: Buyer accounting reference
+        $buyerAccountingReferenceNode = $xml->get("{{$cbc}}AccountingCost");
+        if ($buyerAccountingReferenceNode !== null) {
+            $line->setBuyerAccountingReference($buyerAccountingReferenceNode->asText());
+        }
+
         // Price amount
         $priceNode = $xml->get("{{$cac}}Price/{{$cbc}}PriceAmount");
         if ($priceNode !== null) {
