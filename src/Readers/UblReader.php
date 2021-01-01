@@ -370,6 +370,12 @@ class UblReader extends AbstractReader {
             $line->setBuyerAccountingReference($buyerAccountingReferenceNode->asText());
         }
 
+        // BT-132: Order line reference
+        $orderLineReferenceNode = $xml->get("{{$cac}}OrderLineReference/{{$cbc}}LineID");
+        if ($orderLineReferenceNode !== null) {
+            $line->setOrderLineReference($orderLineReferenceNode->asText());
+        }
+
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
             $this->addAllowanceOrCharge($line, $node);

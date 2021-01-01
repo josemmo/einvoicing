@@ -8,6 +8,7 @@ use Einvoicing\Traits\VatTrait;
 use function round;
 
 class InvoiceLine {
+    protected $orderLineReference = null;
     protected $name = null;
     protected $description = null;
     protected $originCountry = null;
@@ -23,6 +24,26 @@ class InvoiceLine {
     use BuyerAccountingReferenceTrait;
     use ClassificationIdentifiersTrait;
     use VatTrait;
+
+    /**
+     * Get order line reference
+     * @return string|null Order line reference
+     */
+    public function getOrderLineReference(): ?string {
+        return $this->orderLineReference;
+    }
+
+
+    /**
+     * Set order line reference
+     * @param  string|null $reference Order line reference
+     * @return self                   Invoice line instance
+     */
+    public function setOrderLineReference(?string $reference): self {
+        $this->orderLineReference = $reference;
+        return $this;
+    }
+
 
     /**
      * Get item name

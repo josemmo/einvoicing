@@ -458,6 +458,12 @@ class UblWriter extends AbstractWriter {
             $xml->add('cbc:AccountingCost', $buyerAccountingReference);
         }
 
+        // BT-132: Order line reference
+        $orderLineReference = $line->getOrderLineReference();
+        if ($orderLineReference !== null) {
+            $xml->add('cac:OrderLineReference')->add('cbc:LineID', $orderLineReference);
+        }
+
         // Allowances and charges
         foreach ($line->getAllowances() as $item) {
             $this->addAllowanceOrCharge($xml, $item, false, $invoice, $line);
