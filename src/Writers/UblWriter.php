@@ -175,6 +175,57 @@ class UblWriter extends AbstractWriter {
 
 
     /**
+     * Add postal address node
+     * @param UXML   $parent Parent element
+     * @param string $name   New node name
+     * @param Party  $source Source instance
+     */
+    private function addPostalAddressNode(UXML $parent, string $name, Party $source) {
+        $xml = $parent->add($name);
+
+        // Street name
+        $addressLines = $source->getAddress();
+        if (isset($addressLines[0])) {
+            $xml->add('cbc:StreetName', $addressLines[0]);
+        }
+
+        // Additional street name
+        if (isset($addressLines[1])) {
+            $xml->add('cbc:AdditionalStreetName', $addressLines[1]);
+        }
+
+        // City name
+        $cityName = $source->getCity();
+        if ($cityName !== null) {
+            $xml->add('cbc:CityName', $cityName);
+        }
+
+        // Postal code
+        $postalCode = $source->getPostalCode();
+        if ($postalCode !== null) {
+            $xml->add('cbc:PostalZone', $postalCode);
+        }
+
+        // Subdivision
+        $subdivision = $source->getSubdivision();
+        if ($subdivision !== null) {
+            $xml->add('cbc:CountrySubentity', $subdivision);
+        }
+
+        // Address line (third address line)
+        if (isset($addressLines[2])) {
+            $xml->add('cac:AddressLine')->add('cbc:Line', $addressLines[2]);
+        }
+
+        // Country
+        $country = $source->getCountry();
+        if ($country !== null) {
+            $xml->add('cac:Country')->add('cbc:IdentificationCode', $country);
+        }
+    }
+
+
+    /**
      * Add seller or buyer node
      * @param UXML  $parent Invoice element
      * @param Party $party  Party instance
@@ -200,48 +251,8 @@ class UblWriter extends AbstractWriter {
             $xml->add('cac:PartyName')->add('cbc:Name', $tradingName);
         }
 
-        // Initial postal address node
-        $addressNode = $xml->add('cac:PostalAddress');
-
-        // Street name
-        $addressLines = $party->getAddress();
-        if (isset($addressLines[0])) {
-            $addressNode->add('cbc:StreetName', $addressLines[0]);
-        }
-
-        // Additional street name
-        if (isset($addressLines[1])) {
-            $addressNode->add('cbc:AdditionalStreetName', $addressLines[1]);
-        }
-
-        // City name
-        $cityName = $party->getCity();
-        if ($cityName !== null) {
-            $addressNode->add('cbc:CityName', $cityName);
-        }
-
-        // Postal code
-        $postalCode = $party->getPostalCode();
-        if ($postalCode !== null) {
-            $addressNode->add('cbc:PostalZone', $postalCode);
-        }
-
-        // Subdivision
-        $subdivision = $party->getSubdivision();
-        if ($subdivision !== null) {
-            $addressNode->add('cbc:CountrySubentity', $subdivision);
-        }
-
-        // Address line (third address line)
-        if (isset($addressLines[2])) {
-            $addressNode->add('cac:AddressLine')->add('cbc:Line', $addressLines[2]);
-        }
-
-        // Country
-        $country = $party->getCountry();
-        if ($country !== null) {
-            $addressNode->add('cac:Country')->add('cbc:IdentificationCode', $country);
-        }
+        // Postal address node
+        $this->addPostalAddressNode($xml, 'cac:PostalAddress', $party);
 
         // VAT number
         $vatNumber = $party->getVatNumber();

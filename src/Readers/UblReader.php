@@ -145,6 +145,53 @@ class UblReader extends AbstractReader {
 
 
     /**
+     * Parse postal address fields
+     * @param UXML  $xml    XML node
+     * @param Party $target Destination instance
+     */
+    private function parsePostalAddressFields(UXML $xml, Party $target) {
+        $cac = UblWriter::NS_CAC;
+        $cbc = UblWriter::NS_CBC;
+
+        // Postal address
+        $addressNodes = array_filter([
+            $xml->get("{{$cac}}PostalAddress/{{$cbc}}StreetName"),
+            $xml->get("{{$cac}}PostalAddress/{{$cbc}}AdditionalStreetName"),
+            $xml->get("{{$cac}}PostalAddress/{{$cac}}AddressLine/{{$cbc}}Line")
+        ]);
+        $addressLines = array_map(function($node) {
+            return $node->asText();
+        }, $addressNodes);
+        // @phan-suppress-next-line PhanThrowTypeAbsentForCall
+        $target->setAddress($addressLines);
+
+        // City name
+        $cityNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}CityName");
+        if ($cityNode !== null) {
+            $target->setCity($cityNode->asText());
+        }
+
+        // Postal code
+        $postalCodeNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}PostalZone");
+        if ($postalCodeNode !== null) {
+            $target->setPostalCode($postalCodeNode->asText());
+        }
+
+        // Subdivision
+        $subdivisionNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}CountrySubentity");
+        if ($subdivisionNode !== null) {
+            $target->setSubdivision($subdivisionNode->asText());
+        }
+
+        // Country
+        $countryNode = $xml->get("{{$cac}}PostalAddress/{{$cac}}Country/{{$cbc}}IdentificationCode");
+        if ($countryNode !== null) {
+            $target->setCountry($countryNode->asText());
+        }
+    }
+
+
+    /**
      * Parse seller or buyer node
      * @param  UXML  $xml XML node
      * @return Party      Party instance
@@ -172,40 +219,7 @@ class UblReader extends AbstractReader {
         }
 
         // Postal address
-        $addressNodes = array_filter([
-            $xml->get("{{$cac}}PostalAddress/{{$cbc}}StreetName"),
-            $xml->get("{{$cac}}PostalAddress/{{$cbc}}AdditionalStreetName"),
-            $xml->get("{{$cac}}PostalAddress/{{$cac}}AddressLine/{{$cbc}}Line")
-        ]);
-        $addressLines = array_map(function($node) {
-            return $node->asText();
-        }, $addressNodes);
-        // @phan-suppress-next-line PhanThrowTypeAbsentForCall
-        $party->setAddress($addressLines);
-
-        // City name
-        $cityNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}CityName");
-        if ($cityNode !== null) {
-            $party->setCity($cityNode->asText());
-        }
-
-        // Postal code
-        $postalCodeNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}PostalZone");
-        if ($postalCodeNode !== null) {
-            $party->setPostalCode($postalCodeNode->asText());
-        }
-
-        // Subdivision
-        $subdivisionNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}CountrySubentity");
-        if ($subdivisionNode !== null) {
-            $party->setSubdivision($subdivisionNode->asText());
-        }
-
-        // Country
-        $countryNode = $xml->get("{{$cac}}PostalAddress/{{$cac}}Country/{{$cbc}}IdentificationCode");
-        if ($countryNode !== null) {
-            $party->setCountry($countryNode->asText());
-        }
+        $this->parsePostalAddressFields($xml, $party);
 
         // VAT number
         $vatNumberNode = $xml->get("{{$cac}}PartyTaxScheme/{{$cbc}}CompanyID");
