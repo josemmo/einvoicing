@@ -155,9 +155,9 @@ class UblReader extends AbstractReader {
 
         // Postal address
         $addressNodes = array_filter([
-            $xml->get("{{$cac}}PostalAddress/{{$cbc}}StreetName"),
-            $xml->get("{{$cac}}PostalAddress/{{$cbc}}AdditionalStreetName"),
-            $xml->get("{{$cac}}PostalAddress/{{$cac}}AddressLine/{{$cbc}}Line")
+            $xml->get("{{$cbc}}StreetName"),
+            $xml->get("{{$cbc}}AdditionalStreetName"),
+            $xml->get("{{$cac}}AddressLine/{{$cbc}}Line")
         ]);
         $addressLines = array_map(function($node) {
             return $node->asText();
@@ -166,25 +166,25 @@ class UblReader extends AbstractReader {
         $target->setAddress($addressLines);
 
         // City name
-        $cityNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}CityName");
+        $cityNode = $xml->get("{{$cbc}}CityName");
         if ($cityNode !== null) {
             $target->setCity($cityNode->asText());
         }
 
         // Postal code
-        $postalCodeNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}PostalZone");
+        $postalCodeNode = $xml->get("{{$cbc}}PostalZone");
         if ($postalCodeNode !== null) {
             $target->setPostalCode($postalCodeNode->asText());
         }
 
         // Subdivision
-        $subdivisionNode = $xml->get("{{$cac}}PostalAddress/{{$cbc}}CountrySubentity");
+        $subdivisionNode = $xml->get("{{$cbc}}CountrySubentity");
         if ($subdivisionNode !== null) {
             $target->setSubdivision($subdivisionNode->asText());
         }
 
         // Country
-        $countryNode = $xml->get("{{$cac}}PostalAddress/{{$cac}}Country/{{$cbc}}IdentificationCode");
+        $countryNode = $xml->get("{{$cac}}Country/{{$cbc}}IdentificationCode");
         if ($countryNode !== null) {
             $target->setCountry($countryNode->asText());
         }
@@ -219,7 +219,10 @@ class UblReader extends AbstractReader {
         }
 
         // Postal address
-        $this->parsePostalAddressFields($xml, $party);
+        $addressNode = $xml->get("{{$cac}}PostalAddress");
+        if ($addressNode !== null) {
+            $this->parsePostalAddressFields($addressNode, $party);
+        }
 
         // VAT number
         $vatNumberNode = $xml->get("{{$cac}}PartyTaxScheme/{{$cbc}}CompanyID");
