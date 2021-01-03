@@ -3,6 +3,7 @@ namespace Einvoicing\Readers;
 
 use DateTime;
 use Einvoicing\AllowanceOrCharge;
+use Einvoicing\Delivery;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
@@ -22,7 +23,7 @@ class UblReader extends AbstractReader {
         $invoice = new Invoice();
 
         // Load XML document
-        $xml = UXML::load($document);
+        $xml = UXML::fromString($document);
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
 
@@ -117,6 +118,12 @@ class UblReader extends AbstractReader {
             $invoice->setPayee($this->parsePayeeNode($payeeNode));
         }
 
+        // Delivery node
+        $deliveryNode = $xml->get("{{$cac}}Delivery");
+        if ($deliveryNode !== null) {
+            $invoice->setDelivery($this->parseDeliveryNode($deliveryNode));
+        }
+
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
             $this->addAllowanceOrCharge($invoice, $node);
@@ -146,10 +153,10 @@ class UblReader extends AbstractReader {
 
     /**
      * Parse postal address fields
-     * @param UXML  $xml    XML node
-     * @param Party $target Destination instance
+     * @param UXML           $xml    XML node
+     * @param Delivery|Party $target Destination instance
      */
-    private function parsePostalAddressFields(UXML $xml, Party $target) {
+    private function parsePostalAddressFields(UXML $xml, $target) {
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
 
@@ -292,6 +299,44 @@ class UblReader extends AbstractReader {
         }
 
         return $party;
+    }
+
+
+    /**
+     * Parse delivery node
+     * @param  UXML     $xml XML node
+     * @return Delivery      Delivery instance
+     */
+    private function parseDeliveryNode(UXML $xml): Delivery {
+        $delivery = new Delivery();
+        $cac = UblWriter::NS_CAC;
+        $cbc = UblWriter::NS_CBC;
+
+        // BT-72: Actual delivery date
+        $dateNode = $xml->get("{{$cbc}}ActualDeliveryDate");
+        if ($dateNode !== null) {
+            $delivery->setDate(new DateTime($dateNode->asText()));
+        }
+
+        // BT-71: Delivery location identifier
+        $locationIdentifierNode = $xml->get("{{$cac}}DeliveryLocation/{{$cbc}}ID");
+        if ($locationIdentifierNode !== null) {
+            $delivery->setLocationIdentifier($this->parseIdentifierNode($locationIdentifierNode));
+        }
+
+        // Delivery postal address
+        $addressNode = $xml->get("{{$cac}}DeliveryLocation/{{$cac}}Address");
+        if ($addressNode !== null) {
+            $this->parsePostalAddressFields($addressNode, $delivery);
+        }
+
+        // BT-70: Deliver name
+        $nameNode = $xml->get("{{$cac}}DeliveryParty/{{$cac}}PartyName/{{$cbc}}Name");
+        if ($nameNode !== null) {
+            $delivery->setName($nameNode->asText());
+        }
+
+        return $delivery;
     }
 
 

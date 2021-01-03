@@ -34,6 +34,7 @@ class Invoice {
     protected $seller = null;
     protected $buyer = null;
     protected $payee = null;
+    protected $delivery = null;
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
@@ -380,6 +381,26 @@ class Invoice {
      */
     public function setPayee(?Party $payee): self {
         $this->payee = $payee;
+        return $this;
+    }
+
+
+    /**
+     * Get delivery information
+     * @return Delivery|null Delivery instance
+     */
+    public function getDelivery(): ?Delivery {
+        return $this->delivery;
+    }
+
+
+    /**
+     * Set delivery information
+     * @param  Delivery|null $delivery Delivery instance
+     * @return self                    Invoice instance
+     */
+    public function setDelivery(?Delivery $delivery): self {
+        $this->delivery = $delivery;
         return $this;
     }
 

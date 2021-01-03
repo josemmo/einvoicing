@@ -2,6 +2,7 @@
 namespace Einvoicing\Writers;
 
 use Einvoicing\AllowanceOrCharge;
+use Einvoicing\Delivery;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
@@ -102,6 +103,12 @@ class UblWriter extends AbstractWriter {
             $this->addPayeeNode($xml, $payee);
         }
 
+        // Delivery node
+        $delivery = $invoice->getDelivery();
+        if ($delivery !== null) {
+            $this->addDeliveryNode($xml, $delivery);
+        }
+
         // Allowances and charges
         foreach ($invoice->getAllowances() as $item) {
             $this->addAllowanceOrCharge($xml, $item, false, $invoice);
@@ -176,11 +183,12 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add postal address node
-     * @param UXML   $parent Parent element
-     * @param string $name   New node name
-     * @param Party  $source Source instance
+     * @param  UXML           $parent Parent element
+     * @param  string         $name   New node name
+     * @param  Delivery|Party $source Source instance
+     * @return UXML                   Postal address node
      */
-    private function addPostalAddressNode(UXML $parent, string $name, Party $source) {
+    private function addPostalAddressNode(UXML $parent, string $name, $source) {
         $xml = $parent->add($name);
 
         // Street name
@@ -222,6 +230,8 @@ class UblWriter extends AbstractWriter {
         if ($country !== null) {
             $xml->add('cac:Country')->add('cbc:IdentificationCode', $country);
         }
+
+        return $xml;
     }
 
 
@@ -324,6 +334,48 @@ class UblWriter extends AbstractWriter {
         if ($companyId !== null) {
             $legalEntityNode = $xml->add('cac:PartyLegalEntity');
             $this->addIdentifierNode($legalEntityNode, 'cbc:CompanyID', $companyId);
+        }
+    }
+
+
+    /**
+     * Add delivery node
+     * @param UXML     $parent   Invoice element
+     * @param Delivery $delivery Delivery instance
+     */
+    private function addDeliveryNode(UXML $parent, Delivery $delivery) {
+        $xml = $parent->add('cac:Delivery');
+
+        // BT-72: Actual delivery date
+        $date = $delivery->getDate();
+        if ($date !== null) {
+            $xml->add('cbc:ActualDeliveryDate', $date->format('Y-m-d'));
+        }
+
+        // Initial delivery location node
+        $locationNode = $xml->add('cac:DeliveryLocation');
+
+        // BT-71: Delivery location identifier
+        $locationIdentifier = $delivery->getLocationIdentifier();
+        if ($locationIdentifier !== null) {
+            $this->addIdentifierNode($locationNode, 'cbc:ID', $locationIdentifier);
+        }
+
+        // Delivery postal address
+        $addressNode = $this->addPostalAddressNode($locationNode, 'cac:Address', $delivery);
+        if ($addressNode->isEmpty()) {
+            $addressNode->remove();
+        }
+
+        // BT-70: Deliver name
+        $name = $delivery->getName();
+        if ($name !== null) {
+            $xml->add('cac:DeliveryParty')->add('cac:PartyName')->add('cbc:Name', $name);
+        }
+
+        // Remove location node if empty
+        if ($locationNode->isEmpty()) {
+            $locationNode->remove();
         }
     }
 
