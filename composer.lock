@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b55dd8d75b56be51303ccf8152c06ec2",
+    "content-hash": "328d362fd629415568f6762b1bebd87a",
     "packages": [
         {
             "name": "josemmo/uxml",
-            "version": "v0.0.1",
+            "version": "v0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/josemmo/uxml.git",
-                "reference": "430021300185c432e3c04b28992fe50c11f2f155"
+                "reference": "aeb2b00f5448a9f81959cd385c1661554fdfc44b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/josemmo/uxml/zipball/430021300185c432e3c04b28992fe50c11f2f155",
-                "reference": "430021300185c432e3c04b28992fe50c11f2f155",
+                "url": "https://api.github.com/repos/josemmo/uxml/zipball/aeb2b00f5448a9f81959cd385c1661554fdfc44b",
+                "reference": "aeb2b00f5448a9f81959cd385c1661554fdfc44b",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,8 @@
                 "php": ">=7.1"
             },
             "require-dev": {
-                "phan/phan": "^3.0"
+                "phan/phan": "^4",
+                "phpunit/phpunit": "^9"
             },
             "type": "library",
             "autoload": {
@@ -51,9 +52,9 @@
             ],
             "support": {
                 "issues": "https://github.com/josemmo/uxml/issues",
-                "source": "https://github.com/josemmo/uxml/tree/v0.0.1"
+                "source": "https://github.com/josemmo/uxml/tree/v0.1.0"
             },
-            "time": "2020-10-03T17:01:02+00:00"
+            "time": "2021-01-03T09:32:47+00:00"
         }
     ],
     "packages-dev": [
@@ -527,16 +528,16 @@
         },
         {
             "name": "phan/phan",
-            "version": "3.2.9",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phan/phan.git",
-                "reference": "39d52b47bbd9e423a76b7a4ce25b1dd8742ee131"
+                "reference": "6f7acd037847d390175e73d71b14f38da037965f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phan/phan/zipball/39d52b47bbd9e423a76b7a4ce25b1dd8742ee131",
-                "reference": "39d52b47bbd9e423a76b7a4ce25b1dd8742ee131",
+                "url": "https://api.github.com/repos/phan/phan/zipball/6f7acd037847d390175e73d71b14f38da037965f",
+                "reference": "6f7acd037847d390175e73d71b14f38da037965f",
                 "shasum": ""
             },
             "require": {
@@ -558,7 +559,7 @@
                 "phpunit/phpunit": "^8.5.0"
             },
             "suggest": {
-                "ext-ast": "Needed for parsing ASTs (unless --use-fallback-parser is used). 1.0.1+ is needed, 1.0.8+ is recommended.",
+                "ext-ast": "Needed for parsing ASTs (unless --use-fallback-parser is used). 1.0.1+ is needed, 1.0.10+ is recommended.",
                 "ext-iconv": "Either iconv or mbstring is needed to ensure issue messages are valid utf-8",
                 "ext-igbinary": "Improves performance of polyfill when ext-ast is unavailable",
                 "ext-mbstring": "Either iconv or mbstring is needed to ensure issue messages are valid utf-8",
@@ -598,9 +599,9 @@
             ],
             "support": {
                 "issues": "https://github.com/phan/phan/issues",
-                "source": "https://github.com/phan/phan/tree/3.2.9"
+                "source": "https://github.com/phan/phan/tree/4.0.1"
             },
-            "time": "2020-12-26T19:12:51+00:00"
+            "time": "2020-12-31T21:21:49+00:00"
         },
         {
             "name": "phar-io/manifest",
