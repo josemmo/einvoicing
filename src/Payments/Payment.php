@@ -6,6 +6,7 @@ class Payment {
     protected $meansCode = null;
     protected $meansText = null;
     protected $terms = null;
+    protected $card = null;
 
     /**
      * Get payment ID
@@ -83,6 +84,26 @@ class Payment {
      */
     public function setTerms(?string $terms): self {
         $this->terms = $terms;
+        return $this;
+    }
+
+
+    /**
+     * Get payment card
+     * @return Card|null Card instance
+     */
+    public function getCard(): ?Card {
+        return $this->card;
+    }
+
+
+    /**
+     * Set payment card
+     * @param  Card|null $card Card instance
+     * @return self            Payment instance
+     */
+    public function setCard(?Card $card): self {
+        $this->card = $card;
         return $this;
     }
 }

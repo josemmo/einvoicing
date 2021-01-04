@@ -8,6 +8,7 @@ use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
 use Einvoicing\Party;
+use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Payment;
 use Einvoicing\Writers\UblWriter;
 use InvalidArgumentException;
@@ -377,12 +378,49 @@ class UblReader extends AbstractReader {
             $payment->setId($paymentIdNode->asText());
         }
 
+        // BG-18: Payment card
+        $cardNode = $xml->get("{{$cac}}PaymentMeans/{{$cac}}CardAccount");
+        if ($cardNode !== null) {
+            $payment->setCard($this->parsePaymentCardNode($cardNode));
+        }
+
         // BT-20: Payment terms
         if ($termsNode !== null) {
             $payment->setTerms($termsNode->asText());
         }
 
         return $payment;
+    }
+
+
+    /**
+     * Parse payment card node
+     * @param  UXML $xml Payment card node
+     * @return Card      Card instance
+     */
+    private function parsePaymentCardNode(UXML $xml): Card {
+        $card = new Card();
+        $cbc = UblWriter::NS_CBC;
+
+        // BT-87: Card PAN
+        $panNode = $xml->get("{{$cbc}}PrimaryAccountNumberID");
+        if ($panNode !== null) {
+            $card->setPan($panNode->asText());
+        }
+
+        // Card network
+        $networkNode = $xml->get("{{$cbc}}NetworkID");
+        if ($networkNode !== null) {
+            $card->setNetwork($networkNode->asText());
+        }
+
+        // BT-88: Holder name
+        $holderNode = $xml->get("{{$cbc}}HolderName");
+        if ($holderNode !== null) {
+            $card->setHolder($holderNode->asText());
+        }
+
+        return $card;
     }
 
 

@@ -8,6 +8,7 @@ use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Party;
+use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Payment;
 use UXML\UXML;
 
@@ -410,6 +411,12 @@ class UblWriter extends AbstractWriter {
             $xml->add('cbc:PaymentID', $paymentId);
         }
 
+        // BG-18: Payment card
+        $card = $payment->getCard();
+        if ($card !== null) {
+            $this->addPaymentCardNode($xml, $card);
+        }
+
         // Remove PaymentMeans node if empty
         if ($xml->isEmpty()) {
             $xml->remove();
@@ -419,6 +426,34 @@ class UblWriter extends AbstractWriter {
         $terms = $payment->getTerms();
         if ($terms !== null) {
             $parent->add('cac:PaymentTerms')->add('cbc:Note', $terms);
+        }
+    }
+
+
+    /**
+     * Add payment card node
+     * @param UXML $parent PaymentMeans element
+     * @param Card $card   Card instance
+     */
+    private function addPaymentCardNode(UXML $parent, Card $card) {
+        $xml = $parent->add('cac:CardAccount');
+
+        // BT-87: Card PAN
+        $pan = $card->getPan();
+        if ($pan !== null) {
+            $xml->add('cbc:PrimaryAccountNumberID', $pan);
+        }
+
+        // Card network
+        $network = $card->getNetwork();
+        if ($network !== null) {
+            $xml->add('cbc:NetworkID', $network);
+        }
+
+        // BT-88: Holder name
+        $holder = $card->getHolder();
+        if ($holder !== null) {
+            $xml->add('cbc:HolderName', $holder);
         }
     }
 

@@ -174,6 +174,14 @@ trait InvoiceValidationTrait {
                 return "A Payment instruction (BG-16) shall specify the Payment means type code (BT-81)";
             }
         };
+        $res['BR-51'] = static function(Invoice $inv) {
+            if ($inv->getPayment() === null) return;
+            if ($inv->getPayment()->getCard() === null) return;
+            if ($inv->getPayment()->getCard()->getPan() === null) {
+                return "The last 4 to 6 digits of the Payment card primary account number (BT-87) " .
+                    "shall be present if Payment card information (BG-18) is provided in the Invoice";
+            }
+        };
         $res['BR-64'] = static function(Invoice $inv) {
             foreach ($inv->getLines() as $line) {
                 if ($line->getStandardIdentifier() === null) continue;
