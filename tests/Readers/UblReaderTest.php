@@ -3,6 +3,7 @@ namespace Tests\Readers;
 
 use Einvoicing\Readers\UblReader;
 use PHPUnit\Framework\TestCase;
+use function file_get_contents;
 
 final class UblReaderTest extends TestCase {
     const DOCUMENT_PATH = __DIR__ . "/peppol-example.xml";
