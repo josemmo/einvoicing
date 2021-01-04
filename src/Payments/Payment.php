@@ -1,11 +1,16 @@
 <?php
 namespace Einvoicing\Payments;
 
+use OutOfBoundsException;
+use function array_splice;
+use function count;
+
 class Payment {
     protected $id = null;
     protected $meansCode = null;
     protected $meansText = null;
     protected $terms = null;
+    protected $transfers = [];
     protected $card = null;
     protected $mandate = null;
 
@@ -85,6 +90,51 @@ class Payment {
      */
     public function setTerms(?string $terms): self {
         $this->terms = $terms;
+        return $this;
+    }
+
+
+    /**
+     * Get payment transfers
+     * @return Transfer[] Array of transfers
+     */
+    public function getTransfers(): array {
+        return $this->transfers;
+    }
+
+
+    /**
+     * Add payment transfers
+     * @param  Transfer $transfer Transfer instance
+     * @return self               Payment instance
+     */
+    public function addTransfer(Transfer $transfer): self {
+        $this->transfers[] = $transfer;
+        return $this;
+    }
+
+
+    /**
+     * Remove payment transfer
+     * @param  int  $index Transfer index
+     * @return self        Payment instance
+     * @throws OutOfBoundsException if transfer index is out of bounds
+     */
+    public function removeTransfer(int $index): self {
+        if ($index < 0 || $index >= count($this->transfers)) {
+            throw new OutOfBoundsException('Could not find transfer by index');
+        }
+        array_splice($this->transfers, $index, 1);
+        return $this;
+    }
+
+
+    /**
+     * Clear all payment transfers
+     * @return self Payment instance
+     */
+    public function clearTransfers(): self {
+        $this->transfers = [];
         return $this;
     }
 

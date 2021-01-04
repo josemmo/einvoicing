@@ -11,6 +11,7 @@ use Einvoicing\Party;
 use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Mandate;
 use Einvoicing\Payments\Payment;
+use Einvoicing\Payments\Transfer;
 use Einvoicing\Writers\UblWriter;
 use InvalidArgumentException;
 use UXML\UXML;
@@ -385,6 +386,12 @@ class UblReader extends AbstractReader {
             $payment->setCard($this->parsePaymentCardNode($cardNode));
         }
 
+        // BG-17: Payment transfers
+        $transferNodes = $xml->getAll("{{$cac}}PaymentMeans/{{$cac}}PayeeFinancialAccount");
+        foreach ($transferNodes as $transferNode) {
+            $payment->addTransfer($this->parsePaymentTransferNode($transferNode));
+        }
+
         // BG-19: Payment mandate
         $mandateNode = $xml->get("{{$cac}}PaymentMeans/{{$cac}}PaymentMandate");
         if ($mandateNode !== null) {
@@ -428,6 +435,38 @@ class UblReader extends AbstractReader {
         }
 
         return $card;
+    }
+
+
+    /**
+     * Parse payment transfer node
+     * @param  UXML     $xml Payment transfer node
+     * @return Transfer      Transfer instance
+     */
+    private function parsePaymentTransferNode(UXML $xml): Transfer {
+        $transfer = new Transfer();
+        $cac = UblWriter::NS_CAC;
+        $cbc = UblWriter::NS_CBC;
+
+        // BT-84: Receiving account ID
+        $accountIdNode = $xml->get("{{$cbc}}ID");
+        if ($accountIdNode !== null) {
+            $transfer->setAccountId($accountIdNode->asText());
+        }
+
+        // BT-85: Receiving account name
+        $accountNameNode = $xml->get("{{$cbc}}Name");
+        if ($accountNameNode !== null) {
+            $transfer->setAccountName($accountNameNode->asText());
+        }
+
+        // BT-86: Service provider ID
+        $providerNode = $xml->get("{{$cac}}FinancialInstitutionBranch/{{$cbc}}ID");
+        if ($providerNode !== null) {
+            $transfer->setProvider($providerNode->asText());
+        }
+
+        return $transfer;
     }
 
 

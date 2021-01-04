@@ -30,6 +30,11 @@ class Peppol extends AbstractPreset {
                 return "Mandate reference MUST be provided for direct debit";
             }
         };
+        $res['BG-17'] = static function(Invoice $inv) {
+            if ($inv->getPayment() !== null && count($inv->getPayment()->getTransfers()) > 1) {
+                return "An Invoice shall not have multiple credit transfers";
+            }
+        };
 
         return $res;
     }
