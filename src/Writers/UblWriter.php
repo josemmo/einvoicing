@@ -9,6 +9,7 @@ use Einvoicing\InvoiceLine;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Party;
 use Einvoicing\Payments\Card;
+use Einvoicing\Payments\Mandate;
 use Einvoicing\Payments\Payment;
 use UXML\UXML;
 
@@ -417,6 +418,12 @@ class UblWriter extends AbstractWriter {
             $this->addPaymentCardNode($xml, $card);
         }
 
+        // BG-19: Payment mandate
+        $mandate = $payment->getMandate();
+        if ($mandate !== null) {
+            $this->addPaymentMandateNode($xml, $mandate);
+        }
+
         // Remove PaymentMeans node if empty
         if ($xml->isEmpty()) {
             $xml->remove();
@@ -454,6 +461,28 @@ class UblWriter extends AbstractWriter {
         $holder = $card->getHolder();
         if ($holder !== null) {
             $xml->add('cbc:HolderName', $holder);
+        }
+    }
+
+
+    /**
+     * Add payment mandate node
+     * @param UXML    $parent  PaymentMeans element
+     * @param Mandate $mandate Mandate instance
+     */
+    private function addPaymentMandateNode(UXML $parent, Mandate $mandate) {
+        $xml = $parent->add('cac:PaymentMandate');
+
+        // BT-89: Mandate reference
+        $reference = $mandate->getReference();
+        if ($reference !== null) {
+            $xml->add('cbc:ID', $reference);
+        }
+
+        // BT-91: Debited account
+        $account = $mandate->getAccount();
+        if ($account !== null) {
+            $xml->add('cac:PayerFinancialAccount')->add('cbc:ID', $account);
         }
     }
 

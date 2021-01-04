@@ -20,6 +20,24 @@ class Peppol extends AbstractPreset {
     /**
      * @inheritdoc
      */
+    public function getRules(): array {
+        $res = [];
+
+        $res['PEPPOL-EN16931-R061'] = static function(Invoice $inv) {
+            if ($inv->getPayment() === null) return;
+            if ($inv->getPayment()->getMandate() === null) return;
+            if ($inv->getPayment()->getMandate()->getReference() === null) {
+                return "Mandate reference MUST be provided for direct debit";
+            }
+        };
+
+        return $res;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function setupInvoice(Invoice $invoice) {
         parent::setupInvoice($invoice);
         $invoice->setBusinessProcess('urn:fdc:peppol.eu:2017:poacc:billing:01:1.0');

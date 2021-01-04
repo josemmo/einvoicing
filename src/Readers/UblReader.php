@@ -9,6 +9,7 @@ use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
 use Einvoicing\Party;
 use Einvoicing\Payments\Card;
+use Einvoicing\Payments\Mandate;
 use Einvoicing\Payments\Payment;
 use Einvoicing\Writers\UblWriter;
 use InvalidArgumentException;
@@ -384,6 +385,12 @@ class UblReader extends AbstractReader {
             $payment->setCard($this->parsePaymentCardNode($cardNode));
         }
 
+        // BG-19: Payment mandate
+        $mandateNode = $xml->get("{{$cac}}PaymentMeans/{{$cac}}PaymentMandate");
+        if ($mandateNode !== null) {
+            $payment->setMandate($this->parsePaymentMandateNode($mandateNode));
+        }
+
         // BT-20: Payment terms
         if ($termsNode !== null) {
             $payment->setTerms($termsNode->asText());
@@ -421,6 +428,32 @@ class UblReader extends AbstractReader {
         }
 
         return $card;
+    }
+
+
+    /**
+     * Parse payment mandate node
+     * @param  UXML    $xml Payment mandate node
+     * @return Mandate      Mandate instance
+     */
+    private function parsePaymentMandateNode(UXML $xml): Mandate {
+        $mandate = new Mandate();
+        $cac = UblWriter::NS_CAC;
+        $cbc = UblWriter::NS_CBC;
+
+        // BT-89: Mandate reference
+        $referenceNode = $xml->get("{{$cbc}}ID");
+        if ($referenceNode !== null) {
+            $mandate->setReference($referenceNode->asText());
+        }
+
+        // BT-91: Debited account
+        $accountNode = $xml->get("{{$cac}}PayerFinancialAccount/{{$cbc}}ID");
+        if ($accountNode !== null) {
+            $mandate->setAccount($accountNode->asText());
+        }
+
+        return $mandate;
     }
 
 

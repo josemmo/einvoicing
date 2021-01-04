@@ -7,6 +7,7 @@ class Payment {
     protected $meansText = null;
     protected $terms = null;
     protected $card = null;
+    protected $mandate = null;
 
     /**
      * Get payment ID
@@ -104,6 +105,26 @@ class Payment {
      */
     public function setCard(?Card $card): self {
         $this->card = $card;
+        return $this;
+    }
+
+
+    /**
+     * Get payment mandate
+     * @return Mandate|null Mandate instance
+     */
+    public function getMandate(): ?Mandate {
+        return $this->mandate;
+    }
+
+
+    /**
+     * Set payment mandate
+     * @param  Mandate|null $mandate Mandate instance
+     * @return self                  Payment instance
+     */
+    public function setMandate(?Mandate $mandate): self {
+        $this->mandate = $mandate;
         return $this;
     }
 }
