@@ -169,6 +169,11 @@ trait InvoiceValidationTrait {
                 }
             }
         };
+        $res['BR-49'] = static function(Invoice $inv) {
+            if ($inv->getPayment() !== null && $inv->getPayment()->getMeansCode() === null) {
+                return "A Payment instruction (BG-16) shall specify the Payment means type code (BT-81)";
+            }
+        };
         $res['BR-64'] = static function(Invoice $inv) {
             foreach ($inv->getLines() as $line) {
                 if ($line->getStandardIdentifier() === null) continue;

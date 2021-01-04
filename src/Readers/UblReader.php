@@ -8,6 +8,7 @@ use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
 use Einvoicing\Party;
+use Einvoicing\Payments\Payment;
 use Einvoicing\Writers\UblWriter;
 use InvalidArgumentException;
 use UXML\UXML;
@@ -123,6 +124,10 @@ class UblReader extends AbstractReader {
         if ($deliveryNode !== null) {
             $invoice->setDelivery($this->parseDeliveryNode($deliveryNode));
         }
+
+        // Payment nodes
+        $payment = $this->parsePaymentNodes($xml);
+        $invoice->setPayment($payment);
 
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
@@ -337,6 +342,47 @@ class UblReader extends AbstractReader {
         }
 
         return $delivery;
+    }
+
+
+    /**
+     * Parse payment nodes
+     * @param  UXML         $xml XML node
+     * @return Payment|null      Payment instance or NULL if not found
+     */
+    private function parsePaymentNodes(UXML $xml): ?Payment {
+        $cac = UblWriter::NS_CAC;
+        $cbc = UblWriter::NS_CBC;
+
+        // Get root nodes
+        $meansNode = $xml->get("{{$cac}}PaymentMeans");
+        $termsNode = $xml->get("{{$cac}}PaymentTerms/{{$cbc}}Note");
+        if ($meansNode === null && $termsNode === null) return null;
+
+        $payment = new Payment();
+
+        // BT-81: Payment means code
+        // BT-82: Payment means name
+        $meansCodeNode = $xml->get("{{$cac}}PaymentMeans/{{$cbc}}PaymentMeansCode");
+        if ($meansCodeNode !== null) {
+            $payment->setMeansCode($meansCodeNode->asText());
+            if ($meansCodeNode->element()->hasAttribute('name')) {
+                $payment->setMeansText($meansCodeNode->element()->getAttribute('name'));
+            }
+        }
+
+        // BT-83: Payment ID
+        $paymentIdNode = $xml->get("{{$cac}}PaymentMeans/{{$cbc}}PaymentID");
+        if ($paymentIdNode !== null) {
+            $payment->setId($paymentIdNode->asText());
+        }
+
+        // BT-20: Payment terms
+        if ($termsNode !== null) {
+            $payment->setTerms($termsNode->asText());
+        }
+
+        return $payment;
     }
 
 

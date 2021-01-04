@@ -3,6 +3,7 @@ namespace Einvoicing;
 
 use DateTime;
 use Einvoicing\Models\InvoiceTotals;
+use Einvoicing\Payments\Payment;
 use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\BuyerAccountingReferenceTrait;
@@ -35,6 +36,7 @@ class Invoice {
     protected $buyer = null;
     protected $payee = null;
     protected $delivery = null;
+    protected $payment = null;
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
@@ -401,6 +403,26 @@ class Invoice {
      */
     public function setDelivery(?Delivery $delivery): self {
         $this->delivery = $delivery;
+        return $this;
+    }
+
+
+    /**
+     * Get payment information
+     * @return Payment|null Payment instance
+     */
+    public function getPayment(): ?Payment {
+        return $this->payment;
+    }
+
+
+    /**
+     * Set payment information
+     * @param  Payment|null $payment Payment instance
+     * @return self                  Invoice instance
+     */
+    public function setPayment(?Payment $payment): self {
+        $this->payment = $payment;
         return $this;
     }
 

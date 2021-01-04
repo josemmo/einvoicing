@@ -8,6 +8,7 @@ use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Party;
+use Einvoicing\Payments\Payment;
 use UXML\UXML;
 
 class UblWriter extends AbstractWriter {
@@ -107,6 +108,12 @@ class UblWriter extends AbstractWriter {
         $delivery = $invoice->getDelivery();
         if ($delivery !== null) {
             $this->addDeliveryNode($xml, $delivery);
+        }
+
+        // Payment nodes
+        $payment = $invoice->getPayment();
+        if ($payment !== null) {
+            $this->addPaymentNodes($xml, $payment);
         }
 
         // Allowances and charges
@@ -376,6 +383,42 @@ class UblWriter extends AbstractWriter {
         // Remove location node if empty
         if ($locationNode->isEmpty()) {
             $locationNode->remove();
+        }
+    }
+
+
+    /**
+     * Add payment nodes
+     * @param UXML    $parent  Invoice element
+     * @param Payment $payment Payment instance
+     */
+    private function addPaymentNodes(UXML $parent, Payment $payment) {
+        $xml = $parent->add('cac:PaymentMeans');
+
+        // BT-81: Payment means code
+        // BT-82: Payment means name
+        $meansCode = $payment->getMeansCode();
+        if ($meansCode !== null) {
+            $meansText = $payment->getMeansText();
+            $attrs = ($meansText === null) ? [] : ['name' => $meansText];
+            $xml->add('cbc:PaymentMeansCode', $meansCode, $attrs);
+        }
+
+        // BT-83: Payment ID
+        $paymentId = $payment->getId();
+        if ($paymentId !== null) {
+            $xml->add('cbc:PaymentID', $paymentId);
+        }
+
+        // Remove PaymentMeans node if empty
+        if ($xml->isEmpty()) {
+            $xml->remove();
+        }
+
+        // BT-20: Payment terms
+        $terms = $payment->getTerms();
+        if ($terms !== null) {
+            $parent->add('cac:PaymentTerms')->add('cbc:Note', $terms);
         }
     }
 
