@@ -12,6 +12,7 @@ class InvoiceLine {
     protected $name = null;
     protected $description = null;
     protected $originCountry = null;
+    protected $note = null;
     protected $standardIdentifier = null;
     protected $buyerIdentifier = null;
     protected $sellerIdentifier = null;
@@ -101,6 +102,26 @@ class InvoiceLine {
      */
     public function setOriginCountry(?string $originCountry): self {
         $this->originCountry = $originCountry;
+        return $this;
+    }
+
+
+    /**
+     * Get invoice line note
+     * @return string|null Invoice line note
+     */
+    public function getNote(): ?string {
+        return $this->note;
+    }
+
+
+    /**
+     * Set invoice line note
+     * @param  string|null $note Invoice line note
+     * @return self              Invoice line instance
+     */
+    public function setNote(?string $note): self {
+        $this->note = $note;
         return $this;
     }
 

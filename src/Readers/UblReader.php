@@ -575,6 +575,12 @@ class UblReader extends AbstractReader {
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
 
+        // BT-127: Invoice line note
+        $noteNode = $xml->get("{{$cbc}}Note");
+        if ($noteNode !== null) {
+            $line->setNote($noteNode->asText());
+        }
+
         // Quantity
         $quantityNode = $xml->get("{{$cbc}}InvoicedQuantity");
         if ($quantityNode !== null) {
