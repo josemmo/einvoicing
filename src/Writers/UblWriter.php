@@ -89,6 +89,9 @@ class UblWriter extends AbstractWriter {
             $xml->add('cbc:BuyerReference', $buyerReference);
         }
 
+        // BG-14: Invoice period
+        $this->addPeriodNode($xml, $invoice);
+
         // Seller node
         $seller = $invoice->getSeller();
         if ($seller !== null) {
@@ -153,6 +156,30 @@ class UblWriter extends AbstractWriter {
         $scheme = $identifier->getScheme();
         $attrs = ($scheme === null) ? [] : ["$schemeAttr" => $scheme];
         $parent->add($name, $identifier->getValue(), $attrs);
+    }
+
+
+    /**
+     * Add period node
+     * @param UXML                $parent Parent element
+     * @param Invoice|InvoiceLine $source Source instance
+     */
+    private function addPeriodNode(UXML $parent, $source) {
+        $startDate = $source->getPeriodStartDate();
+        $endDate = $source->getPeriodEndDate();
+        if ($startDate === null && $endDate === null) return;
+
+        $xml = $parent->add('cac:InvoicePeriod');
+
+        // Period start date
+        if ($startDate !== null) {
+            $xml->add('cbc:StartDate', $startDate->format('Y-m-d'));
+        }
+
+        // Period end date
+        if ($startDate !== null) {
+            $xml->add('cbc:EndDate', $endDate->format('Y-m-d'));
+        }
     }
 
 
@@ -667,6 +694,9 @@ class UblWriter extends AbstractWriter {
         if ($buyerAccountingReference !== null) {
             $xml->add('cbc:AccountingCost', $buyerAccountingReference);
         }
+
+        // BG-26: Invoice line period
+        $this->addPeriodNode($xml, $line);
 
         // BT-132: Order line reference
         $orderLineReference = $line->getOrderLineReference();

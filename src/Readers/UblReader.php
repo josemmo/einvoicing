@@ -104,6 +104,9 @@ class UblReader extends AbstractReader {
             $invoice->setBuyerReference($buyerReferenceNode->asText());
         }
 
+        // BG-14: Invoice period
+        $this->parsePeriodFields($xml, $invoice);
+
         // Seller node
         $sellerNode = $xml->get("{{$cac}}AccountingSupplierParty/{{$cac}}Party");
         if ($sellerNode !== null) {
@@ -156,6 +159,29 @@ class UblReader extends AbstractReader {
         $value = $xml->asText();
         $scheme = $xml->element()->hasAttribute($schemeAttr) ? $xml->element()->getAttribute($schemeAttr) : null;
         return new Identifier($value, $scheme);
+    }
+
+
+    /**
+     * Parse period fields
+     * @param UXML                $xml    XML node
+     * @param Invoice|InvoiceLine $target Destination instance
+     */
+    private function parsePeriodFields(UXML $xml, $target) {
+        $cac = UblWriter::NS_CAC;
+        $cbc = UblWriter::NS_CBC;
+
+        // Period start date
+        $startDateNode = $xml->get("{{$cac}}InvoicePeriod/{{$cbc}}StartDate");
+        if ($startDateNode !== null) {
+            $target->setPeriodStartDate(new DateTime($startDateNode->asText()));
+        }
+
+        // Period end date
+        $endDateNode = $xml->get("{{$cac}}InvoicePeriod/{{$cbc}}EndDate");
+        if ($endDateNode !== null) {
+            $target->setPeriodEndDate(new DateTime($endDateNode->asText()));
+        }
     }
 
 
@@ -593,6 +619,9 @@ class UblReader extends AbstractReader {
         if ($buyerAccountingReferenceNode !== null) {
             $line->setBuyerAccountingReference($buyerAccountingReferenceNode->asText());
         }
+
+        // BG-26: Invoice line period
+        $this->parsePeriodFields($xml, $line);
 
         // BT-132: Order line reference
         $orderLineReferenceNode = $xml->get("{{$cac}}OrderLineReference/{{$cbc}}LineID");

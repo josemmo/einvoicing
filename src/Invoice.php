@@ -8,6 +8,7 @@ use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\BuyerAccountingReferenceTrait;
 use Einvoicing\Traits\InvoiceValidationTrait;
+use Einvoicing\Traits\PeriodTrait;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use function array_splice;
@@ -41,6 +42,7 @@ class Invoice {
 
     use AllowanceOrChargeTrait;
     use BuyerAccountingReferenceTrait;
+    use PeriodTrait;
     use InvoiceValidationTrait;
 
     /**
