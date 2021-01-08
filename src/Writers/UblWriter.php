@@ -760,6 +760,13 @@ class UblWriter extends AbstractWriter {
         // VAT node
         $this->addVatNode($itemNode, 'cac:ClassifiedTaxCategory', $line->getVatCategory(), $line->getVatRate());
 
+        // BG-32: Item attributes
+        foreach ($line->getAttributes() as $attribute) {
+            $attributeNode = $itemNode->add('cac:AdditionalItemProperty');
+            $attributeNode->add('cbc:Name', $attribute->getName());
+            $attributeNode->add('cbc:Value', $attribute->getValue());
+        }
+
         // Initial price node
         $priceNode = $xml->add('cac:Price');
 

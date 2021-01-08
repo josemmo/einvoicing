@@ -3,6 +3,7 @@ namespace Einvoicing\Readers;
 
 use DateTime;
 use Einvoicing\AllowanceOrCharge;
+use Einvoicing\Attribute;
 use Einvoicing\Delivery;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
@@ -692,6 +693,16 @@ class UblReader extends AbstractReader {
         $vatNode = $xml->get("{{$cac}}Item/{{$cac}}ClassifiedTaxCategory");
         if ($vatNode !== null) {
             $this->setVatAttributes($line, $vatNode);
+        }
+
+        // BG-32: Item attributes
+        $attributeNodes = $xml->getAll("{{$cac}}Item/{{$cac}}AdditionalItemProperty");
+        foreach ($attributeNodes as $attributeNode) {
+            $attributeNameNode = $attributeNode->get("{{$cbc}}Name");
+            $attributeValueNode = $attributeNode->get("{{$cbc}}Value");
+            if ($attributeNameNode !== null && $attributeValueNode !== null) {
+                $line->addAttribute(new Attribute($attributeNameNode->asText(), $attributeValueNode->asText()));
+            }
         }
 
         return $line;

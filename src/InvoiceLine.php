@@ -2,6 +2,7 @@
 namespace Einvoicing;
 
 use Einvoicing\Traits\AllowanceOrChargeTrait;
+use Einvoicing\Traits\AttributesTrait;
 use Einvoicing\Traits\BuyerAccountingReferenceTrait;
 use Einvoicing\Traits\ClassificationIdentifiersTrait;
 use Einvoicing\Traits\PeriodTrait;
@@ -23,6 +24,7 @@ class InvoiceLine {
     protected $baseQuantity = 1;
 
     use AllowanceOrChargeTrait;
+    use AttributesTrait;
     use BuyerAccountingReferenceTrait;
     use ClassificationIdentifiersTrait;
     use PeriodTrait;
