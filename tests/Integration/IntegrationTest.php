@@ -41,4 +41,8 @@ final class IntegrationTest extends TestCase {
     public function testCanRecreatePeppolBaseExample(): void {
         $this->importAndExportInvoice(__DIR__ . "/peppol-base.xml");
     }
+
+    public function testCanRecreatePeppolVatExample(): void {
+        $this->importAndExportInvoice(__DIR__ . "/peppol-vat-s.xml");
+    }
 }
