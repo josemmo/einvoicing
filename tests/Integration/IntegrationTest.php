@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Readers;
+namespace Tests\Integration;
 
 use DOMDocument;
 use Einvoicing\Readers\UblReader;
