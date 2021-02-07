@@ -171,7 +171,7 @@ function renderProperty(Property $property, Class_ $class): string {
  * @param  Class_     $class        Class instance
  * @return string                   Rendered method in markdown
  */
-function renderMethod(Method $method, array $addDocblocks=[], Class_ $class): string {
+function renderMethod(Method $method, array $addDocblocks, Class_ $class): string {
     $docblock = $method->getDocBlock();
     /** @var Param[] */
     $params = $docblock->getTagsByName('param');
