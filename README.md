@@ -1,5 +1,5 @@
 # European Invoicing (eInvoicing)
-[![Build Status](https://travis-ci.com/josemmo/einvoicing.svg?branch=master)](https://travis-ci.com/josemmo/einvoicing)
+[![Build Status](https://github.com/josemmo/einvoicing/workflows/CI/badge.svg)](https://github.com/josemmo/einvoicing/actions)
 [![Latest Version](https://img.shields.io/packagist/v/josemmo/einvoicing?include_prereleases)](https://packagist.org/packages/josemmo/einvoicing)
 [![Minimum PHP Version](https://img.shields.io/packagist/php-v/josemmo/einvoicing)](#installation)
 [![License](https://img.shields.io/github/license/josemmo/einvoicing)](LICENSE)
