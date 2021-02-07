@@ -45,7 +45,7 @@ jobs:
         if: ${{ success() && matrix.deploy || false }}
         run: |
           php ./scripts/build-docs.php
-          docker run --rm -it -v ${PWD}:/docs squidfunk/mkdocs-material build
+          docker run --rm -v ${PWD}:/docs squidfunk/mkdocs-material build
 
        # Deploy documentation
       - name: Deploy documentation
