@@ -35,7 +35,7 @@ jobs:
       # Run static analyzer
       - name: Run static analyzer
         if: ${{ success() && matrix.php-version != '7.1' }}
-        run: vendor/bin/phan
+        run: vendor/bin/phan --color --no-progress-bar
 
       # Run tests
       - name: Run tests
