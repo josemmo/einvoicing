@@ -10,7 +10,7 @@ class VatBreakdown {
 
     /**
      * VAT rate as a percentage
-     * @var int|null
+     * @var float|null
      */
     public $rate;
 

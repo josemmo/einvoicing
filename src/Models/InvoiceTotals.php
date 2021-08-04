@@ -127,12 +127,12 @@ class InvoiceTotals {
 
     /**
      * Update VAT map
-     * @param array    &$vatMap          VAT map reference
-     * @param string   $category         VAT category
-     * @param int|null $rate             VAT rate
-     * @param float    $addTaxableAmount Taxable amount to add
+     * @param array      &$vatMap          VAT map reference
+     * @param string     $category         VAT category
+     * @param float|null $rate             VAT rate
+     * @param float      $addTaxableAmount Taxable amount to add
      */
-    static private function updateVatMap(array &$vatMap, string $category, ?int $rate, float $addTaxableAmount) {
+    static private function updateVatMap(array &$vatMap, string $category, ?float $rate, float $addTaxableAmount) {
         $key = "$category:$rate";
         if (!isset($vatMap[$key])) {
             $vatMap[$key] = new VatBreakdown();

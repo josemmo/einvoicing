@@ -197,12 +197,12 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add VAT node
-     * @param UXML     $parent   Parent element
-     * @param string   $name     New node name
-     * @param string   $category VAT category
-     * @param int|null $rate     VAT rate
+     * @param UXML       $parent   Parent element
+     * @param string     $name     New node name
+     * @param string     $category VAT category
+     * @param float|null $rate     VAT rate
      */
-    private function addVatNode(UXML $parent, string $name, string $category, ?int $rate) {
+    private function addVatNode(UXML $parent, string $name, string $category, ?float $rate) {
         $xml = $parent->add($name);
 
         // VAT category
