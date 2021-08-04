@@ -177,7 +177,7 @@ class UblWriter extends AbstractWriter {
         }
 
         // Period end date
-        if ($startDate !== null) {
+        if ($endDate !== null) {
             $xml->add('cbc:EndDate', $endDate->format('Y-m-d'));
         }
     }
