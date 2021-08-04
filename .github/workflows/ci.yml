@@ -51,9 +51,8 @@ jobs:
        # Deploy documentation
       - name: Deploy documentation
         if: ${{ success() && matrix.deploy || false }}
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: site
-          CLEAN: true # Automatically remove deleted files from the deploy branch
+          branch: gh-pages
+          folder: site
+          clean: true # Automatically remove deleted files from the deploy branch
