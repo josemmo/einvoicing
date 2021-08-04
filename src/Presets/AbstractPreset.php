@@ -25,6 +25,6 @@ abstract class AbstractPreset {
      * @param Invoice $invoice Invoice instance
      */
     public function setupInvoice(Invoice $invoice) {
-        $invoice->setRoundingMatrix([null => 2]);
+        $invoice->setRoundingMatrix(['' => 2]);
     }
 }

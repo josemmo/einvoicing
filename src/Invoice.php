@@ -72,7 +72,7 @@ class Invoice {
      * @return int           Number of decimal places
      */
     public function getDecimals(string $field): int {
-        return $this->roundingMatrix[$field] ?? $this->roundingMatrix[null] ?? self::DEFAULT_DECIMALS;
+        return $this->roundingMatrix[$field] ?? $this->roundingMatrix[''] ?? self::DEFAULT_DECIMALS;
     }
 
 

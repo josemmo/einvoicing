@@ -556,7 +556,7 @@ class UblReader extends AbstractReader {
         $cbc = UblWriter::NS_CBC;
 
         // Add instance to invoice
-        if ($xml->get("{{$cbc}}ChargeIndicator")->asText() === "true") {
+        if ($xml->get("{{$cbc}}ChargeIndicator")->asText() === "true") { // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
             $target->addCharge($allowanceOrCharge);
         } else {
             $target->addAllowance($allowanceOrCharge);
@@ -577,7 +577,7 @@ class UblReader extends AbstractReader {
         // Amount
         $factorNode = $xml->get("{{$cbc}}MultiplierFactorNumeric");
         if ($factorNode === null) {
-            $amount = (float) $xml->get("{{$cbc}}Amount")->asText();
+            $amount = (float) $xml->get("{{$cbc}}Amount")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
             $allowanceOrCharge->setAmount($amount);
         } else {
             $percent = (float) $factorNode->asText();

@@ -6,6 +6,8 @@ use Einvoicing\Invoice;
 use function array_merge;
 use function in_array;
 
+// @phan-file-suppress PhanPossiblyNonClassMethodCall
+
 trait InvoiceValidationTrait {
     /**
      * Validate invoice

@@ -138,7 +138,7 @@ class UblWriter extends AbstractWriter {
         // Invoice lines
         $lines = $invoice->getLines();
         foreach ($lines as $i=>$line) {
-            $this->addLineNode($xml, $line, $i+1, $invoice);
+            $this->addLineNode($xml, $line, $i+1, $invoice); // @phan-suppress-current-line PhanPartialTypeMismatchArgument
         }
 
         return $xml->asXML();
@@ -589,7 +589,7 @@ class UblWriter extends AbstractWriter {
         // Amount
         $baseAmount = $atDocumentLevel ?
             $invoice->getTotals()->netAmount :
-            $line->getNetAmount($invoice->getDecimals('line/netAmount')) ?? 0;
+            $line->getNetAmount($invoice->getDecimals('line/netAmount')) ?? 0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
         $amount = $item->getEffectiveAmount($baseAmount, $invoice->getDecimals('line/allowanceChargeAmount'));
         $this->addAmountNode($xml, 'cbc:Amount', $amount, $invoice->getCurrency());
 

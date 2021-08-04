@@ -3,6 +3,8 @@ namespace Einvoicing\Presets;
 
 use Einvoicing\Invoice;
 
+// @phan-file-suppress PhanPossiblyNonClassMethodCall
+
 /**
  * PEPPOL BIS Billing 3.0
  * @author OpenPEPPOL

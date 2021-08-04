@@ -203,6 +203,7 @@ class InvoiceLine {
      * Set quantity
      * @param  int|float $quantity Quantity
      * @return self                Invoice line instance
+     * @suppress PhanPartialTypeMismatchProperty
      */
     public function setQuantity($quantity): self {
         $this->quantity = $quantity;
@@ -267,6 +268,7 @@ class InvoiceLine {
      * Set base quantity
      * @param  int|float $baseQuantity Base quantity
      * @return self                    Invoice line instance
+     * @suppress PhanPartialTypeMismatchProperty
      */
     public function setBaseQuantity($baseQuantity): self {
         $this->baseQuantity = $baseQuantity;
