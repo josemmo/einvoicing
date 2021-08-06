@@ -31,6 +31,8 @@ class Invoice {
     protected $taxPointDate = null;
     protected $note = null;
     protected $buyerReference = null;
+    /** @var OrderReference|null */
+    protected $orderReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -283,6 +285,25 @@ class Invoice {
      */
     public function setBuyerReference(?string $buyerReference): self {
         $this->buyerReference = $buyerReference;
+        return $this;
+    }
+
+
+    /**
+     * Get order reference
+     * @return OrderReference|null Order reference
+     */
+    public function getOrderReference(): ?OrderReference {
+        return $this->orderReference;
+    }
+
+    /**
+     * Set order reference
+     * @param  OrderReference|null $orderReference Order reference
+     * @return self                                Invoice instance
+     */
+    public function setOrderReference(?OrderReference $orderReference): self {
+        $this->orderReference = $orderReference;
         return $this;
     }
 

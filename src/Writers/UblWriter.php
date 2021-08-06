@@ -89,6 +89,20 @@ class UblWriter extends AbstractWriter {
             $xml->add('cbc:BuyerReference', $buyerReference);
         }
 
+        // BT-13: Order reference
+        $orderReference = $invoice->getOrderReference();
+        if ($orderReference !== null) {
+            $orderReferenceNode = $xml->add('cac:OrderReference');
+
+            if ($id = $orderReference->getId()) {
+                $orderReferenceNode->add('cbc:ID', $id);
+            }
+
+            if ($salesOrderId = $orderReference->getSalesOrderId()) {
+                $orderReferenceNode->add('cbc:SalesOrderID', $salesOrderId);
+            }
+        }
+
         // BG-14: Invoice period
         $this->addPeriodNode($xml, $invoice);
 

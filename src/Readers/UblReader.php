@@ -8,6 +8,7 @@ use Einvoicing\Delivery;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
+use Einvoicing\OrderReference;
 use Einvoicing\Party;
 use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Mandate;
@@ -103,6 +104,17 @@ class UblReader extends AbstractReader {
         $buyerReferenceNode = $xml->get("{{$cbc}}BuyerReference");
         if ($buyerReferenceNode !== null) {
             $invoice->setBuyerReference($buyerReferenceNode->asText());
+        }
+
+        // BT-13: Order reference
+        $orderReferenceNode = $xml->get("{{$cac}}OrderReference");
+        if ($orderReferenceNode !== null) {
+            $idNode = $orderReferenceNode->get("{{$cbc}}ID");
+            $salesOrderIDNode = $orderReferenceNode->get("{{$cbc}}SalesOrderID");
+            $invoice->setOrderReference(new OrderReference(
+                $idNode ? $idNode->asText() : null,
+                $salesOrderIDNode ? $salesOrderIDNode->asText() : null
+            ));
         }
 
         // BG-14: Invoice period
