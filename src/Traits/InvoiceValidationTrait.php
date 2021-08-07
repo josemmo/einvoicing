@@ -99,11 +99,6 @@ trait InvoiceValidationTrait {
                 if ($line->getPrice() < 0) return "The Item net price (BT-146) shall NOT be negative";
             }
         };
-        $res['BR-28'] = static function(Invoice $inv) {
-            foreach ($inv->getLines() as $line) {
-                if ($line->getNetAmount() < 0) return "The Item gross price (BT-148) shall NOT be negative";
-            }
-        };
         $res['BR-31'] = static function(Invoice $inv) {
             foreach ($inv->getAllowances() as $allowance) {
                 if ($allowance->getAmount() === null) {
