@@ -27,7 +27,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: none
-          extensions: ast-1.0.14
+          extensions: ast-stable
 
       # Setup Composer
       - name: Setup Composer
