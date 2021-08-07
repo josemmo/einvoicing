@@ -12,9 +12,6 @@
     <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
     <cbc:AccountingCost>4025:123:4343</cbc:AccountingCost>
     <cbc:BuyerReference>0150abc</cbc:BuyerReference>
-    <cac:OrderReference>
-        <cbc:ID>854777</cbc:ID>
-    </cac:OrderReference>
     <cac:AccountingSupplierParty>
         <cac:Party>
             <cbc:EndpointID schemeID="0088">7300010000001</cbc:EndpointID>

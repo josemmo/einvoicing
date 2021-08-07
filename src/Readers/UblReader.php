@@ -8,7 +8,6 @@ use Einvoicing\Delivery;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
-use Einvoicing\OrderReference;
 use Einvoicing\Party;
 use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Mandate;
@@ -106,19 +105,20 @@ class UblReader extends AbstractReader {
             $invoice->setBuyerReference($buyerReferenceNode->asText());
         }
 
-        // BT-13: Order reference
-        $orderReferenceNode = $xml->get("{{$cac}}OrderReference");
-        if ($orderReferenceNode !== null) {
-            $idNode = $orderReferenceNode->get("{{$cbc}}ID");
-            $salesOrderIDNode = $orderReferenceNode->get("{{$cbc}}SalesOrderID");
-            $invoice->setOrderReference(new OrderReference(
-                $idNode ? $idNode->asText() : null,
-                $salesOrderIDNode ? $salesOrderIDNode->asText() : null
-            ));
-        }
-
         // BG-14: Invoice period
         $this->parsePeriodFields($xml, $invoice);
+
+        // BT-13: Purchase order reference
+        $purchaseOrderReferenceNode = $xml->get("{{$cac}}OrderReference/{{$cbc}}ID");
+        if ($purchaseOrderReferenceNode !== null) {
+            $invoice->setPurchaseOrderReference($purchaseOrderReferenceNode->asText());
+        }
+
+        // BT-14: Sales order reference
+        $salesOrderReferenceNode = $xml->get("{{$cac}}OrderReference/{{$cbc}}SalesOrderID");
+        if ($salesOrderReferenceNode !== null) {
+            $invoice->setSalesOrderReference($salesOrderReferenceNode->asText());
+        }
 
         // Seller node
         $sellerNode = $xml->get("{{$cac}}AccountingSupplierParty/{{$cac}}Party");

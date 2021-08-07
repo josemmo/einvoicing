@@ -31,8 +31,8 @@ class Invoice {
     protected $taxPointDate = null;
     protected $note = null;
     protected $buyerReference = null;
-    /** @var OrderReference|null */
-    protected $orderReference = null;
+    protected $purchaseOrderReference = null;
+    protected $salesOrderReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -290,20 +290,41 @@ class Invoice {
 
 
     /**
-     * Get order reference
-     * @return OrderReference|null Order reference
+     * Get purchase order reference
+     * @return string|null Purchase order reference
      */
-    public function getOrderReference(): ?OrderReference {
-        return $this->orderReference;
+    public function getPurchaseOrderReference(): ?string {
+        return $this->purchaseOrderReference;
     }
 
+
     /**
-     * Set order reference
-     * @param  OrderReference|null $orderReference Order reference
+     * Set purchase order reference
+     * @param  string|null $purchaseOrderReference Purchase order reference
      * @return self                                Invoice instance
      */
-    public function setOrderReference(?OrderReference $orderReference): self {
-        $this->orderReference = $orderReference;
+    public function setPurchaseOrderReference(?string $purchaseOrderReference): self {
+        $this->purchaseOrderReference = $purchaseOrderReference;
+        return $this;
+    }
+
+
+    /**
+     * Get sales order reference
+     * @return string|null Sales order reference
+     */
+    public function getSalesOrderReference(): ?string {
+        return $this->salesOrderReference;
+    }
+
+
+    /**
+     * Set sales order reference
+     * @param  string|null $salesOrderReference Sales order reference
+     * @return self                             Invoice instance
+     */
+    public function setSalesOrderReference(?string $salesOrderReference): self {
+        $this->salesOrderReference = $salesOrderReference;
         return $this;
     }
 
