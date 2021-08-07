@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c958c02d30a22b2133f873f4f6ea2cf",
+    "content-hash": "1cc14bd61534b65cbd3dd84fdc0c7465",
     "packages": [
         {
             "name": "josemmo/uxml",
-            "version": "v0.1.1",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/josemmo/uxml.git",
-                "reference": "60b59961a3c7144f03c4d9971f04277dd9c0085d"
+                "reference": "be11039e103ad1a3d801ea67c03fdc30756f7992"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/josemmo/uxml/zipball/60b59961a3c7144f03c4d9971f04277dd9c0085d",
-                "reference": "60b59961a3c7144f03c4d9971f04277dd9c0085d",
+                "url": "https://api.github.com/repos/josemmo/uxml/zipball/be11039e103ad1a3d801ea67c03fdc30756f7992",
+                "reference": "be11039e103ad1a3d801ea67c03fdc30756f7992",
                 "shasum": ""
             },
             "require": {
@@ -25,8 +25,8 @@
                 "php": ">=7.1"
             },
             "require-dev": {
-                "phan/phan": "^4",
-                "symfony/phpunit-bridge": "^5.2"
+                "phan/phan": "^5.0",
+                "symfony/phpunit-bridge": "^5.3"
             },
             "type": "library",
             "autoload": {
@@ -52,9 +52,9 @@
             ],
             "support": {
                 "issues": "https://github.com/josemmo/uxml/issues",
-                "source": "https://github.com/josemmo/uxml/tree/v0.1.1"
+                "source": "https://github.com/josemmo/uxml/tree/v0.1.2"
             },
-            "time": "2021-05-25T17:54:56+00:00"
+            "time": "2021-08-07T09:49:41+00:00"
         }
     ],
     "packages-dev": [
