@@ -192,20 +192,19 @@ class InvoiceLine {
 
     /**
      * Get quantity
-     * @return int|float Quantity
+     * @return float Quantity
      */
-    public function getQuantity() {
+    public function getQuantity(): float {
         return $this->quantity;
     }
 
 
     /**
      * Set quantity
-     * @param  int|float $quantity Quantity
-     * @return self                Invoice line instance
-     * @suppress PhanPartialTypeMismatchProperty
+     * @param  float $quantity Quantity
+     * @return self            Invoice line instance
      */
-    public function setQuantity($quantity): self {
+    public function setQuantity(float $quantity): self {
         $this->quantity = $quantity;
         return $this;
     }
@@ -242,11 +241,11 @@ class InvoiceLine {
 
     /**
      * Set price
-     * @param  float          $price        Price
-     * @param  int|float|null $baseQuantity Base quantity
-     * @return self                         Invoice line instance
+     * @param  float      $price        Price
+     * @param  float|null $baseQuantity Base quantity
+     * @return self                     Invoice line instance
      */
-    public function setPrice(float $price, $baseQuantity=null): self {
+    public function setPrice(float $price, ?float $baseQuantity=null): self {
         $this->price = $price;
         if ($baseQuantity !== null) {
             $this->setBaseQuantity($baseQuantity);
@@ -257,20 +256,19 @@ class InvoiceLine {
 
     /**
      * Get base quantity
-     * @return int|float Base quantity
+     * @return float Base quantity
      */
-    public function getBaseQuantity() {
+    public function getBaseQuantity(): float {
         return $this->baseQuantity;
     }
 
 
     /**
      * Set base quantity
-     * @param  int|float $baseQuantity Base quantity
-     * @return self                    Invoice line instance
-     * @suppress PhanPartialTypeMismatchProperty
+     * @param  float $baseQuantity Base quantity
+     * @return self                Invoice line instance
      */
-    public function setBaseQuantity($baseQuantity): self {
+    public function setBaseQuantity(float $baseQuantity): self {
         $this->baseQuantity = $baseQuantity;
         return $this;
     }
