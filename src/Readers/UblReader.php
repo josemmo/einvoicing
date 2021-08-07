@@ -108,6 +108,18 @@ class UblReader extends AbstractReader {
         // BG-14: Invoice period
         $this->parsePeriodFields($xml, $invoice);
 
+        // BT-13: Purchase order reference
+        $purchaseOrderReferenceNode = $xml->get("{{$cac}}OrderReference/{{$cbc}}ID");
+        if ($purchaseOrderReferenceNode !== null) {
+            $invoice->setPurchaseOrderReference($purchaseOrderReferenceNode->asText());
+        }
+
+        // BT-14: Sales order reference
+        $salesOrderReferenceNode = $xml->get("{{$cac}}OrderReference/{{$cbc}}SalesOrderID");
+        if ($salesOrderReferenceNode !== null) {
+            $invoice->setSalesOrderReference($salesOrderReferenceNode->asText());
+        }
+
         // Seller node
         $sellerNode = $xml->get("{{$cac}}AccountingSupplierParty/{{$cac}}Party");
         if ($sellerNode !== null) {

@@ -92,6 +92,9 @@ class UblWriter extends AbstractWriter {
         // BG-14: Invoice period
         $this->addPeriodNode($xml, $invoice);
 
+        // Order reference node
+        $this->addOrderReferenceNode($xml, $invoice);
+
         // Seller node
         $seller = $invoice->getSeller();
         if ($seller !== null) {
@@ -179,6 +182,30 @@ class UblWriter extends AbstractWriter {
         // Period end date
         if ($endDate !== null) {
             $xml->add('cbc:EndDate', $endDate->format('Y-m-d'));
+        }
+    }
+
+
+    /**
+     * Add order reference node
+     * @param UXML    $parent  Parent element
+     * @param Invoice $invoice Invoice instance
+     */
+    private function addOrderReferenceNode(UXML $parent, Invoice $invoice) {
+        $purchaseOrderReference = $invoice->getPurchaseOrderReference();
+        $salesOrderReference = $invoice->getSalesOrderReference();
+        if ($purchaseOrderReference === null && $salesOrderReference === null) return;
+
+        $orderReferenceNode = $parent->add('cac:OrderReference');
+
+        // BT-13: Purchase order reference
+        if ($purchaseOrderReference !== null) {
+            $orderReferenceNode->add('cbc:ID', $purchaseOrderReference);
+        }
+
+        // BT-14: Sales order reference
+        if ($salesOrderReference !== null) {
+            $orderReferenceNode->add('cbc:SalesOrderID', $salesOrderReference);
         }
     }
 

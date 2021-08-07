@@ -25,6 +25,11 @@ class Peppol extends AbstractPreset {
     public function getRules(): array {
         $res = [];
 
+        $res['PEPPOL-EN16931-R003'] = static function(Invoice $inv) {
+            if ($inv->getBuyerReference() !== null) return;
+            if ($inv->getPurchaseOrderReference() !== null) return;
+            return "A buyer reference or purchase order reference MUST be provided.";
+        };
         $res['PEPPOL-EN16931-R061'] = static function(Invoice $inv) {
             if ($inv->getPayment() === null) return;
             if ($inv->getPayment()->getMandate() === null) return;
