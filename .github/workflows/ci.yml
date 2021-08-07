@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental || false }}
     strategy:
+      fail-fast: false
       matrix:
         php-version: ['7.1', '7.2', '7.3', '7.4']
         include:
@@ -26,7 +27,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: none
-          extensions: ast
+          extensions: ast-1.0.14
 
       # Setup Composer
       - name: Setup Composer
