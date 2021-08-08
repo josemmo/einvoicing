@@ -13,6 +13,7 @@ use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Mandate;
 use Einvoicing\Payments\Payment;
 use Einvoicing\Payments\Transfer;
+use Einvoicing\Traits\VatTrait;
 use Einvoicing\Writers\UblWriter;
 use InvalidArgumentException;
 use UXML\UXML;
@@ -43,6 +44,26 @@ class UblReader extends AbstractReader {
             if ($presetClassname !== null) {
                 $invoice = new Invoice($presetClassname);
             }
+        }
+
+        // Index tax exemption reasons
+        /** @var array<string, array{code: string|null, reason: string|null}> */
+        $taxExemptions = [];
+        foreach ($xml->getAll("{{$cac}}TaxTotal/{{$cac}}TaxSubtotal/{{$cac}}TaxCategory") as $node) {
+            $exemptionReasonCodeNode = $node->get("{{$cbc}}TaxExemptionReasonCode");
+            $exemptionReasonNode = $node->get("{{$cbc}}TaxExemptionReason");
+            if ($exemptionReasonCodeNode === null && $exemptionReasonNode === null) continue;
+
+            // Get tax subtotal key
+            $category = $node->get("{{$cbc}}ID")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+            $rate = (float) $node->get("{{$cbc}}Percent")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+            $key = "$category:$rate";
+
+            // Save reasons
+            $taxExemptions[$key] = [
+                "code" => ($exemptionReasonCodeNode === null) ? null : $exemptionReasonCodeNode->asText(),
+                "reason" => ($exemptionReasonNode === null) ? null : $exemptionReasonNode->asText(),
+            ];
         }
 
         // BT-23: Business process type
@@ -150,12 +171,12 @@ class UblReader extends AbstractReader {
 
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
-            $this->addAllowanceOrCharge($invoice, $node);
+            $this->addAllowanceOrCharge($invoice, $node, $taxExemptions);
         }
 
         // Invoice lines
         foreach ($xml->getAll("{{$cac}}InvoiceLine") as $node) {
-            $invoice->addLine($this->parseInvoiceLine($node));
+            $invoice->addLine($this->parseInvoiceLine($node, $taxExemptions));
         }
 
         return $invoice;
@@ -537,10 +558,11 @@ class UblReader extends AbstractReader {
 
     /**
      * Set VAT attributes
-     * @param AllowanceOrCharge|InvoiceLine $target Target instance
-     * @param UXML                          $xml    XML node
+     * @param VatTrait $target         Target instance
+     * @param UXML     $xml            XML node
+     * @param array    &$taxExemptions Tax exemption reasons
      */
-    private function setVatAttributes($target, UXML $xml) {
+    private function setVatAttributes($target, UXML $xml, array $taxExemptions) {
         $cbc = UblWriter::NS_CBC;
 
         // Tax category
@@ -554,15 +576,21 @@ class UblReader extends AbstractReader {
         if ($taxRateNode !== null) {
             $target->setVatRate((float) $taxRateNode->asText());
         }
+
+        // Tax exemption reasons
+        $key = "{$target->getVatCategory()}:{$target->getVatRate()}";
+        $target->setVatExemptionReasonCode($taxExemptions[$key]['code'] ?? null);
+        $target->setVatExemptionReason($taxExemptions[$key]['reason'] ?? null);
     }
 
 
     /**
      * Add allowance or charge
-     * @param Invoice|InvoiceLine $target Target instance
-     * @param UXML                $xml    XML node
+     * @param Invoice|InvoiceLine $target         Target instance
+     * @param UXML                $xml            XML node
+     * @param array               &$taxExemptions Tax exemption reasons
      */
-    private function addAllowanceOrCharge($target, UXML $xml) {
+    private function addAllowanceOrCharge($target, UXML $xml, array &$taxExemptions) {
         $allowanceOrCharge = new AllowanceOrCharge();
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
@@ -599,17 +627,18 @@ class UblReader extends AbstractReader {
         // VAT attributes
         $vatNode = $xml->get("{{$cac}}TaxCategory");
         if ($vatNode !== null) {
-            $this->setVatAttributes($allowanceOrCharge, $vatNode);
+            $this->setVatAttributes($allowanceOrCharge, $vatNode, $taxExemptions);
         }
     }
 
 
     /**
      * Parse invoice line
-     * @param  UXML        $xml XML node
-     * @return InvoiceLine      Invoice line instance
+     * @param  UXML        $xml            XML node
+     * @param  array       &$taxExemptions Tax exemption reasons
+     * @return InvoiceLine                 Invoice line instance
      */
-    private function parseInvoiceLine(UXML $xml): InvoiceLine {
+    private function parseInvoiceLine(UXML $xml, array &$taxExemptions): InvoiceLine {
         $line = new InvoiceLine();
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
@@ -644,7 +673,7 @@ class UblReader extends AbstractReader {
 
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
-            $this->addAllowanceOrCharge($line, $node);
+            $this->addAllowanceOrCharge($line, $node, $taxExemptions);
         }
 
         // BT-154: Item description
@@ -704,7 +733,7 @@ class UblReader extends AbstractReader {
         // VAT attributes
         $vatNode = $xml->get("{{$cac}}Item/{{$cac}}ClassifiedTaxCategory");
         if ($vatNode !== null) {
-            $this->setVatAttributes($line, $vatNode);
+            $this->setVatAttributes($line, $vatNode, $taxExemptions);
         }
 
         // BG-32: Item attributes

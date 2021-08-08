@@ -224,12 +224,17 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add VAT node
-     * @param UXML       $parent   Parent element
-     * @param string     $name     New node name
-     * @param string     $category VAT category
-     * @param float|null $rate     VAT rate
+     * @param UXML        $parent              Parent element
+     * @param string      $name                New node name
+     * @param string      $category            VAT category
+     * @param float|null  $rate                VAT rate
+     * @param string|null $exemptionReasonCode VAT exemption reason code
+     * @param string|null $exemptionReason     VAT exemption reason as text
      */
-    private function addVatNode(UXML $parent, string $name, string $category, ?float $rate) {
+    private function addVatNode(
+        UXML $parent, string $name, string $category, ?float $rate,
+        ?string $exemptionReasonCode=null, ?string $exemptionReason=null
+    ) {
         $xml = $parent->add($name);
 
         // VAT category
@@ -238,6 +243,16 @@ class UblWriter extends AbstractWriter {
         // VAT rate
         if ($rate !== null) {
             $xml->add('cbc:Percent', (string) $rate);
+        }
+
+        // Exemption reason code
+        if ($exemptionReasonCode !== null) {
+            $xml->add('cbc:TaxExemptionReasonCode', $exemptionReasonCode);
+        }
+
+        // Exemption reason (as text)
+        if ($exemptionReason !== null) {
+            $xml->add('cbc:TaxExemptionReason', $exemptionReason);
         }
 
         // Tax scheme
@@ -648,7 +663,8 @@ class UblWriter extends AbstractWriter {
             $vatBreakdownNode = $xml->add('cac:TaxSubtotal');
             $this->addAmountNode($vatBreakdownNode, 'cbc:TaxableAmount', $item->taxableAmount, $totals->currency);
             $this->addAmountNode($vatBreakdownNode, 'cbc:TaxAmount', $item->taxAmount, $totals->currency);
-            $this->addVatNode($vatBreakdownNode, 'cac:TaxCategory', $item->category, $item->rate);
+            $this->addVatNode($vatBreakdownNode, 'cac:TaxCategory', $item->category, $item->rate,
+                $item->exemptionReasonCode, $item->exemptionReason);
         }
     }
 

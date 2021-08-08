@@ -18,4 +18,16 @@ final class VatTraitTest extends TestCase {
         $this->line->setVatRate(0);
         $this->assertEquals(0, $this->line->getVatRate());
     }
+
+    public function testCanReadAndWriteExemptions(): void {
+        $category = "E";
+        $reason = "Supply of transport services for sick or injured persons";
+        $reasonCode = "VATEX-EU-132-1P";
+        $this->line->setVatCategory($category);
+        $this->assertEquals($category, $this->line->getVatCategory());
+        $this->line->setVatExemptionReason($reason);
+        $this->assertEquals($reason, $this->line->getVatExemptionReason());
+        $this->line->setVatExemptionReasonCode($reasonCode);
+        $this->assertEquals($reasonCode, $this->line->getVatExemptionReasonCode());
+    }
 }
