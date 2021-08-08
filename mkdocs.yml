@@ -1,5 +1,5 @@
 # Project configuration
-site_name: eInvoicing
+site_name: European Invoicing (eInvoicing)
 site_url: https://josemmo.github.io/einvoicing/
 repo_name: josemmo/einvoicing
 repo_url: https://github.com/josemmo/einvoicing
@@ -8,11 +8,11 @@ edit_uri: ""
 # Theme customization
 theme:
   name: material
-  icon:
-    repo: fontawesome/brands/github
+  logo: logo-white.svg
+  favicon: favicon.png
   palette:
     scheme: slate
-    primary: light blue
+    primary: blue
     accent: yellow
   features:
     - navigation.tabs

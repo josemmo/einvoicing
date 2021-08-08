@@ -2,6 +2,7 @@
 namespace Einvoicing\Models;
 
 use Einvoicing\Invoice;
+use Einvoicing\Traits\VatTrait;
 use function array_values;
 use function round;
 
@@ -88,7 +89,7 @@ class InvoiceTotals {
         foreach ($inv->getLines() as $line) {
             $lineNetAmount = $line->getNetAmount($inv->getDecimals('line/netAmount')) ?? 0;
             $totals->netAmount += $lineNetAmount;
-            self::updateVatMap($vatMap, $line->getVatCategory(), $line->getVatRate(), $lineNetAmount);
+            self::updateVatMap($vatMap, $line, $lineNetAmount);
         }
 
         // Apply allowance and charge totals
@@ -96,12 +97,12 @@ class InvoiceTotals {
         foreach ($inv->getAllowances() as $item) {
             $allowanceAmount = $item->getEffectiveAmount($totals->netAmount, $allowancesChargesDecimals);
             $totals->allowancesAmount += $allowanceAmount;
-            self::updateVatMap($vatMap, $item->getVatCategory(), $item->getVatRate(), -$allowanceAmount);
+            self::updateVatMap($vatMap, $item, -$allowanceAmount);
         }
         foreach ($inv->getCharges() as $item) {
             $chargeAmount = $item->getEffectiveAmount($totals->netAmount, $allowancesChargesDecimals);
             $totals->chargesAmount += $chargeAmount;
-            self::updateVatMap($vatMap, $item->getVatCategory(), $item->getVatRate(), $chargeAmount);
+            self::updateVatMap($vatMap, $item, $chargeAmount);
         }
 
         // Calculate VAT amounts
@@ -127,18 +128,34 @@ class InvoiceTotals {
 
     /**
      * Update VAT map
-     * @param array    &$vatMap          VAT map reference
-     * @param string   $category         VAT category
-     * @param int|null $rate             VAT rate
-     * @param float    $addTaxableAmount Taxable amount to add
+     * @param VatBreakdown[string] &$vatMap          VAT map reference
+     * @param VatTrait             $item             Item instance
+     * @param float|null           $rate             VAT rate
+     * @param float                $addTaxableAmount Taxable amount to add
      */
-    static private function updateVatMap(array &$vatMap, string $category, ?int $rate, float $addTaxableAmount) {
+    static private function updateVatMap(array &$vatMap, $item, float $addTaxableAmount) {
+        $category = $item->getVatCategory();
+        $rate = $item->getVatRate();
         $key = "$category:$rate";
+
+        // Initialize VAT breakdown
         if (!isset($vatMap[$key])) {
             $vatMap[$key] = new VatBreakdown();
             $vatMap[$key]->category = $category;
             $vatMap[$key]->rate = $rate;
         }
+
+        // Update exemption reason (last item overwrites previous ones)
+        $exemptionReasonCode = $item->getVatExemptionReasonCode();
+        $exemptionReason = $item->getVatExemptionReason();
+        if ($exemptionReasonCode !== null) {
+            $vatMap[$key]->exemptionReasonCode = $exemptionReasonCode;
+        }
+        if ($exemptionReason !== null) {
+            $vatMap[$key]->exemptionReason = $exemptionReason;
+        }
+
+        // Increase taxable amount
         $vatMap[$key]->taxableAmount += $addTaxableAmount;
     }
 }

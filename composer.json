@@ -29,12 +29,12 @@
     },
     "require": {
         "php": ">=7.1",
-        "josemmo/uxml": "^0.1.1"
+        "josemmo/uxml": "^0.1.2"
     },
     "require-dev": {
         "ext-openssl": "*",
-        "phan/phan": "^4",
+        "phan/phan": "^5.0",
         "phpdocumentor/reflection": "^4.0",
-        "symfony/phpunit-bridge": "^5.2"
+        "symfony/phpunit-bridge": "^5.3"
     }
 }

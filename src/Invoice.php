@@ -31,6 +31,8 @@ class Invoice {
     protected $taxPointDate = null;
     protected $note = null;
     protected $buyerReference = null;
+    protected $purchaseOrderReference = null;
+    protected $salesOrderReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -72,7 +74,7 @@ class Invoice {
      * @return int           Number of decimal places
      */
     public function getDecimals(string $field): int {
-        return $this->roundingMatrix[$field] ?? $this->roundingMatrix[null] ?? self::DEFAULT_DECIMALS;
+        return $this->roundingMatrix[$field] ?? $this->roundingMatrix[''] ?? self::DEFAULT_DECIMALS;
     }
 
 
@@ -283,6 +285,46 @@ class Invoice {
      */
     public function setBuyerReference(?string $buyerReference): self {
         $this->buyerReference = $buyerReference;
+        return $this;
+    }
+
+
+    /**
+     * Get purchase order reference
+     * @return string|null Purchase order reference
+     */
+    public function getPurchaseOrderReference(): ?string {
+        return $this->purchaseOrderReference;
+    }
+
+
+    /**
+     * Set purchase order reference
+     * @param  string|null $purchaseOrderReference Purchase order reference
+     * @return self                                Invoice instance
+     */
+    public function setPurchaseOrderReference(?string $purchaseOrderReference): self {
+        $this->purchaseOrderReference = $purchaseOrderReference;
+        return $this;
+    }
+
+
+    /**
+     * Get sales order reference
+     * @return string|null Sales order reference
+     */
+    public function getSalesOrderReference(): ?string {
+        return $this->salesOrderReference;
+    }
+
+
+    /**
+     * Set sales order reference
+     * @param  string|null $salesOrderReference Sales order reference
+     * @return self                             Invoice instance
+     */
+    public function setSalesOrderReference(?string $salesOrderReference): self {
+        $this->salesOrderReference = $salesOrderReference;
         return $this;
     }
 

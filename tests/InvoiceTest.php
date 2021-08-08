@@ -17,7 +17,7 @@ final class InvoiceTest extends TestCase {
     private $line;
 
     protected function setUp(): void {
-        $this->invoice = (new Invoice)->setRoundingMatrix([null => 2]);
+        $this->invoice = (new Invoice)->setRoundingMatrix(['' => 2]);
         $this->line = new InvoiceLine();
     }
 
@@ -56,7 +56,7 @@ final class InvoiceTest extends TestCase {
         $this->invoice->setRoundingMatrix([
             "invoice/paidAmount" => 4,
             "line/netAmount" => 8,
-            null => 3
+            "" => 3
         ])->setPaidAmount(123.456789)
           ->setRoundingAmount(987.654321)
           ->addLine((new InvoiceLine)->setPrice(12.121212121))

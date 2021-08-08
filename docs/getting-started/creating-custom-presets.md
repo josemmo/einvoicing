@@ -91,7 +91,7 @@ class CustomPreset extends AbstractPreset {
     public function setupInvoice(Invoice $invoice) {
         $invoice->setRoundingMatrix([
             "line/netAmount" => 4,
-            null => 2
+            "" => 2
         ]);
     }
 }

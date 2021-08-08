@@ -29,7 +29,7 @@ class UblWriter extends AbstractWriter {
             'xmlns:cbc' => self::NS_CBC
         ]);
 
-        // BT-24: Specification indentifier
+        // BT-24: Specification identifier
         $specificationIdentifier = $invoice->getSpecification();
         if ($specificationIdentifier !== null) {
             $xml->add('cbc:CustomizationID', $specificationIdentifier);
@@ -92,6 +92,9 @@ class UblWriter extends AbstractWriter {
         // BG-14: Invoice period
         $this->addPeriodNode($xml, $invoice);
 
+        // Order reference node
+        $this->addOrderReferenceNode($xml, $invoice);
+
         // Seller node
         $seller = $invoice->getSeller();
         if ($seller !== null) {
@@ -138,7 +141,7 @@ class UblWriter extends AbstractWriter {
         // Invoice lines
         $lines = $invoice->getLines();
         foreach ($lines as $i=>$line) {
-            $this->addLineNode($xml, $line, $i+1, $invoice);
+            $this->addLineNode($xml, $line, $i+1, $invoice); // @phan-suppress-current-line PhanPartialTypeMismatchArgument
         }
 
         return $xml->asXML();
@@ -177,8 +180,32 @@ class UblWriter extends AbstractWriter {
         }
 
         // Period end date
-        if ($startDate !== null) {
+        if ($endDate !== null) {
             $xml->add('cbc:EndDate', $endDate->format('Y-m-d'));
+        }
+    }
+
+
+    /**
+     * Add order reference node
+     * @param UXML    $parent  Parent element
+     * @param Invoice $invoice Invoice instance
+     */
+    private function addOrderReferenceNode(UXML $parent, Invoice $invoice) {
+        $purchaseOrderReference = $invoice->getPurchaseOrderReference();
+        $salesOrderReference = $invoice->getSalesOrderReference();
+        if ($purchaseOrderReference === null && $salesOrderReference === null) return;
+
+        $orderReferenceNode = $parent->add('cac:OrderReference');
+
+        // BT-13: Purchase order reference
+        if ($purchaseOrderReference !== null) {
+            $orderReferenceNode->add('cbc:ID', $purchaseOrderReference);
+        }
+
+        // BT-14: Sales order reference
+        if ($salesOrderReference !== null) {
+            $orderReferenceNode->add('cbc:SalesOrderID', $salesOrderReference);
         }
     }
 
@@ -197,12 +224,17 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add VAT node
-     * @param UXML     $parent   Parent element
-     * @param string   $name     New node name
-     * @param string   $category VAT category
-     * @param int|null $rate     VAT rate
+     * @param UXML        $parent              Parent element
+     * @param string      $name                New node name
+     * @param string      $category            VAT category
+     * @param float|null  $rate                VAT rate
+     * @param string|null $exemptionReasonCode VAT exemption reason code
+     * @param string|null $exemptionReason     VAT exemption reason as text
      */
-    private function addVatNode(UXML $parent, string $name, string $category, ?int $rate) {
+    private function addVatNode(
+        UXML $parent, string $name, string $category, ?float $rate,
+        ?string $exemptionReasonCode=null, ?string $exemptionReason=null
+    ) {
         $xml = $parent->add($name);
 
         // VAT category
@@ -211,6 +243,16 @@ class UblWriter extends AbstractWriter {
         // VAT rate
         if ($rate !== null) {
             $xml->add('cbc:Percent', (string) $rate);
+        }
+
+        // Exemption reason code
+        if ($exemptionReasonCode !== null) {
+            $xml->add('cbc:TaxExemptionReasonCode', $exemptionReasonCode);
+        }
+
+        // Exemption reason (as text)
+        if ($exemptionReason !== null) {
+            $xml->add('cbc:TaxExemptionReason', $exemptionReason);
         }
 
         // Tax scheme
@@ -589,7 +631,7 @@ class UblWriter extends AbstractWriter {
         // Amount
         $baseAmount = $atDocumentLevel ?
             $invoice->getTotals()->netAmount :
-            $line->getNetAmount($invoice->getDecimals('line/netAmount')) ?? 0;
+            $line->getNetAmount($invoice->getDecimals('line/netAmount')) ?? 0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
         $amount = $item->getEffectiveAmount($baseAmount, $invoice->getDecimals('line/allowanceChargeAmount'));
         $this->addAmountNode($xml, 'cbc:Amount', $amount, $invoice->getCurrency());
 
@@ -621,7 +663,8 @@ class UblWriter extends AbstractWriter {
             $vatBreakdownNode = $xml->add('cac:TaxSubtotal');
             $this->addAmountNode($vatBreakdownNode, 'cbc:TaxableAmount', $item->taxableAmount, $totals->currency);
             $this->addAmountNode($vatBreakdownNode, 'cbc:TaxAmount', $item->taxAmount, $totals->currency);
-            $this->addVatNode($vatBreakdownNode, 'cac:TaxCategory', $item->category, $item->rate);
+            $this->addVatNode($vatBreakdownNode, 'cac:TaxCategory', $item->category, $item->rate,
+                $item->exemptionReasonCode, $item->exemptionReason);
         }
     }
 
@@ -633,7 +676,7 @@ class UblWriter extends AbstractWriter {
      */
     private function addDocumentTotalsNode(UXML $parent, InvoiceTotals $totals) {
         $xml = $parent->add('cac:LegalMonetaryTotal');
-        
+
         // Build totals matrix
         $totalsMatrix = [
             "cbc:LineExtensionAmount" => $totals->netAmount,

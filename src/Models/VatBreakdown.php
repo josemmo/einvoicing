@@ -10,9 +10,21 @@ class VatBreakdown {
 
     /**
      * VAT rate as a percentage
-     * @var int|null
+     * @var float|null
      */
     public $rate;
+
+    /**
+     * VAT exemption reason code
+     * @var string|null
+     */
+    public $exemptionReasonCode = null;
+
+    /**
+     * VAT exemption reason as text
+     * @var string|null
+     */
+    public $exemptionReason = null;
 
     /**
      * Sum of all taxable amounts
