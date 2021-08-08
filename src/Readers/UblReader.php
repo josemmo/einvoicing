@@ -174,6 +174,18 @@ class UblReader extends AbstractReader {
             $this->addAllowanceOrCharge($invoice, $node, $taxExemptions);
         }
 
+        // BT-113: Paid amount
+        $paidAmountNode = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}PrepaidAmount");
+        if ($paidAmountNode !== null) {
+            $invoice->setPaidAmount((float) $paidAmountNode->asText());
+        }
+
+        // BT-114: Rounding amount
+        $roundingAmountNode = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}PayableRoundingAmount");
+        if ($roundingAmountNode !== null) {
+            $invoice->setRoundingAmount((float) $roundingAmountNode->asText());
+        }
+
         // Invoice lines
         foreach ($xml->getAll("{{$cac}}InvoiceLine") as $node) {
             $invoice->addLine($this->parseInvoiceLine($node, $taxExemptions));
