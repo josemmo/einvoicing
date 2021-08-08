@@ -29,7 +29,7 @@ class UblWriter extends AbstractWriter {
             'xmlns:cbc' => self::NS_CBC
         ]);
 
-        // BT-24: Specification indentifier
+        // BT-24: Specification identifier
         $specificationIdentifier = $invoice->getSpecification();
         if ($specificationIdentifier !== null) {
             $xml->add('cbc:CustomizationID', $specificationIdentifier);
@@ -676,7 +676,7 @@ class UblWriter extends AbstractWriter {
      */
     private function addDocumentTotalsNode(UXML $parent, InvoiceTotals $totals) {
         $xml = $parent->add('cac:LegalMonetaryTotal');
-        
+
         // Build totals matrix
         $totalsMatrix = [
             "cbc:LineExtensionAmount" => $totals->netAmount,

@@ -33,7 +33,7 @@ class UblReader extends AbstractReader {
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
 
-        // BT-24: Specification indentifier
+        // BT-24: Specification identifier
         $specificationNode = $xml->get("{{$cbc}}CustomizationID");
         if ($specificationNode !== null) {
             $specification = $specificationNode->asText();
