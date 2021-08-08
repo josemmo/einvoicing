@@ -17,7 +17,7 @@ final class InvoiceTest extends TestCase {
     private $line;
 
     protected function setUp(): void {
-        $this->invoice = (new Invoice)->setRoundingMatrix([null => 2]);
+        $this->invoice = (new Invoice)->setRoundingMatrix(['' => 2]);
         $this->line = new InvoiceLine();
     }
 
