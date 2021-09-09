@@ -3,6 +3,7 @@ namespace Tests\Writers;
 
 use DateTime;
 use Einvoicing\AllowanceOrCharge;
+use Einvoicing\Attachment\EmbeddedAttachment;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
@@ -54,6 +55,13 @@ final class UblWriterTest extends TestCase {
             ->setVatRate(21)
             ->addCharge((new AllowanceOrCharge)->setReason('Handling and shipping')->setAmount(10.1234));
 
+        $attachment = (new EmbeddedAttachment())
+            ->setId('ABC-123')
+            ->setDescription('Invoice ABC-123')
+            ->setFilename('ABC-123.pdf')
+            ->setMimeType('application/pdf')
+            ->setContent(base64_encode('pdf content'));
+
         $invoice = new Invoice(Peppol::class);
         $invoice->setNumber('ABC-123')
             ->setIssueDate(new DateTime('-3 days'))
@@ -64,7 +72,8 @@ final class UblWriterTest extends TestCase {
             ->addLine($complexLine)
             ->addLine((new InvoiceLine)->setName('Line #2')->setPrice(40, 2)->setVatRate(21)->setQuantity(4))
             ->addLine((new InvoiceLine)->setName('Line #3')->setPrice(0.56)->setVatRate(10)->setQuantity(2))
-            ->addAllowance((new AllowanceOrCharge)->setReason('5% discount')->setAmount(5)->markAsPercentage()->setVatRate(21));
+            ->addAllowance((new AllowanceOrCharge)->setReason('5% discount')->setAmount(5)->markAsPercentage()->setVatRate(21))
+            ->addAttachment($attachment);
         
         return $invoice;
     }
