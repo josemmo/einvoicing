@@ -2,6 +2,7 @@
 namespace Einvoicing\Writers;
 
 use Einvoicing\AllowanceOrCharge;
+use Einvoicing\Attachment;
 use Einvoicing\Delivery;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
@@ -94,6 +95,11 @@ class UblWriter extends AbstractWriter {
 
         // Order reference node
         $this->addOrderReferenceNode($xml, $invoice);
+
+        // BG-24: Attachments node
+        foreach ($invoice->getAttachments() as $attachment) {
+            $this->addAttachmentNode($xml, $attachment);
+        }
 
         // Seller node
         $seller = $invoice->getSeller();
@@ -826,5 +832,60 @@ class UblWriter extends AbstractWriter {
         }
 
         return $xml;
+    }
+
+    /**
+     * Add attachment node
+     * @param UXML       $parent     Parent element
+     * @param Attachment $attachment Attachment instance
+     */
+    private function addAttachmentNode(UXML $parent, Attachment $attachment) {
+        $xml = $parent->add('cac:AdditionalDocumentReference');
+        $isInvoiceObjectReference = (!$attachment->hasExternalUrl() && !$attachment->hasContents());
+
+        // BT-122: Supporting document reference
+        $identifier = $attachment->getId();
+        if ($identifier !== null) {
+            $this->addIdentifierNode($xml, 'cbc:ID', $identifier);
+        }
+
+        // BT-18: Document type code
+        if ($isInvoiceObjectReference) {
+            // Code "130" MUST be used to indicate an invoice object reference
+            // Not used for other additional documents
+            $xml->add('cbc:DocumentTypeCode', '130');
+        }
+
+        // BT-123: Supporting document description
+        $description = $attachment->getDescription();
+        if ($description !== null) {
+            $xml->add('cbc:DocumentDescription', $description);
+        }
+
+        // Attachment inner node
+        if ($isInvoiceObjectReference) {
+            return; // Skip inner node in this case
+        }
+        $attXml = $xml->add('cac:Attachment');
+
+        // BT-125: Attached document
+        if ($attachment->hasContents()) {
+            $attrs = [];
+            $mimeCode = $attachment->getMimeCode();
+            $filename = $attachment->getFilename();
+            if ($mimeCode !== null) {
+                $attrs['mimeCode'] = $mimeCode;
+            }
+            if ($filename !== null) {
+                $attrs['filename'] = $filename;
+            }
+            $attXml->add('cbc:EmbeddedDocumentBinaryObject', base64_encode($attachment->getContents()), $attrs);
+        }
+
+        // BT-124: External document location
+        $externalUrl = $attachment->getExternalUrl();
+        if ($externalUrl !== null) {
+            $attXml->add('cac:ExternalReference')->add('cbc:URI', $externalUrl);
+        }
     }
 }

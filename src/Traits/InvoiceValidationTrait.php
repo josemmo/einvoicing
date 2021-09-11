@@ -189,6 +189,13 @@ trait InvoiceValidationTrait {
                     "shall be present if Payment card information (BG-18) is provided in the Invoice";
             }
         };
+        $res['BR-52'] = static function(Invoice $inv) {
+            foreach ($inv->getAttachments() as $attachment) {
+                if ($attachment->getId() === null) {
+                    return "Each Additional supporting document shall contain a Supporting document reference (BT-122)";
+                }
+            }
+        };
         $res['BR-61'] = static function(Invoice $inv) {
             if ($inv->getPayment() === null) return;
             if (!in_array($inv->getPayment()->getMeansCode(), ['30', '58'])) return;

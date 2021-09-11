@@ -12,6 +12,13 @@
     <ns:DocumentCurrencyCode>EUR</ns:DocumentCurrencyCode>
     <ns:AccountingCost>4025:123:4343</ns:AccountingCost>
     <ns:BuyerReference>0150abc</ns:BuyerReference>
+    <cac:AdditionalDocumentReference>
+        <ns:ID>ABC-123</ns:ID>
+        <ns:DocumentDescription>Invoice ABC-123</ns:DocumentDescription>
+        <cac:Attachment>
+            <ns:EmbeddedDocumentBinaryObject mimeCode="text/plain" filename="att.txt">VGhpcyBpcyBhIHNhbXBsZSBzdHJpbmc=</ns:EmbeddedDocumentBinaryObject>
+        </cac:Attachment>
+    </cac:AdditionalDocumentReference>
     <cac:AccountingSupplierParty>
         <cac:Party>
             <ns:EndpointID schemeID="0088">9482348239847239874</ns:EndpointID>
