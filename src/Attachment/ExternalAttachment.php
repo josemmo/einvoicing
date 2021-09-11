@@ -1,25 +1,24 @@
 <?php
-
 namespace Einvoicing\Attachment;
 
-class ExternalAttachment extends Attachment
-{
+class ExternalAttachment extends Attachment {
     protected $uri;
 
     /**
-     * @return string
+     * Get external URI
+     * @return string Attachment external URI
      */
-    public function getUri(): string
-    {
+    public function getUri(): string {
         return $this->uri;
     }
 
+
     /**
-     * @param string $uri Attachment uri
-     * @return self       Attachment instance
+     * Attachment external URI
+     * @param  string $uri Attachment URI
+     * @return self        Attachment instance
      */
-    public function setUri(string $uri): self
-    {
+    public function setUri(string $uri): self {
         $this->uri = $uri;
         return $this;
     }

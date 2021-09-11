@@ -377,18 +377,17 @@ class Invoice {
      * Get attachments
      * @return Attachment[] Attachments
      */
-    public function getAttachments(): array
-    {
+    public function getAttachments(): array {
         return $this->attachments;
     }
 
 
     /**
-     * @param Attachment $attachment Attachment
-     * @return self                  Invoice instance
+     * Add attachment
+     * @param  Attachment $attachment Attachment
+     * @return self                   Invoice instance
      */
-    public function addAttachment(Attachment $attachment): self
-    {
+    public function addAttachment(Attachment $attachment): self {
         $this->attachments[] = $attachment;
         return $this;
     }

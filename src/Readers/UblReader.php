@@ -771,11 +771,10 @@ class UblReader extends AbstractReader {
 
     /**
      * Parse Attachment
-     * @param UXML $xml   XML node
-     * @return Attachment Attachment instance
+     * @param  UXML       $xml XML node
+     * @return Attachment      Attachment instance
      */
-    private function parseAttachment(UXML $xml): Attachment
-    {
+    private function parseAttachment(UXML $xml): Attachment {
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
 
@@ -789,7 +788,7 @@ class UblReader extends AbstractReader {
             $attachment->setContent($embedded->asText());
             $embeddedElement = $embedded->element();
             if ($embeddedElement->hasAttribute('mimeCode')) {
-                $attachment->setMimeType($embeddedElement->getAttribute('mimeCode'));
+                $attachment->setMimeCode($embeddedElement->getAttribute('mimeCode'));
             }
             if ($embeddedElement->hasAttribute('filename')) {
                 $attachment->setFilename($embeddedElement->getAttribute('filename'));

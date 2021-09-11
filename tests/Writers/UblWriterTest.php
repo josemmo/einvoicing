@@ -55,11 +55,11 @@ final class UblWriterTest extends TestCase {
             ->setVatRate(21)
             ->addCharge((new AllowanceOrCharge)->setReason('Handling and shipping')->setAmount(10.1234));
 
-        $attachment = (new EmbeddedAttachment())
+        $attachment = (new EmbeddedAttachment)
             ->setId('ABC-123')
             ->setDescription('Invoice ABC-123')
             ->setFilename('ABC-123.pdf')
-            ->setMimeType('application/pdf')
+            ->setMimeCode('application/pdf')
             ->setContent(base64_encode('pdf content'));
 
         $invoice = new Invoice(Peppol::class);

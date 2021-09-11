@@ -1,28 +1,25 @@
 <?php
-
 namespace Tests\Attachment;
 
 use Einvoicing\Attachment\EmbeddedAttachment;
 use PHPUnit\Framework\TestCase;
 
-class EmbeddedAttachmentTest extends TestCase
-{
-    public function testItCanCreate(): void
-    {
-        $attachment = (new EmbeddedAttachment())
-            ->setId($id = 'INV123')
-            ->setDescription($description = 'Invoice INV123')
-            ->setDocumentTypeCode($documentTypeCode = '130')
-            ->setFilename($filename = 'INV123.pdf')
-            ->setMimeType($mimeType = 'application/pdf')
-            ->setContent($content = base64_encode('pdf content'))
-        ;
+final class EmbeddedAttachmentTest extends TestCase {
+    public function testItCanCreate(): void {
+        $attachmentContent = base64_encode('pdf content');
+        $attachment = (new EmbeddedAttachment)
+            ->setId('INV123')
+            ->setDescription('Invoice INV123')
+            ->setDocumentTypeCode('130')
+            ->setFilename('INV123.pdf')
+            ->setMimeCode('application/pdf')
+            ->setContent($attachmentContent);
 
-        $this->assertSame($id, $attachment->getId());
-        $this->assertSame($description, $attachment->getDescription());
-        $this->assertSame($documentTypeCode, $attachment->getDocumentTypeCode());
-        $this->assertSame($filename, $attachment->getFilename());
-        $this->assertSame($mimeType, $attachment->getMimeType());
-        $this->assertSame($content, $attachment->getContent());
+        $this->assertSame('INV123', $attachment->getId());
+        $this->assertSame('Invoice INV123', $attachment->getDescription());
+        $this->assertSame('130', $attachment->getDocumentTypeCode());
+        $this->assertSame('INV123.pdf', $attachment->getFilename());
+        $this->assertSame('application/pdf', $attachment->getMimeCode());
+        $this->assertSame($attachmentContent, $attachment->getContent());
     }
 }

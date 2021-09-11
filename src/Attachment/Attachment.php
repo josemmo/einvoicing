@@ -1,69 +1,66 @@
 <?php
-
 namespace Einvoicing\Attachment;
 
-abstract class Attachment
-{
-    protected $id;
+abstract class Attachment {
+    protected $id = null;
     protected $documentTypeCode = null;
     protected $description = null;
 
     /**
-     * Get the attachment ID
-     * @return string Attachment id
+     * Get attachment ID
+     * @return string|null Attachment ID
      */
-    public function getId(): string
-    {
+    public function getId(): ?string {
         return $this->id;
     }
 
+
     /**
-     * Set the attachment ID
-     * @param string $id Attachment id
-     * @return self      Attachment instance
+     * Set attachment ID
+     * @param  string $id Attachment ID
+     * @return self       Attachment instance
      */
-    public function setId(string $id): self
-    {
+    public function setId(string $id): self {
         $this->id = $id;
         return $this;
     }
+
 
     /**
      * Get document type code
      * @return string|null Attachment document type code
      */
-    public function getDocumentTypeCode(): ?string
-    {
+    public function getDocumentTypeCode(): ?string {
         return $this->documentTypeCode;
     }
 
+
     /**
      * Set document type code (should always be 130)
-     * @param string|null $documentTypeCode Attachment document type code
-     * @return self                         Attachment instance
+     * @param  string|null $documentTypeCode Attachment document type code
+     * @return self                          Attachment instance
      */
-    public function setDocumentTypeCode(?string $documentTypeCode): self
-    {
+    public function setDocumentTypeCode(?string $documentTypeCode): self {
         $this->documentTypeCode = $documentTypeCode;
         return $this;
     }
 
+
     /**
-     * Get the description
+     * Get description
      * @return string|null Attachment description
      */
-    public function getDescription(): ?string
-    {
+    public function getDescription(): ?string {
         return $this->description;
     }
 
+
     /**
-     * Set the description
-     * @param string|null $description Attachment description
-     * @return self                    Attachment instance
+     * Set description
+     * @param  string|null $description Attachment description
+     * @return self                     Attachment instance
      */
-    public function setDescription(?string $description): self
-    {
+    public function setDescription(?string $description): self {
         $this->description = $description;
         return $this;
     }

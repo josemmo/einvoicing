@@ -27,6 +27,6 @@ final class UblReaderTest extends TestCase {
         $this->assertEquals(1656.25, $totals->payableAmount);
         $this->assertEquals('S', $totals->vatBreakdown[0]->category);
         $this->assertEquals(25, $totals->vatBreakdown[0]->rate);
-        $this->assertCount(1, $invoice->getAttachments());
+        $this->assertEquals('ABC-123.pdf', $invoice->getAttachments()[0]->getFilename());
     }
 }

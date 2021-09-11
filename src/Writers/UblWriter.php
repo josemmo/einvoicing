@@ -836,8 +836,8 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add document totals node
-     * @param UXML          $parent Parent element
-     * @param Attachment[]  $attachments Invoice attachments
+     * @param UXML         $parent Parent element
+     * @param Attachment[] $attachments Invoice attachments
      */
     private function addAttachments(UXML $parent, array $attachments) {
         foreach ($attachments as $attachment) {
@@ -862,8 +862,8 @@ class UblWriter extends AbstractWriter {
             if ($attachment instanceof EmbeddedAttachment && $attachment->getContent()) {
                 $xmlAttachment = $xml->add('cac:Attachment');
                 $attr = [];
-                if ($attachment->getMimeType()) {
-                    $attr['mimeCode'] = $attachment->getMimeType();
+                if ($attachment->getMimeCode()) {
+                    $attr['mimeCode'] = $attachment->getMimeCode();
                 }
 
                 if ($attachment->getFilename()) {
