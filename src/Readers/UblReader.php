@@ -3,9 +3,7 @@ namespace Einvoicing\Readers;
 
 use DateTime;
 use Einvoicing\AllowanceOrCharge;
-use Einvoicing\Attachment\Attachment;
-use Einvoicing\Attachment\EmbeddedAttachment;
-use Einvoicing\Attachment\ExternalAttachment;
+use Einvoicing\Attachment;
 use Einvoicing\Attribute;
 use Einvoicing\Delivery;
 use Einvoicing\Identifier;
@@ -144,9 +142,9 @@ class UblReader extends AbstractReader {
             $invoice->setSalesOrderReference($salesOrderReferenceNode->asText());
         }
 
-        // BG-24: Attachments
+        // BG-24: Attachment nodes
         foreach ($xml->getAll("{{$cac}}AdditionalDocumentReference") as $node) {
-            $invoice->addAttachment($this->parseAttachment($node));
+            $invoice->addAttachment($this->parseAttachmentNode($node));
         }
 
         // Seller node
@@ -770,53 +768,45 @@ class UblReader extends AbstractReader {
     }
 
     /**
-     * Parse Attachment
+     * Parse attachment node
      * @param  UXML       $xml XML node
      * @return Attachment      Attachment instance
      */
-    private function parseAttachment(UXML $xml): Attachment {
+    private function parseAttachmentNode(UXML $xml): Attachment {
+        $attachment = new Attachment();
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
 
-        $attachmentNode = $xml->get("{{$cac}}Attachment");
-        $embedded = $attachmentNode->get("{{$cbc}}EmbeddedDocumentBinaryObject");
-        $external = $attachmentNode->get("{{$cac}}ExternalReference");
-
-        // BT-125
-        if ($embedded) {
-            $attachment = new EmbeddedAttachment();
-            $attachment->setContent($embedded->asText());
-            $embeddedElement = $embedded->element();
-            if ($embeddedElement->hasAttribute('mimeCode')) {
-                $attachment->setMimeCode($embeddedElement->getAttribute('mimeCode'));
-            }
-            if ($embeddedElement->hasAttribute('filename')) {
-                $attachment->setFilename($embeddedElement->getAttribute('filename'));
-            }
+        // BT-122: Supporting document reference
+        $identifierNode = $xml->get("{{$cbc}}ID");
+        if ($identifierNode !== null) {
+            $attachment->setId($this->parseIdentifierNode($identifierNode));
         }
 
-        // BT-124
-        if ($external) {
-            $attachment = new ExternalAttachment();
-            $attachment->setUri($external->get("{{$cbc}}URI")->asText());
-        }
-
-        // BT-18, BT-122
-        $idNode = $attachmentNode->get("{{$cbc}}ID");
-        if ($idNode) {
-            $attachment->setId($idNode->asText());
-        }
-
-        // BT-123
-        $descriptionNode = $attachmentNode->get("{{$cbc}}DocumentDescription");
-        if ($descriptionNode) {
+        // BT-123: Supporting document description
+        $descriptionNode = $xml->get("{{$cbc}}DocumentDescription");
+        if ($descriptionNode !== null) {
             $attachment->setDescription($descriptionNode->asText());
         }
 
-        // BT-18
-        $documentTypeCodeNode = $attachmentNode->get("{{$cbc}}DocumentTypeCode");
-        if ($documentTypeCodeNode) {
-            $attachment->setDocumentTypeCode($documentTypeCodeNode->asText());
+        // BT-125: Attached document
+        $embeddedDocumentNode = $xml->get("{{$cac}}Attachment/{{$cbc}}EmbeddedDocumentBinaryObject");
+        if ($embeddedDocumentNode !== null) {
+            $embeddedDocumentElement = $embeddedDocumentNode->element();
+            // @phan-suppress-next-line PhanPossiblyFalseTypeArgument
+            $attachment->setContents(base64_decode($embeddedDocumentNode->asText()));
+            if ($embeddedDocumentElement->hasAttribute('mimeCode')) {
+                $attachment->setMimeCode($embeddedDocumentElement->getAttribute('mimeCode'));
+            }
+            if ($embeddedDocumentElement->hasAttribute('filename')) {
+                $attachment->setFilename($embeddedDocumentElement->getAttribute('filename'));
+            }
+        }
+
+        // BT-124: External document location
+        $externalDocumentNode = $xml->get("{{$cac}}Attachment/{{$cac}}ExternalReference/{{$cbc}}URI");
+        if ($externalDocumentNode !== null) {
+            $attachment->setExternalUrl($externalDocumentNode->asText());
         }
 
         return $attachment;

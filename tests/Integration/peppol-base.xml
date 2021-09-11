@@ -15,6 +15,25 @@
     <cac:OrderReference>
         <cbc:ID>854777</cbc:ID>
     </cac:OrderReference>
+    <cac:AdditionalDocumentReference>
+        <cbc:ID>INV-123</cbc:ID>
+        <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+    </cac:AdditionalDocumentReference>
+    <cac:AdditionalDocumentReference>
+        <cbc:ID>ATT-4321</cbc:ID>
+        <cbc:DocumentDescription>A link to an external attachment</cbc:DocumentDescription>
+        <cac:Attachment>
+            <cac:ExternalReference>
+                <cbc:URI>https://www.example.com/document.pdf</cbc:URI>
+            </cac:ExternalReference>
+        </cac:Attachment>
+    </cac:AdditionalDocumentReference>
+    <cac:AdditionalDocumentReference>
+        <cbc:ID>ATT-1234</cbc:ID>
+        <cac:Attachment>
+            <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="ATT-1234.pdf">VGhlIGF0dGFjaG1lbnQgcmF3IGNvbnRlbnRz</cbc:EmbeddedDocumentBinaryObject>  
+        </cac:Attachment>
+    </cac:AdditionalDocumentReference>
     <cac:AccountingSupplierParty>
         <cac:Party>
             <cbc:EndpointID schemeID="0088">9482348239847239874</cbc:EndpointID>

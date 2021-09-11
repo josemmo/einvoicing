@@ -16,7 +16,7 @@
         <ns:ID>ABC-123</ns:ID>
         <ns:DocumentDescription>Invoice ABC-123</ns:DocumentDescription>
         <cac:Attachment>
-            <ns:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="ABC-123.pdf">cGRmIGNvbnRlbnQ=</ns:EmbeddedDocumentBinaryObject>
+            <ns:EmbeddedDocumentBinaryObject mimeCode="text/plain" filename="att.txt">VGhpcyBpcyBhIHNhbXBsZSBzdHJpbmc=</ns:EmbeddedDocumentBinaryObject>
         </cac:Attachment>
     </cac:AdditionalDocumentReference>
     <cac:AccountingSupplierParty>
