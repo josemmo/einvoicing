@@ -6,6 +6,7 @@ use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Payments\Payment;
 use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
+use Einvoicing\Traits\AttachmentsTrait;
 use Einvoicing\Traits\BuyerAccountingReferenceTrait;
 use Einvoicing\Traits\InvoiceValidationTrait;
 use Einvoicing\Traits\PeriodTrait;
@@ -43,6 +44,7 @@ class Invoice {
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
+    use AttachmentsTrait;
     use BuyerAccountingReferenceTrait;
     use PeriodTrait;
     use InvoiceValidationTrait;
