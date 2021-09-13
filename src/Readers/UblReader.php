@@ -142,6 +142,12 @@ class UblReader extends AbstractReader {
             $invoice->setSalesOrderReference($salesOrderReferenceNode->asText());
         }
 
+        // BG-3: Billing Reference
+        $billingReference = $xml->get("{{$cac}}BillingReference/{{$cac}}InvoiceDocumentReference/{{$cbc}}ID");
+        if ($billingReference !== null) {
+            $invoice->setBillingReference($billingReference->asText());
+        }
+
         // BG-24: Attachment nodes
         foreach ($xml->getAll("{{$cac}}AdditionalDocumentReference") as $node) {
             $invoice->addAttachment($this->parseAttachmentNode($node));

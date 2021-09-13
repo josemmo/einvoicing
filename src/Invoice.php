@@ -34,6 +34,7 @@ class Invoice {
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
+    protected $billingReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -327,6 +328,26 @@ class Invoice {
      */
     public function setSalesOrderReference(?string $salesOrderReference): self {
         $this->salesOrderReference = $salesOrderReference;
+        return $this;
+    }
+
+
+    /**
+     * Get billing reference
+     * @return string|null Billing reference
+     */
+    public function getBillingReference(): ?string {
+        return $this->billingReference;
+    }
+
+
+    /**
+     * Set sales order reference
+     * @param  string|null $billingReference Billing reference
+     * @return self                          Invoice instance
+     */
+    public function setBillingReference(?string $billingReference): self {
+        $this->billingReference = $billingReference;
         return $this;
     }
 

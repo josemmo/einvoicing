@@ -96,6 +96,15 @@ class UblWriter extends AbstractWriter {
         // Order reference node
         $this->addOrderReferenceNode($xml, $invoice);
 
+        // BG-3: Billing reference
+        if ($invoice->getBillingReference()) {
+            $xml
+                ->add('cac:BillingReference')
+                ->add('cac:InvoiceDocumentReference')
+                ->add('cbc:ID', $invoice->getBillingReference())
+            ;
+        }
+
         // BG-24: Attachments node
         foreach ($invoice->getAttachments() as $attachment) {
             $this->addAttachmentNode($xml, $attachment);
