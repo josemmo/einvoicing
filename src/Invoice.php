@@ -35,6 +35,7 @@ class Invoice {
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
+    protected $originatorDocumentReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -329,6 +330,28 @@ class Invoice {
      */
     public function setSalesOrderReference(?string $salesOrderReference): self {
         $this->salesOrderReference = $salesOrderReference;
+        return $this;
+    }
+
+
+    /**
+     * Get originator document reference
+     * @return string|null
+     */
+    public function getOriginatorDocumentReference(): ?string
+    {
+        return $this->originatorDocumentReference;
+    }
+
+
+    /**
+     * Set originator document reference
+     * @param string|null $originatorDocumentReference
+     * @return Invoice
+     * @see https://docs.peppol.eu/poacc/billing/3.0/syntax/ubl-invoice/cac-OriginatorDocumentReference/
+     */
+    public function setOriginatorDocumentReference(?string $originatorDocumentReference): self {
+        $this->originatorDocumentReference = $originatorDocumentReference;
         return $this;
     }
 

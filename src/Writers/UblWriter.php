@@ -106,6 +106,13 @@ class UblWriter extends AbstractWriter {
             }
         }
 
+        $originatorDocumentReference = $invoice->getOriginatorDocumentReference();
+        if ($originatorDocumentReference) {
+            $xml
+                ->add('cac:OriginatorDocumentReference')
+                ->add('cbc:ID', $originatorDocumentReference);
+        }
+
         // BG-24: Attachments node
         foreach ($invoice->getAttachments() as $attachment) {
             $this->addAttachmentNode($xml, $attachment);
