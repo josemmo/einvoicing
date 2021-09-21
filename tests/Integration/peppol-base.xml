@@ -15,6 +15,17 @@
     <cac:OrderReference>
         <cbc:ID>854777</cbc:ID>
     </cac:OrderReference>
+    <cac:BillingReference>
+        <cac:InvoiceDocumentReference>
+            <cbc:ID>INV-122</cbc:ID>
+            <cbc:IssueDate>2021-09-21</cbc:IssueDate>
+        </cac:InvoiceDocumentReference>
+    </cac:BillingReference>
+    <cac:BillingReference>
+        <cac:InvoiceDocumentReference>
+            <cbc:ID>INV-123</cbc:ID>
+        </cac:InvoiceDocumentReference>
+    </cac:BillingReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>INV-123</cbc:ID>
         <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
