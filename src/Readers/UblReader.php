@@ -9,6 +9,7 @@ use Einvoicing\Delivery;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
+use Einvoicing\InvoiceReference;
 use Einvoicing\Party;
 use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Mandate;
@@ -142,10 +143,18 @@ class UblReader extends AbstractReader {
             $invoice->setSalesOrderReference($salesOrderReferenceNode->asText());
         }
 
-        // BG-3: Billing Reference
-        $billingReference = $xml->get("{{$cac}}BillingReference/{{$cac}}InvoiceDocumentReference/{{$cbc}}ID");
-        if ($billingReference !== null) {
-            $invoice->setBillingReference($billingReference->asText());
+        // BG-3: Preceding invoice references
+        foreach ($xml->getAll("{{$cac}}BillingReference/{{$cac}}InvoiceDocumentReference") as $node) {
+            $invoiceReferenceValueNode = $node->get("{{$cbc}}ID");
+            if ($invoiceReferenceValueNode === null) {
+                continue;
+            }
+            $invoiceReference = new InvoiceReference($invoiceReferenceValueNode->asText());
+            $invoiceReferenceIssueDateNode = $node->get("{{$cbc}}IssueDate");
+            if ($invoiceReferenceIssueDateNode !== null) {
+                $invoiceReference->setIssueDate(new DateTime($invoiceReferenceIssueDateNode->asText()));
+            }
+            $invoice->addPrecedingInvoiceReference($invoiceReference);
         }
 
         // BG-24: Attachment nodes
