@@ -26,6 +26,9 @@
             <cbc:ID>INV-123</cbc:ID>
         </cac:InvoiceDocumentReference>
     </cac:BillingReference>
+    <cac:OriginatorDocumentReference>
+        <cbc:ID>PPID-123</cbc:ID>
+    </cac:OriginatorDocumentReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>INV-123</cbc:ID>
         <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>

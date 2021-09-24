@@ -157,10 +157,10 @@ class UblReader extends AbstractReader {
             $invoice->addPrecedingInvoiceReference($invoiceReference);
         }
 
-        // Originator Document Reference
-        $originatorDocumentReference = $xml->get("{{$cac}}OriginatorDocumentReference/{{$cbc}}ID");
-        if ($originatorDocumentReference !== null) {
-            $invoice->setOriginatorDocumentReference($originatorDocumentReference->asText());
+        // BT-17: Tender or lot reference
+        $tenderOrLotReferenceNode = $xml->get("{{$cac}}OriginatorDocumentReference/{{$cbc}}ID");
+        if ($tenderOrLotReferenceNode !== null) {
+            $invoice->setTenderOrLotReference($tenderOrLotReferenceNode->asText());
         }
 
         // BG-24: Attachment nodes

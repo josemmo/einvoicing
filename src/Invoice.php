@@ -35,7 +35,7 @@ class Invoice {
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
-    protected $originatorDocumentReference = null;
+    protected $tenderOrLotReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -335,23 +335,21 @@ class Invoice {
 
 
     /**
-     * Get originator document reference
-     * @return string|null
+     * Get tender or lot reference
+     * @return string|null Tender or lot reference
      */
-    public function getOriginatorDocumentReference(): ?string
-    {
-        return $this->originatorDocumentReference;
+    public function getTenderOrLotReference(): ?string {
+        return $this->tenderOrLotReference;
     }
 
 
     /**
-     * Set originator document reference
-     * @param string|null $originatorDocumentReference
-     * @return Invoice
-     * @see https://docs.peppol.eu/poacc/billing/3.0/syntax/ubl-invoice/cac-OriginatorDocumentReference/
+     * Set tender or lot reference
+     * @param  string|null $tenderOrLotReference Tender or lot reference
+     * @return self                              Invoice instance
      */
-    public function setOriginatorDocumentReference(?string $originatorDocumentReference): self {
-        $this->originatorDocumentReference = $originatorDocumentReference;
+    public function setTenderOrLotReference(?string $tenderOrLotReference): self {
+        $this->tenderOrLotReference = $tenderOrLotReference;
         return $this;
     }
 

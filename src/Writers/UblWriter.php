@@ -106,11 +106,10 @@ class UblWriter extends AbstractWriter {
             }
         }
 
-        $originatorDocumentReference = $invoice->getOriginatorDocumentReference();
-        if ($originatorDocumentReference) {
-            $xml
-                ->add('cac:OriginatorDocumentReference')
-                ->add('cbc:ID', $originatorDocumentReference);
+        // BT-17: Tender or lot reference
+        $tenderOrLotReference = $invoice->getTenderOrLotReference();
+        if ($tenderOrLotReference !== null) {
+            $xml->add('cac:OriginatorDocumentReference')->add('cbc:ID', $tenderOrLotReference);
         }
 
         // BG-24: Attachments node
