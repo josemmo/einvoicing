@@ -17,6 +17,9 @@
             <ns:ID>INV-123</ns:ID>
         </cac:InvoiceDocumentReference>
     </cac:BillingReference>
+    <cac:OriginatorDocumentReference>
+        <ns:ID>PPID-123</ns:ID>
+    </cac:OriginatorDocumentReference>
     <cac:AdditionalDocumentReference>
         <ns:ID>ABC-123</ns:ID>
         <ns:DocumentDescription>Invoice ABC-123</ns:DocumentDescription>

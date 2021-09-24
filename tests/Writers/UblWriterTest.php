@@ -72,6 +72,7 @@ final class UblWriterTest extends TestCase {
             ->setDueDate(new DateTime('+30 days'))
             ->setBuyerReference('REF-0172637')
             ->addPrecedingInvoiceReference(new InvoiceReference('INV-123'))
+            ->setOriginatorDocumentReference('PPID-123')
             ->setSeller($seller)
             ->setBuyer($buyer)
             ->addLine($complexLine)
