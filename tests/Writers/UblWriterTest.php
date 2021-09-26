@@ -7,6 +7,7 @@ use Einvoicing\Attachment;
 use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
+use Einvoicing\InvoiceReference;
 use Einvoicing\Party;
 use Einvoicing\Presets\Peppol;
 use Einvoicing\Writers\UblWriter;
@@ -70,6 +71,8 @@ final class UblWriterTest extends TestCase {
             ->setIssueDate(new DateTime('-3 days'))
             ->setDueDate(new DateTime('+30 days'))
             ->setBuyerReference('REF-0172637')
+            ->addPrecedingInvoiceReference(new InvoiceReference('INV-123'))
+            ->setTenderOrLotReference('PPID-123')
             ->setSeller($seller)
             ->setBuyer($buyer)
             ->addLine($complexLine)

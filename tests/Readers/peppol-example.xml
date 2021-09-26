@@ -12,6 +12,11 @@
     <ns:DocumentCurrencyCode>EUR</ns:DocumentCurrencyCode>
     <ns:AccountingCost>4025:123:4343</ns:AccountingCost>
     <ns:BuyerReference>0150abc</ns:BuyerReference>
+    <cac:BillingReference>
+        <cac:InvoiceDocumentReference>
+            <ns:ID>INV-123</ns:ID>
+        </cac:InvoiceDocumentReference>
+    </cac:BillingReference>
     <cac:AdditionalDocumentReference>
         <ns:ID>ABC-123</ns:ID>
         <ns:DocumentDescription>Invoice ABC-123</ns:DocumentDescription>

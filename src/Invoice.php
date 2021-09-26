@@ -10,6 +10,7 @@ use Einvoicing\Traits\AttachmentsTrait;
 use Einvoicing\Traits\BuyerAccountingReferenceTrait;
 use Einvoicing\Traits\InvoiceValidationTrait;
 use Einvoicing\Traits\PeriodTrait;
+use Einvoicing\Traits\PrecedingInvoiceReferencesTrait;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use function array_splice;
@@ -34,6 +35,7 @@ class Invoice {
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
+    protected $tenderOrLotReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -48,6 +50,7 @@ class Invoice {
     use BuyerAccountingReferenceTrait;
     use PeriodTrait;
     use InvoiceValidationTrait;
+    use PrecedingInvoiceReferencesTrait;
 
     /**
      * Invoice constructor
@@ -327,6 +330,26 @@ class Invoice {
      */
     public function setSalesOrderReference(?string $salesOrderReference): self {
         $this->salesOrderReference = $salesOrderReference;
+        return $this;
+    }
+
+
+    /**
+     * Get tender or lot reference
+     * @return string|null Tender or lot reference
+     */
+    public function getTenderOrLotReference(): ?string {
+        return $this->tenderOrLotReference;
+    }
+
+
+    /**
+     * Set tender or lot reference
+     * @param  string|null $tenderOrLotReference Tender or lot reference
+     * @return self                              Invoice instance
+     */
+    public function setTenderOrLotReference(?string $tenderOrLotReference): self {
+        $this->tenderOrLotReference = $tenderOrLotReference;
         return $this;
     }
 
