@@ -29,6 +29,9 @@
     <cac:OriginatorDocumentReference>
         <cbc:ID>PPID-123</cbc:ID>
     </cac:OriginatorDocumentReference>
+    <cac:ContractDocumentReference>
+        <cbc:ID>123Contractref</cbc:ID>
+    </cac:ContractDocumentReference>
     <cac:AdditionalDocumentReference>
         <cbc:ID>INV-123</cbc:ID>
         <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>

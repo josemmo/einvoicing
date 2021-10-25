@@ -163,6 +163,12 @@ class UblReader extends AbstractReader {
             $invoice->setTenderOrLotReference($tenderOrLotReferenceNode->asText());
         }
 
+        // BT-12: Contract reference
+        $contractReferenceNode = $xml->get("{{$cac}}ContractDocumentReference/{{$cbc}}ID");
+        if ($contractReferenceNode !== null) {
+            $invoice->setContractReference($contractReferenceNode->asText());
+        }
+
         // BG-24: Attachment nodes
         foreach ($xml->getAll("{{$cac}}AdditionalDocumentReference") as $node) {
             $invoice->addAttachment($this->parseAttachmentNode($node));
