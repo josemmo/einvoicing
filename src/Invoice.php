@@ -36,6 +36,7 @@ class Invoice {
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
     protected $tenderOrLotReference = null;
+    protected $contractReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $seller = null;
@@ -350,6 +351,26 @@ class Invoice {
      */
     public function setTenderOrLotReference(?string $tenderOrLotReference): self {
         $this->tenderOrLotReference = $tenderOrLotReference;
+        return $this;
+    }
+
+
+    /**
+     * Get contract reference
+     * @return string|null Contract reference
+     */
+    public function getContractReference(): ?string {
+        return $this->contractReference;
+    }
+
+
+    /**
+     * Set contract reference
+     * @param  string|null $contractReference Contract reference
+     * @return self                           Invoice instance
+     */
+    public function setContractReference(?string $contractReference): self {
+        $this->contractReference = $contractReference;
         return $this;
     }
 
