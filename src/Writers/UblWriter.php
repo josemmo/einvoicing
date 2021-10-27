@@ -379,6 +379,17 @@ class UblWriter extends AbstractWriter {
             $taxNode->add('cac:TaxScheme')->add('cbc:ID', 'VAT');
         }
 
+        // Tax registration identifier
+        $taxRegistrationId = $party->getTaxRegistrationId();
+        if ($taxRegistrationId !== null) {
+            $taxRegistrationNode = $xml->add('cac:PartyTaxScheme');
+            $taxRegistrationNode->add('cbc:CompanyID', $taxRegistrationId->getValue());
+            $taxRegistrationScheme = $taxRegistrationId->getScheme();
+            if ($taxRegistrationScheme !== null) {
+                $taxRegistrationNode->add('cac:TaxScheme')->add('cbc:ID', $taxRegistrationScheme);
+            }
+        }
+
         // Initial legal entity node
         $legalEntityNode = $xml->add('cac:PartyLegalEntity');
 

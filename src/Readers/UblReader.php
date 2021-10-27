@@ -344,10 +344,20 @@ class UblReader extends AbstractReader {
             $this->parsePostalAddressFields($addressNode, $party);
         }
 
-        // VAT number
-        $vatNumberNode = $xml->get("{{$cac}}PartyTaxScheme/{{$cbc}}CompanyID");
-        if ($vatNumberNode !== null) {
-            $party->setVatNumber($vatNumberNode->asText());
+        // VAT number and tax registration identifier
+        foreach ($xml->getAll("{{$cac}}PartyTaxScheme") as $taxNode) {
+            $companyIdNode = $taxNode->get("{{$cbc}}CompanyID");
+            if ($companyIdNode === null) continue;
+            $companyId = $companyIdNode->asText();
+
+            $taxSchemeNode = $taxNode->get("{{$cac}}TaxScheme/{{$cbc}}ID");
+            $taxScheme = ($taxSchemeNode === null) ? null : $taxSchemeNode->asText();
+
+            if ($taxScheme === "VAT") {
+                $party->setVatNumber($companyId);
+            } else {
+                $party->setTaxRegistrationId(new Identifier($companyId, $taxScheme));
+            }
         }
 
         // Legal name

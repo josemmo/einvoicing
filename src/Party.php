@@ -10,6 +10,7 @@ class Party {
     protected $tradingName = null;
     protected $companyId = null;
     protected $vatNumber = null;
+    protected $taxRegistrationId = null;
     protected $contactName = null;
     protected $contactPhone = null;
     protected $contactEmail = null;
@@ -113,6 +114,26 @@ class Party {
      */
     public function setVatNumber(?string $vatNumber): self {
         $this->vatNumber = $vatNumber;
+        return $this;
+    }
+
+
+    /**
+     * Get tax registration ID
+     * @return Identifier|null Tax registration ID
+     */
+    public function getTaxRegistrationId(): ?Identifier {
+        return $this->taxRegistrationId;
+    }
+
+
+    /**
+     * Set tax registration ID
+     * @param  Identifier|null $taxRegistrationId Tax registration ID
+     * @return self                               Party instance
+     */
+    public function setTaxRegistrationId(?Identifier $taxRegistrationId): self {
+        $this->taxRegistrationId = $taxRegistrationId;
         return $this;
     }
 
