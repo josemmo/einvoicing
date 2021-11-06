@@ -73,6 +73,7 @@ final class UblWriterTest extends TestCase {
             ->setBuyerReference('REF-0172637')
             ->addPrecedingInvoiceReference(new InvoiceReference('INV-123'))
             ->setTenderOrLotReference('PPID-123')
+            ->setContractReference('123Contractref')
             ->setSeller($seller)
             ->setBuyer($buyer)
             ->addLine($complexLine)

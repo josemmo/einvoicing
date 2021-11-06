@@ -112,6 +112,12 @@ class UblWriter extends AbstractWriter {
             $xml->add('cac:OriginatorDocumentReference')->add('cbc:ID', $tenderOrLotReference);
         }
 
+        // BT-12: Contract reference
+        $contractReference = $invoice->getContractReference();
+        if ($contractReference !== null) {
+            $xml->add('cac:ContractDocumentReference')->add('cbc:ID', $contractReference);
+        }
+
         // BG-24: Attachments node
         foreach ($invoice->getAttachments() as $attachment) {
             $this->addAttachmentNode($xml, $attachment);
@@ -371,6 +377,17 @@ class UblWriter extends AbstractWriter {
             $taxNode = $xml->add('cac:PartyTaxScheme');
             $taxNode->add('cbc:CompanyID', $vatNumber);
             $taxNode->add('cac:TaxScheme')->add('cbc:ID', 'VAT');
+        }
+
+        // Tax registration identifier
+        $taxRegistrationId = $party->getTaxRegistrationId();
+        if ($taxRegistrationId !== null) {
+            $taxRegistrationNode = $xml->add('cac:PartyTaxScheme');
+            $taxRegistrationNode->add('cbc:CompanyID', $taxRegistrationId->getValue());
+            $taxRegistrationScheme = $taxRegistrationId->getScheme();
+            if ($taxRegistrationScheme !== null) {
+                $taxRegistrationNode->add('cac:TaxScheme')->add('cbc:ID', $taxRegistrationScheme);
+            }
         }
 
         // Initial legal entity node
