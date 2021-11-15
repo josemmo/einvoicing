@@ -754,7 +754,7 @@ class UblWriter extends AbstractWriter {
         $xml = $parent->add('cac:InvoiceLine');
 
         // BT-126: Line ID
-        $xml->add('cbc:ID', (string) $index);
+        $xml->add('cbc:ID', $line->getLineId() ?? (string) $index);
 
         // BT-127: Invoice line note
         $note = $line->getNote();
