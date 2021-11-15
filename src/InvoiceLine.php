@@ -10,6 +10,7 @@ use Einvoicing\Traits\VatTrait;
 use function round;
 
 class InvoiceLine {
+    protected $id = null;
     protected $orderLineReference = null;
     protected $name = null;
     protected $description = null;
@@ -22,7 +23,6 @@ class InvoiceLine {
     protected $unit = "C62"; // TODO: add constants
     protected $price = null;
     protected $baseQuantity = 1;
-    protected $lineId = null;
 
     use AllowanceOrChargeTrait;
     use AttributesTrait;
@@ -30,6 +30,26 @@ class InvoiceLine {
     use ClassificationIdentifiersTrait;
     use PeriodTrait;
     use VatTrait;
+
+    /**
+     * Get invoice line identifier
+     * @return string|null
+     */
+    public function getId(): ?string {
+        return $this->id;
+    }
+
+
+    /**
+     * Set invoice line identifier
+     * @param  string $id Invoice line identifier
+     * @return self       Invoice line instance
+     */
+    public function setId(string $id): self {
+        $this->id = $id;
+        return $this;
+    }
+
 
     /**
      * Get order line reference
@@ -332,23 +352,5 @@ class InvoiceLine {
         $netAmount -= $this->getAllowancesAmount($decimals);
         $netAmount += $this->getChargesAmount($decimals);
         return $netAmount;
-    }
-
-    /**
-     * Get Invoice line identifier
-     * @return string|null
-     */
-    public function getLineId(): ?string {
-        return $this->lineId;
-    }
-
-    /**
-     * Set Invoice line identifier
-     * @param string $lineId         The ID for the Line
-     * @return self                Invoice line instance
-     */
-    public function setLineId(string $lineId): self {
-        $this->lineId = $lineId;
-        return $this;
     }
 }

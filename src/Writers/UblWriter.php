@@ -753,8 +753,8 @@ class UblWriter extends AbstractWriter {
     private function addLineNode(UXML $parent, InvoiceLine $line, int $index, Invoice $invoice) {
         $xml = $parent->add('cac:InvoiceLine');
 
-        // BT-126: Line ID
-        $xml->add('cbc:ID', $line->getLineId() ?? (string) $index);
+        // BT-126: Invoice line identifier
+        $xml->add('cbc:ID', $line->getId() ?? (string) $index);
 
         // BT-127: Invoice line note
         $note = $line->getNote();
