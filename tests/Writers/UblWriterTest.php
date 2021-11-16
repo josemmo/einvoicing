@@ -12,10 +12,12 @@ use Einvoicing\Party;
 use Einvoicing\Presets\Peppol;
 use Einvoicing\Writers\UblWriter;
 use PHPUnit\Framework\TestCase;
+use UXML\UXML;
 use const CURLOPT_HTTPHEADER;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_URL;
+use function array_map;
 use function curl_close;
 use function curl_exec;
 use function curl_init;
@@ -79,7 +81,7 @@ final class UblWriterTest extends TestCase {
             ->addLine($complexLine)
             ->addLine((new InvoiceLine)->setName('Line #2')->setPrice(40, 2)->setVatRate(21)->setQuantity(4))
             ->addLine((new InvoiceLine)->setName('Line #3')->setPrice(0.56)->setVatRate(10)->setQuantity(2))
-            ->addLine((new InvoiceLine)->setId('5')->setName('Line #4')->setPrice(0.56)->setVatRate(10)->setQuantity(2))
+            ->addLine((new InvoiceLine)->setName('Line #4')->setPrice(0.56)->setVatRate(10)->setQuantity(2))
             ->addAllowance((new AllowanceOrCharge)->setReason('5% discount')->setAmount(5)->markAsPercentage()->setVatRate(21))
             ->addAttachment((new Attachment)->setId(new Identifier('INV-123', 'ABT')))
             ->addAttachment($externalAttachment)
@@ -124,5 +126,28 @@ final class UblWriterTest extends TestCase {
         $invoice->validate();
         $contents = $this->writer->export($invoice);
         $this->assertTrue($this->validateInvoice($contents, 'ubl'));
+    }
+
+    public function testCanHaveLinesWithForcedDuplicateIdentifiers(): void {
+        $invoice = $this->getSampleInvoice();
+        $invoice->getLines()[1]->setId('DuplicateId');
+        $invoice->getLines()[2]->setId('DuplicateId');
+        $invoice->getLines()[3]->setId('DuplicateId');
+        $xml = UXML::fromString($this->writer->export($invoice));
+        $actualLineIds = array_map(function(UXML $item) {
+            return $item->asText();
+        }, $xml->getAll('cac:InvoiceLine/cbc:ID'));
+        $this->assertEquals(['1', 'DuplicateId', 'DuplicateId', 'DuplicateId'], $actualLineIds);
+    }
+
+    public function testCanAutogenerateInvoiceLineIdentifiers(): void {
+        $invoice = $this->getSampleInvoice();
+        $invoice->getLines()[1]->setId('1');
+        $invoice->getLines()[2]->setId('AnotherCustomId');
+        $xml = UXML::fromString($this->writer->export($invoice));
+        $actualLineIds = array_map(function(UXML $item) {
+            return $item->asText();
+        }, $xml->getAll('cac:InvoiceLine/cbc:ID'));
+        $this->assertEquals(['2', '1', 'AnotherCustomId', '3'], $actualLineIds);
     }
 }

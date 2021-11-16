@@ -275,7 +275,7 @@
         </cac:Price>
     </cac:InvoiceLine>
     <cac:InvoiceLine>
-        <cbc:ID>3</cbc:ID>
+        <cbc:ID>a-custom-identifier</cbc:ID>
         <cbc:Note>Testing note on line level</cbc:Note>
         <cbc:InvoicedQuantity unitCode="C62">10</cbc:InvoicedQuantity>
         <cbc:LineExtensionAmount currencyID="EUR">909</cbc:LineExtensionAmount>

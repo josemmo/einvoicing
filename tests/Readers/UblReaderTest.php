@@ -18,6 +18,11 @@ final class UblReaderTest extends TestCase {
     public function testCanReadInvoice(): void {
         $invoice = $this->reader->import(file_get_contents(self::DOCUMENT_PATH));
         $invoice->validate();
+
+        $lines = $invoice->getLines();
+        $this->assertEquals('1', $lines[0]->getId());
+        $this->assertEquals('2', $lines[1]->getId());
+
         $totals = $invoice->getTotals();
         $this->assertEquals(1300, $totals->netAmount);
         $this->assertEquals(1325, $totals->taxExclusiveAmount);
