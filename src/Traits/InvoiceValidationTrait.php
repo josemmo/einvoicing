@@ -6,7 +6,7 @@ use Einvoicing\Invoice;
 use function array_merge;
 use function in_array;
 
-// @phan-file-suppress PhanPossiblyNonClassMethodCall
+// @phan-file-suppress PhanPluginInconsistentReturnFunction, PhanPossiblyNonClassMethodCall
 
 trait InvoiceValidationTrait {
     /**
@@ -26,7 +26,7 @@ trait InvoiceValidationTrait {
 
     /**
      * Get effective validation rules
-     * @return array Map of <string,callable> rules
+     * @return array<string,callable> Map of rules
      * @suppress PhanUndeclaredProperty
      */
     private function getRules(): array {
@@ -40,7 +40,7 @@ trait InvoiceValidationTrait {
 
     /**
      * Get EN16931 validation rules
-     * @return array Map of <string,callable> rules
+     * @return array<string,callable> Map of rules
      */
     private function getDefaultRules(): array {
         $res = [];

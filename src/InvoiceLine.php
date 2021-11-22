@@ -10,6 +10,7 @@ use Einvoicing\Traits\VatTrait;
 use function round;
 
 class InvoiceLine {
+    protected $id = null;
     protected $orderLineReference = null;
     protected $name = null;
     protected $description = null;
@@ -29,6 +30,26 @@ class InvoiceLine {
     use ClassificationIdentifiersTrait;
     use PeriodTrait;
     use VatTrait;
+
+    /**
+     * Get invoice line identifier
+     * @return string|null
+     */
+    public function getId(): ?string {
+        return $this->id;
+    }
+
+
+    /**
+     * Set invoice line identifier
+     * @param  string $id Invoice line identifier
+     * @return self       Invoice line instance
+     */
+    public function setId(string $id): self {
+        $this->id = $id;
+        return $this;
+    }
+
 
     /**
      * Get order line reference

@@ -14,6 +14,7 @@ use Einvoicing\Payments\Mandate;
 use Einvoicing\Payments\Payment;
 use Einvoicing\Payments\Transfer;
 use UXML\UXML;
+use function in_array;
 
 class UblWriter extends AbstractWriter {
     const NS_INVOICE = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
@@ -168,8 +169,16 @@ class UblWriter extends AbstractWriter {
 
         // Invoice lines
         $lines = $invoice->getLines();
-        foreach ($lines as $i=>$line) {
-            $this->addLineNode($xml, $line, $i+1, $invoice); // @phan-suppress-current-line PhanPartialTypeMismatchArgument
+        $lastGenId = 0;
+        $usedIds = [];
+        foreach ($lines as $line) {
+            $lineId = $line->getId();
+            if ($lineId !== null) {
+                $usedIds[] = $lineId;
+            }
+        }
+        foreach ($lines as $line) {
+            $this->addLineNode($xml, $line, $invoice, $lastGenId, $usedIds);
         }
 
         return $xml->asXML();
@@ -745,16 +754,23 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add invoice line
-     * @param UXML        $parent  Parent XML element
-     * @param InvoiceLine $line    Invoice line
-     * @param int         $index   Invoice line index
-     * @param Invoice     $invoice Invoice instance
+     * @param UXML        $parent     Parent XML element
+     * @param InvoiceLine $line       Invoice line
+     * @param Invoice     $invoice    Invoice instance
+     * @param int         &$lastGenId Last used auto-generated ID
+     * @param string[]    &$usedIds   Used invoice line IDs
      */
-    private function addLineNode(UXML $parent, InvoiceLine $line, int $index, Invoice $invoice) {
+    private function addLineNode(UXML $parent, InvoiceLine $line, Invoice $invoice, int &$lastGenId, array &$usedIds) {
         $xml = $parent->add('cac:InvoiceLine');
 
-        // BT-126: Line ID
-        $xml->add('cbc:ID', (string) $index);
+        // BT-126: Invoice line identifier
+        $lineId = $line->getId();
+        if ($lineId === null) {
+            do {
+                $lineId = (string) ++$lastGenId;
+            } while (in_array($lineId, $usedIds));
+        }
+        $xml->add('cbc:ID', $lineId);
 
         // BT-127: Invoice line note
         $note = $line->getNote();

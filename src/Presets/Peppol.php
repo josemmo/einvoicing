@@ -3,7 +3,7 @@ namespace Einvoicing\Presets;
 
 use Einvoicing\Invoice;
 
-// @phan-file-suppress PhanPossiblyNonClassMethodCall
+// @phan-file-suppress PhanPluginInconsistentReturnFunction, PhanPossiblyNonClassMethodCall
 
 /**
  * PEPPOL BIS Billing 3.0
