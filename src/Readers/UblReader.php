@@ -57,8 +57,15 @@ class UblReader extends AbstractReader {
             if ($exemptionReasonCodeNode === null && $exemptionReasonNode === null) continue;
 
             // Get tax subtotal key
-            $category = $node->get("{{$cbc}}ID")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
-            $rate = (float) $node->get("{{$cbc}}Percent")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+            $category = null;
+            if ($node->get("{{$cbc}}ID") !== null) {
+                $category = $node->get("{{$cbc}}ID")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+            }
+
+            $rate = null;
+            if ($node->get("{{$cbc}}Percent") !== null) {
+                $rate = (float) $node->get("{{$cbc}}Percent")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+            }
             $key = "$category:$rate";
 
             // Save reasons
@@ -651,10 +658,12 @@ class UblReader extends AbstractReader {
         $cbc = UblWriter::NS_CBC;
 
         // Add instance to invoice
-        if ($xml->get("{{$cbc}}ChargeIndicator")->asText() === "true") { // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
-            $target->addCharge($allowanceOrCharge);
-        } else {
-            $target->addAllowance($allowanceOrCharge);
+        if ($xml->get("{{$cbc}}ChargeIndicator") !== null) {
+            if ($xml->get("{{$cbc}}ChargeIndicator")->asText() === "true") { // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+                $target->addCharge($allowanceOrCharge);
+            } else {
+                $target->addAllowance($allowanceOrCharge);
+            }
         }
 
         // Reason code
@@ -671,7 +680,7 @@ class UblReader extends AbstractReader {
 
         // Amount
         $factorNode = $xml->get("{{$cbc}}MultiplierFactorNumeric");
-        if ($factorNode === null) {
+        if ($factorNode === null && $xml->get("{{$cbc}}Amount") !== null) {
             $amount = (float) $xml->get("{{$cbc}}Amount")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
             $allowanceOrCharge->setAmount($amount);
         } else {
