@@ -33,7 +33,7 @@ class InvoiceLine {
 
     /**
      * Get invoice line identifier
-     * @return string|null
+     * @return string|null Invoice line identifier
      */
     public function getId(): ?string {
         return $this->id;
