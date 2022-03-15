@@ -10,11 +10,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.1', '7.2', '7.3', '7.4']
+        php-version: ['7.1', '7.2', '7.3', '7.4', '8.0']
         include:
-          - php-version: '8.0'
-            deploy: ${{ github.ref == 'refs/heads/master' }}
           - php-version: '8.1'
+            deploy: ${{ github.ref == 'refs/heads/master' }}
+          - php-version: '8.2'
             experimental: true
     steps:
       # Download code from repository
@@ -31,7 +31,7 @@ jobs:
 
       # Setup Composer
       - name: Setup Composer
-        run: composer validate --strict && composer install --ignore-platform-reqs
+        run: composer validate --strict && composer install
 
       # Run static analyzer
       - name: Run static analyzer
@@ -52,7 +52,7 @@ jobs:
        # Deploy documentation
       - name: Deploy documentation
         if: ${{ success() && matrix.deploy || false }}
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@4.2.5
         with:
           branch: gh-pages
           folder: site
