@@ -57,9 +57,15 @@ class UblReader extends AbstractReader {
             if ($exemptionReasonCodeNode === null && $exemptionReasonNode === null) continue;
 
             // Get tax subtotal key
-            $category = $node->get("{{$cbc}}ID")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
-            $rate = (float) $node->get("{{$cbc}}Percent")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
-            $key = "$category:$rate";
+            $categoryNode = $node->get("{{$cbc}}ID");
+            if ($categoryNode === null) {
+                throw new InvalidArgumentException('Missing <cbc:ID /> node from tax item');
+            }
+            $rateNode = $node->get("{{$cbc}}Percent");
+            if ($rateNode === null) {
+                throw new InvalidArgumentException('Missing <cbc:Percent /> node from tax item');
+            }
+            $key = "{$categoryNode->asText()}:{$rateNode->asText()}";
 
             // Save reasons
             $taxExemptions[$key] = [
@@ -651,7 +657,8 @@ class UblReader extends AbstractReader {
         $cbc = UblWriter::NS_CBC;
 
         // Add instance to invoice
-        if ($xml->get("{{$cbc}}ChargeIndicator")->asText() === "true") { // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+        $chargeIndicatorNode = $xml->get("{{$cbc}}ChargeIndicator");
+        if ($chargeIndicatorNode !== null && $chargeIndicatorNode->asText() === "true") {
             $target->addCharge($allowanceOrCharge);
         } else {
             $target->addAllowance($allowanceOrCharge);
@@ -671,12 +678,16 @@ class UblReader extends AbstractReader {
 
         // Amount
         $factorNode = $xml->get("{{$cbc}}MultiplierFactorNumeric");
-        if ($factorNode === null) {
-            $amount = (float) $xml->get("{{$cbc}}Amount")->asText(); // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
-            $allowanceOrCharge->setAmount($amount);
-        } else {
+        $amountNode = $xml->get("{{$cbc}}Amount");
+        if ($factorNode !== null) {
             $percent = (float) $factorNode->asText();
             $allowanceOrCharge->markAsPercentage()->setAmount($percent);
+        } elseif ($amountNode !== null) {
+            $amount = (float) $amountNode->asText();
+            $allowanceOrCharge->setAmount($amount);
+        } else {
+            throw new InvalidArgumentException('Missing both <cbc:Amount /> and <cbc:MultiplierFactorNumeric />' .
+                ' nodes from allowance/charge');
         }
 
         // VAT attributes
