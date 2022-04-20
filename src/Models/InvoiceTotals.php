@@ -4,7 +4,6 @@ namespace Einvoicing\Models;
 use Einvoicing\Invoice;
 use Einvoicing\Traits\VatTrait;
 use function array_values;
-use function round;
 
 class InvoiceTotals {
     /**
@@ -87,20 +86,19 @@ class InvoiceTotals {
 
         // Process all invoice lines
         foreach ($inv->getLines() as $line) {
-            $lineNetAmount = $line->getNetAmount($inv->getDecimals('line/netAmount')) ?? 0;
+            $lineNetAmount = $line->getNetAmount() ?? 0.0;
             $totals->netAmount += $lineNetAmount;
             self::updateVatMap($vatMap, $line, $lineNetAmount);
         }
 
         // Apply allowance and charge totals
-        $allowancesChargesDecimals = $inv->getDecimals('invoice/allowancesChargesAmount');
         foreach ($inv->getAllowances() as $item) {
-            $allowanceAmount = $item->getEffectiveAmount($totals->netAmount, $allowancesChargesDecimals);
+            $allowanceAmount = $item->getEffectiveAmount($totals->netAmount);
             $totals->allowancesAmount += $allowanceAmount;
             self::updateVatMap($vatMap, $item, -$allowanceAmount);
         }
         foreach ($inv->getCharges() as $item) {
-            $chargeAmount = $item->getEffectiveAmount($totals->netAmount, $allowancesChargesDecimals);
+            $chargeAmount = $item->getEffectiveAmount($totals->netAmount);
             $totals->chargesAmount += $chargeAmount;
             self::updateVatMap($vatMap, $item, $chargeAmount);
         }
@@ -108,7 +106,6 @@ class InvoiceTotals {
         // Calculate VAT amounts
         foreach ($vatMap as $item) {
             $item->taxAmount = $item->taxableAmount * ($item->rate / 100);
-            $item->taxAmount = round($item->taxAmount, $inv->getDecimals('invoice/taxAmount'));
             $totals->vatAmount += $item->taxAmount;
         }
 

@@ -2,7 +2,6 @@
 namespace Einvoicing;
 
 use Einvoicing\Traits\VatTrait;
-use function round;
 
 class AllowanceOrCharge {
     protected $reasonCode = null;
@@ -104,15 +103,14 @@ class AllowanceOrCharge {
     /**
      * Get effective amount relative to base amount
      * @param  float $baseAmount Base amount
-     * @param  int   $decimals   Number of decimal places
      * @return float             Effective amount
      */
-    public function getEffectiveAmount(float $baseAmount, int $decimals): float {
+    public function getEffectiveAmount(float $baseAmount): float {
         $amount = $this->getAmount();
         if ($this->isPercentage()) {
             $amount = $baseAmount * ($amount / 100);
         }
-        $amount = round($amount, $decimals);
+
         return $amount;
     }
 }

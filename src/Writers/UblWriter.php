@@ -679,13 +679,13 @@ class UblWriter extends AbstractWriter {
         // Amount
         $baseAmount = $atDocumentLevel ?
             $invoice->getTotals()->netAmount :
-            $line->getNetAmount($invoice->getDecimals('line/netAmount')) ?? 0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
-        $amount = $item->getEffectiveAmount($baseAmount, $invoice->getDecimals('line/allowanceChargeAmount'));
-        $this->addAmountNode($xml, 'cbc:Amount', $amount, $invoice->getCurrency());
+            $line->getNetAmount() ?? 0.0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+        $amount = $item->getEffectiveAmount($baseAmount);
+        $this->addAmountNode($xml, 'cbc:Amount', round($amount, 2), $invoice->getCurrency());
 
         // Base amount
         if ($item->isPercentage()) {
-            $this->addAmountNode($xml, 'cbc:BaseAmount', $baseAmount, $invoice->getCurrency());
+            $this->addAmountNode($xml, 'cbc:BaseAmount', round($baseAmount, 2), $invoice->getCurrency());
         }
 
         // Tax category
@@ -704,13 +704,13 @@ class UblWriter extends AbstractWriter {
         $xml = $parent->add('cac:TaxTotal');
 
         // Add tax amount
-        $this->addAmountNode($xml, 'cbc:TaxAmount', $totals->vatAmount, $totals->currency);
+        $this->addAmountNode($xml, 'cbc:TaxAmount', round($totals->vatAmount, 2), $totals->currency);
 
         // Add each tax details
         foreach ($totals->vatBreakdown as $item) {
             $vatBreakdownNode = $xml->add('cac:TaxSubtotal');
-            $this->addAmountNode($vatBreakdownNode, 'cbc:TaxableAmount', $item->taxableAmount, $totals->currency);
-            $this->addAmountNode($vatBreakdownNode, 'cbc:TaxAmount', $item->taxAmount, $totals->currency);
+            $this->addAmountNode($vatBreakdownNode, 'cbc:TaxableAmount', round($item->taxableAmount, 2), $totals->currency);
+            $this->addAmountNode($vatBreakdownNode, 'cbc:TaxAmount', round($item->taxAmount, 2), $totals->currency);
             $this->addVatNode($vatBreakdownNode, 'cac:TaxCategory', $item->category, $item->rate,
                 $item->exemptionReasonCode, $item->exemptionReason);
         }
@@ -747,7 +747,7 @@ class UblWriter extends AbstractWriter {
 
         // Create and append XML nodes
         foreach ($totalsMatrix as $field=>$amount) {
-            $this->addAmountNode($xml, $field, $amount, $totals->currency);
+            $this->addAmountNode($xml, $field, round($amount, 2), $totals->currency);
         }
     }
 
@@ -782,9 +782,9 @@ class UblWriter extends AbstractWriter {
         $xml->add('cbc:InvoicedQuantity', (string) $line->getQuantity(), ['unitCode' => $line->getUnit()]);
 
         // BT-131: Line net amount
-        $netAmount = $line->getNetAmount($invoice->getDecimals('line/netAmount'));
+        $netAmount = $line->getNetAmount();
         if ($netAmount !== null) {
-            $this->addAmountNode($xml, 'cbc:LineExtensionAmount', $netAmount, $invoice->getCurrency());
+            $this->addAmountNode($xml, 'cbc:LineExtensionAmount', round($netAmount,2), $invoice->getCurrency());
         }
 
         // BT-133: Buyer accounting reference
@@ -871,7 +871,7 @@ class UblWriter extends AbstractWriter {
         // Price amount
         $price = $line->getPrice();
         if ($price !== null) {
-            $this->addAmountNode($priceNode, 'cbc:PriceAmount', $price, $invoice->getCurrency());
+            $this->addAmountNode($priceNode, 'cbc:PriceAmount', round($price, 2), $invoice->getCurrency());
         }
 
         // Base quantity
