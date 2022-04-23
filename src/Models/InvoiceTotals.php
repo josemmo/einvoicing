@@ -4,6 +4,7 @@ namespace Einvoicing\Models;
 use Einvoicing\Invoice;
 use Einvoicing\Traits\VatTrait;
 use function array_values;
+use function round;
 
 class InvoiceTotals {
     /**
@@ -74,10 +75,11 @@ class InvoiceTotals {
 
     /**
      * Create instance from invoice
-     * @param  Invoice $inv Invoice instance
-     * @return self         Totals instance
+     * @param  Invoice $inv   Invoice instance
+     * @param  boolean $round Whether to round values or not
+     * @return self           Totals instance
      */
-    static public function fromInvoice(Invoice $inv): InvoiceTotals {
+    static public function fromInvoice(Invoice $inv, bool $round=true): InvoiceTotals {
         $totals = new self();
         $vatMap = [];
 
@@ -118,6 +120,23 @@ class InvoiceTotals {
 
         // Attach VAT breakdown
         $totals->vatBreakdown = array_values($vatMap);
+
+        // Round values
+        if ($round) {
+            $totals->netAmount = round($totals->netAmount, $inv->getDecimals('invoice/netAmount'));
+            $totals->allowancesAmount = round($totals->allowancesAmount, $inv->getDecimals('invoice/allowancesChargesAmount'));
+            $totals->chargesAmount = round($totals->chargesAmount, $inv->getDecimals('invoice/allowancesChargesAmount'));
+            $totals->vatAmount = round($totals->vatAmount, $inv->getDecimals('invoice/vatAmount'));
+            $totals->taxExclusiveAmount = round($totals->taxExclusiveAmount, $inv->getDecimals('invoice/taxExclusiveAmount'));
+            $totals->taxInclusiveAmount = round($totals->taxInclusiveAmount, $inv->getDecimals('invoice/taxInclusiveAmount'));
+            $totals->paidAmount = round($totals->paidAmount, $inv->getDecimals('invoice/paidAmount'));
+            $totals->roundingAmount = round($totals->roundingAmount, $inv->getDecimals('invoice/roundingAmount'));
+            $totals->payableAmount = round($totals->payableAmount, $inv->getDecimals('invoice/payableAmount'));
+            foreach ($totals->vatBreakdown as $item) {
+                $item->taxableAmount = round($item->taxableAmount, $inv->getDecimals('invoice/allowancesChargesAmount'));
+                $item->taxAmount = round($item->taxAmount, $inv->getDecimals('invoice/taxAmount'));
+            }
+        }
 
         return $totals;
     }

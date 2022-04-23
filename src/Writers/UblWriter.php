@@ -26,7 +26,7 @@ class UblWriter extends AbstractWriter {
      * @inheritdoc
      */
     public function export(Invoice $invoice): string {
-        $totals = $invoice->getTotals();
+        $totals = $invoice->getTotals(false);
         $xml = UXML::newInstance('Invoice', null, [
             'xmlns' => self::NS_INVOICE,
             'xmlns:cac' => self::NS_CAC,
@@ -645,7 +645,7 @@ class UblWriter extends AbstractWriter {
      * @param AllowanceOrCharge  $item     Allowance or charge instance
      * @param boolean            $isCharge Is charge (TRUE) or allowance (FALSE)
      * @param Invoice            $invoice  Invoice instance
-     * @param InvoiceTotals|null $totals   Invoice totals or NULL in case at line level
+     * @param InvoiceTotals|null $totals   Unrounded invoice totals or NULL in case at line level
      * @param InvoiceLine|null   $line     Invoice line or NULL in case of at document level
      */
     private function addAllowanceOrCharge(
@@ -711,7 +711,7 @@ class UblWriter extends AbstractWriter {
      * Add tax total node
      * @param UXML          $parent  Parent element
      * @param Invoice       $invoice Invoice instance
-     * @param InvoiceTotals $totals  Invoice totals
+     * @param InvoiceTotals $totals  Unrounded invoice totals
      */
     private function addTaxTotalNode(UXML $parent, Invoice $invoice, InvoiceTotals $totals) {
         $xml = $parent->add('cac:TaxTotal');
@@ -755,7 +755,7 @@ class UblWriter extends AbstractWriter {
      * Add document totals node
      * @param UXML          $parent  Parent element
      * @param Invoice       $invoice Invoice instance
-     * @param InvoiceTotals $totals  Invoice totals
+     * @param InvoiceTotals $totals  Unrounded invoice totals
      */
     private function addDocumentTotalsNode(UXML $parent, Invoice $invoice, InvoiceTotals $totals) {
         $xml = $parent->add('cac:LegalMonetaryTotal');

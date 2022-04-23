@@ -63,20 +63,9 @@ final class InvoiceTest extends TestCase {
           ->addLine((new InvoiceLine)->setPrice(34.343434343));
 
         $totals = $this->invoice->getTotals();
-        $this->assertEquals(123.456789, $totals->paidAmount);
-        $this->assertEquals(987.654321, $totals->roundingAmount);
-        $this->assertEquals(
-            123.4568,
-            round($totals->paidAmount, $this->invoice->getDecimals('invoice/paidAmount'))
-        );
-        $this->assertEquals(
-            987.654,
-            round($totals->roundingAmount, $this->invoice->getDecimals('invoice/roundingAmount'))
-        );
-        $this->assertEquals(
-            46.46464646,
-            round($totals->netAmount, $this->invoice->getDecimals('invoice/netAmount'))
-        );
+        $this->assertEquals(123.4568,    $totals->paidAmount);
+        $this->assertEquals(987.654,     $totals->roundingAmount);
+        $this->assertEquals(46.46464646, $totals->netAmount);
     }
 
     public function testTotalAmountsAreCalculatedCorrectly(): void {
@@ -91,7 +80,7 @@ final class InvoiceTest extends TestCase {
             ->addAllowance($allowance)
             ->addCharge($charge);
 
-        $totals = $this->invoice->getTotals();
+        $totals = $this->invoice->getTotals(false);
         $this->assertEquals(300.5,    $totals->netAmount);
         $this->assertEquals(12.34,    $totals->allowancesAmount);
         $this->assertEquals(22.5375,  $totals->chargesAmount);
