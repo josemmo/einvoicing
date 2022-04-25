@@ -16,7 +16,6 @@ use OutOfBoundsException;
 use function array_splice;
 use function count;
 use function is_subclass_of;
-use function round;
 
 class Invoice {
     const DEFAULT_DECIMALS = 8;
@@ -377,11 +376,10 @@ class Invoice {
 
     /**
      * Get invoice prepaid amount
-     * NOTE: may be rounded according to the CIUS specification
      * @return float Invoice prepaid amount
      */
     public function getPaidAmount(): float {
-        return round($this->paidAmount, $this->getDecimals('invoice/paidAmount'));
+        return $this->paidAmount;
     }
 
 
@@ -398,11 +396,10 @@ class Invoice {
 
     /**
      * Get invoice rounding amount
-     * NOTE: may be rounded according to the CIUS specification
      * @return float Invoice rounding amount
      */
     public function getRoundingAmount(): float {
-        return round($this->roundingAmount, $this->getDecimals('invoice/roundingAmount'));
+        return $this->roundingAmount;
     }
 
 
@@ -564,9 +561,10 @@ class Invoice {
 
     /**
      * Get invoice total
-     * @return InvoiceTotals Invoice totals
+     * @param  boolean       $round Whether to round values or not
+     * @return InvoiceTotals        Invoice totals
      */
-    public function getTotals(): InvoiceTotals {
-        return InvoiceTotals::fromInvoice($this);
+    public function getTotals(bool $round=true): InvoiceTotals {
+        return InvoiceTotals::fromInvoice($this, $round);
     }
 }

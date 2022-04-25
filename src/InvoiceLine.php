@@ -7,7 +7,6 @@ use Einvoicing\Traits\BuyerAccountingReferenceTrait;
 use Einvoicing\Traits\ClassificationIdentifiersTrait;
 use Einvoicing\Traits\PeriodTrait;
 use Einvoicing\Traits\VatTrait;
-use function round;
 
 class InvoiceLine {
     protected $id = null;
@@ -297,27 +296,25 @@ class InvoiceLine {
 
     /**
      * Get total net amount (without VAT) before allowances/charges
-     * @param  int        $decimals Number of decimal places
      * @return float|null           Net amount before allowances/charges
      */
-    public function getNetAmountBeforeAllowancesCharges(int $decimals=Invoice::DEFAULT_DECIMALS): ?float {
+    public function getNetAmountBeforeAllowancesCharges(): ?float {
         if ($this->price === null) {
             return null;
         }
-        return round(($this->price / $this->baseQuantity) * $this->quantity, $decimals);
+        return ($this->price / $this->baseQuantity) * $this->quantity;
     }
 
 
     /**
      * Get allowances total amount
-     * @param  int   $decimals Number of decimal places
      * @return float           Allowances total amount
      */
-    public function getAllowancesAmount(int $decimals=Invoice::DEFAULT_DECIMALS): float {
+    public function getAllowancesAmount(): float {
         $allowancesAmount = 0;
-        $baseAmount = $this->getNetAmountBeforeAllowancesCharges($decimals) ?? 0;
+        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0.0;
         foreach ($this->getAllowances() as $item) {
-            $allowancesAmount += $item->getEffectiveAmount($baseAmount, $decimals);
+            $allowancesAmount += $item->getEffectiveAmount($baseAmount);
         }
         return $allowancesAmount;
     }
@@ -325,14 +322,13 @@ class InvoiceLine {
 
     /**
      * Get charges total amount
-     * @param  int   $decimals Number of decimal places
      * @return float           Charges total amount
      */
-    public function getChargesAmount(int $decimals=Invoice::DEFAULT_DECIMALS): float {
+    public function getChargesAmount(): float {
         $chargesAmount = 0;
-        $baseAmount = $this->getNetAmountBeforeAllowancesCharges($decimals) ?? 0;
+        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0.0;
         foreach ($this->getCharges() as $item) {
-            $chargesAmount += $item->getEffectiveAmount($baseAmount, $decimals);
+            $chargesAmount += $item->getEffectiveAmount($baseAmount);
         }
         return $chargesAmount;
     }
@@ -341,16 +337,15 @@ class InvoiceLine {
     /**
      * Get total net amount (without VAT)
      * NOTE: inclusive of line level allowances and charges
-     * @param  int        $decimals Number of decimal places
      * @return float|null           Net amount
      */
-    public function getNetAmount(int $decimals=Invoice::DEFAULT_DECIMALS): ?float {
-        $netAmount = $this->getNetAmountBeforeAllowancesCharges($decimals);
+    public function getNetAmount(): ?float {
+        $netAmount = $this->getNetAmountBeforeAllowancesCharges();
         if ($netAmount === null) {
             return null;
         }
-        $netAmount -= $this->getAllowancesAmount($decimals);
-        $netAmount += $this->getChargesAmount($decimals);
+        $netAmount -= $this->getAllowancesAmount();
+        $netAmount += $this->getChargesAmount();
         return $netAmount;
     }
 }
