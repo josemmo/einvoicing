@@ -1,6 +1,6 @@
 # Getting Started
 eInvoicing (short for "European Invoicing") is a free and open-source library written in PHP for creating and reading
-electronic invoices compliant with [EN 16931](https://ec.europa.eu/cefdigital/wiki/x/kwFVBg).
+electronic invoices compliant with [EN 16931](https://ec.europa.eu/digital-building-blocks/wikis/x/boTXGw).
 
 ## Requirements
 In order to install this library, your environment has to meet the following requirements:

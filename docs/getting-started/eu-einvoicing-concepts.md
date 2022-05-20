@@ -39,7 +39,7 @@ more particular cases, such us the ones mentioned before.
 The most popular CIUS is [PEPPOL BIS Billing 3.0][4], a cross-border specification used by multiple countries and
 international companies from both public and private sectors.
 
-[1]: https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/Navigating+the+eInvoicing+standard+documentation
-[2]: https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/Required+syntaxes
-[3]: https://ec.europa.eu/cefdigital/wiki/x/5xLoAg
+[1]: https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/Navigating+the+eInvoicing+standard+documentation
+[2]: https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/Required+syntaxes
+[3]: https://ec.europa.eu/digital-building-blocks/wikis/display/EINVCOMMUNITY/Registry+of+CIUS+%28Core+Invoice+Usage+Specifications%29+and+Extensions
 [4]: http://docs.peppol.eu/poacc/billing/3.0/
