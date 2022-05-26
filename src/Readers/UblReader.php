@@ -62,10 +62,8 @@ class UblReader extends AbstractReader {
                 throw new InvalidArgumentException('Missing <cbc:ID /> node from tax item');
             }
             $rateNode = $node->get("{{$cbc}}Percent");
-            if ($rateNode === null) {
-                throw new InvalidArgumentException('Missing <cbc:Percent /> node from tax item');
-            }
-            $key = "{$categoryNode->asText()}:{$rateNode->asText()}";
+            $rateKey = ($rateNode === null) ? '' : floatval($rateNode->asText());
+            $key = "{$categoryNode->asText()}:{$rateKey}";
 
             // Save reasons
             $taxExemptions[$key] = [
@@ -639,7 +637,8 @@ class UblReader extends AbstractReader {
         }
 
         // Tax exemption reasons
-        $key = "{$target->getVatCategory()}:{$target->getVatRate()}";
+        $rateKey = $target->getVatRate() ?? '';
+        $key = "{$target->getVatCategory()}:{$rateKey}";
         $target->setVatExemptionReasonCode($taxExemptions[$key]['code'] ?? null);
         $target->setVatExemptionReason($taxExemptions[$key]['reason'] ?? null);
     }
