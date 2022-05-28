@@ -387,11 +387,17 @@ class UblReader extends AbstractReader {
         if ($legalNameNode !== null) {
             $party->setName($legalNameNode->asText());
         }
-        
+
         // Company ID
         $companyIdNode = $xml->get("{{$cac}}PartyLegalEntity/{{$cbc}}CompanyID");
         if ($companyIdNode !== null) {
             $party->setCompanyId($this->parseIdentifierNode($companyIdNode));
+        }
+
+        // BT-33: Seller additional legal information
+        $companyLegalFormNode = $xml->get("{{$cac}}PartyLegalEntity/{{$cbc}}CompanyLegalForm");
+        if ($companyLegalFormNode !== null) {
+            $party->setLegalInformation($companyLegalFormNode->asText());
         }
 
         // Contact name

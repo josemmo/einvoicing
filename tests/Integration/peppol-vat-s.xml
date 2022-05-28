@@ -38,7 +38,8 @@
             </cac:PartyTaxScheme>
             <cac:PartyLegalEntity>
                 <cbc:RegistrationName>SupplierOfficialName Ltd</cbc:RegistrationName>
-                <cbc:CompanyID>GB983294</cbc:CompanyID>  
+                <cbc:CompanyID>GB983294</cbc:CompanyID>
+                <cbc:CompanyLegalForm>AdditionalLegalInformation</cbc:CompanyLegalForm>
             </cac:PartyLegalEntity>
             <cac:Contact>
                 <cbc:Name>John Doe</cbc:Name>

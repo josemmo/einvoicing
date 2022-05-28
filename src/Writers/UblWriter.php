@@ -421,6 +421,12 @@ class UblWriter extends AbstractWriter {
             $this->addIdentifierNode($legalEntityNode, 'cbc:CompanyID', $companyId);
         }
 
+        // BT-33: Seller additional legal information
+        $legalInformation = $party->getLegalInformation();
+        if ($legalInformation !== null) {
+            $legalEntityNode->add('cbc:CompanyLegalForm', $legalInformation);
+        }
+
         // Contact point
         if ($party->hasContactInformation()) {
             $contactNode = $xml->add('cac:Contact');
