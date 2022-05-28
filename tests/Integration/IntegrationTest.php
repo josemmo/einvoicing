@@ -53,4 +53,8 @@ final class IntegrationTest extends TestCase {
     public function testCanRecreatePeppolAllowanceExample(): void {
         $this->importAndExportInvoice(__DIR__ . "/peppol-allowance.xml");
     }
+
+    public function testCanRecreateCiusRoTaxCurrencyCodeExample(): void {
+        $this->importAndExportInvoice(__DIR__ . "/cius-ro-tax-currency-code.xml");
+    }
 }

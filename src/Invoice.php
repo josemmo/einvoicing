@@ -27,6 +27,7 @@ class Invoice {
     protected $number = null;
     protected $type = 380; // TODO: add constants
     protected $currency = "EUR"; // TODO: add constants
+    protected $vatCurrency = null;
     protected $issueDate = null;
     protected $dueDate = null;
     protected $taxPointDate = null;
@@ -38,6 +39,7 @@ class Invoice {
     protected $contractReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
+    protected $customVatAmount = null;
     protected $seller = null;
     protected $buyer = null;
     protected $payee = null;
@@ -190,6 +192,26 @@ class Invoice {
      */
     public function setCurrency(string $currencyCode): self {
         $this->currency = $currencyCode;
+        return $this;
+    }
+
+
+    /**
+     * Get VAT accounting currency code
+     * @return string|null VAT accounting currency code or NULL if same as document's
+     */
+    public function getVatCurrency(): ?string {
+        return $this->vatCurrency;
+    }
+
+
+    /**
+     * Set VAT accounting currency code
+     * @param  string|null $currencyCode VAT accounting currency code or NULL if same as document's
+     * @return self                      Invoice instance
+     */
+    public function setVatCurrency(?string $currencyCode): self {
+        $this->vatCurrency = $currencyCode;
         return $this;
     }
 
@@ -410,6 +432,26 @@ class Invoice {
      */
     public function setRoundingAmount(float $roundingAmount): self {
         $this->roundingAmount = $roundingAmount;
+        return $this;
+    }
+
+
+    /**
+     * Get total VAT amount in VAT accounting currency
+     * @return float|null Total amount in accounting currency
+     */
+    public function getCustomVatAmount(): ?float {
+        return $this->customVatAmount;
+    }
+
+
+    /**
+     * Set total VAT amount in VAT accounting currency
+     * @param  float|null  $customVatAmount Total amount in accounting currency
+     * @return self                         Invoice instance
+     */
+    public function setCustomVatAmount(?float $customVatAmount): self {
+        $this->customVatAmount = $customVatAmount;
         return $this;
     }
 

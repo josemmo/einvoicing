@@ -120,6 +120,12 @@ class UblReader extends AbstractReader {
             $invoice->setCurrency($currencyNode->asText());
         }
 
+        // BT-6: VAT accounting currency code
+        $vatCurrencyNode = $xml->get("{{$cbc}}TaxCurrencyCode");
+        if ($vatCurrencyNode !== null) {
+            $invoice->setVatCurrency($vatCurrencyNode->asText());
+        }
+
         // BT-19: Buyer accounting reference
         $buyerAccountingReferenceNode = $xml->get("{{$cbc}}AccountingCost");
         if ($buyerAccountingReferenceNode !== null) {
@@ -209,6 +215,18 @@ class UblReader extends AbstractReader {
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
             $this->addAllowanceOrCharge($invoice, $node, $taxExemptions);
+        }
+
+        // BT-111: Total VAT amount in accounting currency
+        foreach ($xml->getAll("{{$cac}}TaxTotal") as $taxTotalNode) {
+            if ($taxTotalNode->get("{{$cac}}TaxSubtotal") !== null) {
+                // The other tax total node, then
+                continue;
+            }
+            $taxAmountNode = $taxTotalNode->get("{{$cbc}}TaxAmount");
+            if ($taxAmountNode !== null) {
+                $invoice->setCustomVatAmount((float) $taxAmountNode->asText());
+            }
         }
 
         // BT-113: Paid amount

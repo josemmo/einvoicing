@@ -81,6 +81,12 @@ class UblWriter extends AbstractWriter {
         // BT-5: Invoice currency code
         $xml->add('cbc:DocumentCurrencyCode', $invoice->getCurrency());
 
+        // BT-6: VAT accounting currency code
+        $vatCurrency = $invoice->getVatCurrency();
+        if ($vatCurrency !== null) {
+            $xml->add('cbc:TaxCurrencyCode', $vatCurrency);
+        }
+
         // BT-19: Buyer accounting reference
         $buyerAccountingReference = $invoice->getBuyerAccountingReference();
         if ($buyerAccountingReference !== null) {
@@ -165,7 +171,7 @@ class UblWriter extends AbstractWriter {
         }
 
         // Invoice totals
-        $this->addTaxTotalNode($xml, $invoice, $totals);
+        $this->addTaxTotalNodes($xml, $invoice, $totals);
         $this->addDocumentTotalsNode($xml, $invoice, $totals);
 
         // Invoice lines
@@ -708,12 +714,12 @@ class UblWriter extends AbstractWriter {
 
 
     /**
-     * Add tax total node
+     * Add tax total nodes
      * @param UXML          $parent  Parent element
      * @param Invoice       $invoice Invoice instance
      * @param InvoiceTotals $totals  Unrounded invoice totals
      */
-    private function addTaxTotalNode(UXML $parent, Invoice $invoice, InvoiceTotals $totals) {
+    private function addTaxTotalNodes(UXML $parent, Invoice $invoice, InvoiceTotals $totals) {
         $xml = $parent->add('cac:TaxTotal');
 
         // Add tax amount
@@ -746,6 +752,17 @@ class UblWriter extends AbstractWriter {
                 $item->rate,
                 $item->exemptionReasonCode,
                 $item->exemptionReason
+            );
+        }
+
+        // Add tax amount in VAT accounting currency (if any)
+        $customVatAmount = $totals->customVatAmount;
+        if ($customVatAmount !== null) {
+            $this->addAmountNode(
+                $parent->add('cac:TaxTotal'),
+                'cbc:TaxAmount',
+                round($customVatAmount, $invoice->getDecimals('invoice/taxAmount')),
+                $totals->vatCurrency ?? $totals->currency
             );
         }
     }

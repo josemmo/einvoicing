@@ -8,10 +8,16 @@ use function round;
 
 class InvoiceTotals {
     /**
-     * Totals currency code
+     * Invoice currency code
      * @var string
      */
     public $currency;
+
+    /**
+     * VAT accounting currency code
+     * @var string|null
+     */
+    public $vatCurrency = null;
 
     /**
      * Sum of all invoice line net amounts
@@ -62,6 +68,12 @@ class InvoiceTotals {
     public $roundingAmount = 0;
 
     /**
+     * Total VAT amount in accounting currency
+     * @var float|null
+     */
+    public $customVatAmount = null;
+
+    /**
      * Amount due for payment
      * @var float
      */
@@ -83,8 +95,9 @@ class InvoiceTotals {
         $totals = new self();
         $vatMap = [];
 
-        // Set currency code
+        // Set currency codes
         $totals->currency = $inv->getCurrency();
+        $totals->vatCurrency = $inv->getVatCurrency();
 
         // Process all invoice lines
         foreach ($inv->getLines() as $line) {
@@ -116,6 +129,7 @@ class InvoiceTotals {
         $totals->taxInclusiveAmount = $totals->taxExclusiveAmount + $totals->vatAmount;
         $totals->paidAmount = $inv->getPaidAmount();
         $totals->roundingAmount = $inv->getRoundingAmount();
+        $totals->customVatAmount = $inv->getCustomVatAmount();
         $totals->payableAmount = $totals->taxInclusiveAmount - $totals->paidAmount + $totals->roundingAmount;
 
         // Attach VAT breakdown
