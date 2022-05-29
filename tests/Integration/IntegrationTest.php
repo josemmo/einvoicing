@@ -21,10 +21,18 @@ final class IntegrationTest extends TestCase {
     }
 
     protected function normalize(string $xml): string {
+        // Normalize input document
         $doc = new DOMDocument();
         $doc->preserveWhiteSpace = false;
         $doc->loadXML($xml, LIBXML_NOERROR);
-        return $doc->C14N();
+        $normalizedXml = $doc->C14N();
+        unset($doc);
+
+        // Export formatted XML for better diffing
+        $doc = new DOMDocument();
+        $doc->formatOutput = true;
+        $doc->loadXML($normalizedXml, LIBXML_NOERROR);
+        return $doc->saveXML();
     }
 
     protected function importAndExportInvoice(string $xmlPath): void {
