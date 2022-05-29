@@ -52,6 +52,15 @@ final class InvoiceTest extends TestCase {
         $this->invoice->addLine(new InvoiceLine)->removeLine(1);
     }
 
+    public function testCanRoundNegativeZeroes(): void {
+        $this->assertEquals('-1', (string) $this->invoice->round(-0.9999, 'invoice/netAmount'));
+        $this->assertEquals('0',  (string) $this->invoice->round(-0.0001, 'invoice/netAmount'));
+        $this->assertEquals('0',  (string) $this->invoice->round(-0,      'invoice/netAmount'));
+        $this->assertEquals('0',  (string) $this->invoice->round(0,       'invoice/netAmount'));
+        $this->assertEquals('0',  (string) $this->invoice->round(0.0001,  'invoice/netAmount'));
+        $this->assertEquals('1',  (string) $this->invoice->round(0.9999,  'invoice/netAmount'));
+    }
+
     public function testDecimalMatrixIsUsed(): void {
         $this->invoice->setRoundingMatrix([
             'invoice/paidAmount' => 4,

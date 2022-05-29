@@ -16,6 +16,7 @@ use OutOfBoundsException;
 use function array_splice;
 use function count;
 use function is_subclass_of;
+use function round;
 
 class Invoice {
     const DEFAULT_DECIMALS = 8;
@@ -82,6 +83,21 @@ class Invoice {
      */
     public function getDecimals(string $field): int {
         return $this->roundingMatrix[$field] ?? $this->roundingMatrix[''] ?? self::DEFAULT_DECIMALS;
+    }
+
+
+    /**
+     * Round value
+     * @param  float  $value Value to round
+     * @param  string $field Field name
+     * @return float         Rounded value
+     */
+    public function round(float $value, string $field): float {
+        $rounded = round($value, $this->getDecimals($field));
+        if ($rounded == 0) {
+            $rounded += 0; // To fix negative zero
+        }
+        return $rounded;
     }
 
 
