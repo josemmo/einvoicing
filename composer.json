@@ -29,7 +29,7 @@
     },
     "require": {
         "php": ">=7.1",
-        "josemmo/uxml": "^0.1.3"
+        "josemmo/uxml": "^0.1.4"
     },
     "require-dev": {
         "ext-openssl": "*",
