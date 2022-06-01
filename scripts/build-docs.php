@@ -1,7 +1,9 @@
 <?php
 use phpDocumentor\Reflection\DocBlock;
+use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
 use phpDocumentor\Reflection\DocBlock\Tags\Param;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
+use phpDocumentor\Reflection\DocBlock\Tags\See;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\File\LocalFile;
@@ -27,7 +29,7 @@ const MKDOCS_CONFIG = __DIR__ . "/../mkdocs.yml";
 
 /**
  * Get project files
- * @return Element[string] Array of documentable classes
+ * @return array<string,Element> Array of documentable classes
  */
 function getProjectFiles(): array {
     $files = [];
@@ -55,7 +57,7 @@ function getProjectFiles(): array {
  * Get class public elements
  * @param  Class_                         $class    Class instance
  * @param  string                         $type     Element type ("constants", "properties" or "methods")
- * @param  Element[string]                &$project Project files
+ * @param  array<string,Element>          &$project Project files
  * @return Constant[]|Property[]|Method[]           Public elements
  */
 function getPublicElements(Class_ $class, string $type, array &$project): array {
@@ -102,9 +104,9 @@ function getClassUrl(string $fqsen): string {
 
 /**
  * Render class
- * @param  Class_          $class    Class instance
- * @param  Element[string] &$project Project files
- * @return string                    Markdown documentation
+ * @param  Class_                $class    Class instance
+ * @param  array<string,Element> &$project Project files
+ * @return string                          Markdown documentation
  */
 function renderClass(Class_ $class, array &$project): string {
     $doc = "# {$class->getFqsen()}\n\n";
@@ -180,8 +182,21 @@ function renderMethod(Method $method, array $addDocblocks, Class_ $class): strin
     $return = $docblock->getTagsByName('return')[0] ?? null;
 
     // Method summary
-    $doc = "## `{$method->getName()}()`\n";
+    $doc  = "## `{$method->getName()}()`\n";
     $doc .= $docblock->getSummary() . "\n";
+
+    // Deprecation warning
+    /** @var Deprecated|null */
+    $deprecated = $docblock->getTagsByName('deprecated')[0] ?? null;
+    if ($deprecated !== null) {
+        /** @var See */
+        $see = $docblock->getTagsByName('see')[0];
+        $seeRef = $see->getReference();
+        $doc .= "\n";
+        $doc .= "!!! warning \"Deprecated since v{$deprecated->getVersion()}\"\n";
+        $doc .= "\n";
+        $doc .= "    Use [`$seeRef`](#" . strtolower(substr($seeRef, strpos($seeRef, '::')+2, -2)) . ") instead.\n";
+    }
 
     // Signature
     $doc .= "\n```php\n";
