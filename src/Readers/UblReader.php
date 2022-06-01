@@ -102,10 +102,9 @@ class UblReader extends AbstractReader {
             $invoice->setType((int) $typeNode->asText());
         }
 
-        // BT-22: Note
-        $noteNode = $xml->get("{{$cbc}}Note");
-        if ($noteNode !== null) {
-            $invoice->setNote($noteNode->asText());
+        // BT-22: Notes
+        foreach ($xml->getAll("{{$cbc}}Note") as $noteNode) {
+            $invoice->addNote($noteNode->asText());
         }
 
         // BT-7: Tax point date

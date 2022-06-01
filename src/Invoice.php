@@ -32,7 +32,7 @@ class Invoice {
     protected $issueDate = null;
     protected $dueDate = null;
     protected $taxPointDate = null;
-    protected $note = null;
+    protected $notes = [];
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
@@ -293,11 +293,58 @@ class Invoice {
 
 
     /**
+     * Get invoice notes
+     * @return string[] Invoice notes
+     */
+    public function getNotes(): array {
+        return $this->notes;
+    }
+
+
+    /**
+     * Add invoice note
+     * @param  string $note Invoice note
+     * @return self         Invoice instance
+     */
+    public function addNote(string $note): self {
+        $this->notes[] = $note;
+        return $this;
+    }
+
+
+    /**
+     * Remove invoice note
+     * @param  int  $index Invoice note index
+     * @return self        Invoice instance
+     * @throws OutOfBoundsException if invoice note index is out of bounds
+     */
+    public function removeNote(int $index): self {
+        if ($index < 0 || $index >= count($this->notes)) {
+            throw new OutOfBoundsException('Could not find invoice note by index');
+        }
+        array_splice($this->notes, $index, 1);
+        return $this;
+    }
+
+
+    /**
+     * Clear all invoice notes
+     * @return self Invoice instance
+     */
+    public function clearNotes(): self {
+        $this->notes = [];
+        return $this;
+    }
+
+
+    /**
      * Get invoice note
      * @return string|null Invoice note
+     * @deprecated 0.2.1
+     * @see Invoice::getNotes()
      */
     public function getNote(): ?string {
-        return $this->note;
+        return $this->notes[0] ?? null;
     }
 
 
@@ -305,9 +352,12 @@ class Invoice {
      * Set invoice note
      * @param  string|null $note Invoice note
      * @return self              Invoice instance
+     * @deprecated 0.2.1
+     * @see Invoice::addNote()
      */
     public function setNote(?string $note): self {
-        $this->note = $note;
+        // @phan-suppress-next-line PhanPartialTypeMismatchProperty
+        $this->notes = ($note === null) ? [] : [$note];
         return $this;
     }
 

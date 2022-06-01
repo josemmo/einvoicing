@@ -31,6 +31,28 @@ final class InvoiceTest extends TestCase {
         new Invoice(self::class);
     }
 
+    public function testCanReadAndWriteNotes(): void {
+        $note = "This is a test";
+        $this->assertSame($note, $this->invoice->addNote($note)->getNotes()[0]);
+        $this->invoice->removeNote(0);
+        $this->assertEmpty($this->invoice->getNotes());
+    }
+
+    public function testCanRemoveNotes(): void {
+        $this->invoice
+            ->addNote('Note #1')
+            ->addNote('Note #2')
+            ->addNote('Note #3')
+            ->removeNote(2)
+            ->removeNote(0);
+        $this->assertSame('Note #2', $this->invoice->getNotes()[0]);
+    }
+
+    public function testCannotRemoveOutOfBoundsNotes(): void {
+        $this->expectException(OutOfBoundsException::class);
+        $this->invoice->addNote('A sample note')->removeNote(1);
+    }
+
     public function testCanReadAndWriteLines(): void {
         $this->assertSame($this->line, $this->invoice->addLine($this->line)->getLines()[0]);
         $this->invoice->removeLine(0);

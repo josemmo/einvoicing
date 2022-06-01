@@ -25,6 +25,11 @@ class Peppol extends AbstractPreset {
     public function getRules(): array {
         $res = [];
 
+        $res['PEPPOL-EN16931-R002'] = static function(Invoice $inv) {
+            if (count($inv->getNotes()) > 1) {
+                return "No more than one note is allowed on document level.";
+            }
+        };
         $res['PEPPOL-EN16931-R003'] = static function(Invoice $inv) {
             if ($inv->getBuyerReference() !== null) return;
             if ($inv->getPurchaseOrderReference() !== null) return;

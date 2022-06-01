@@ -65,9 +65,8 @@ class UblWriter extends AbstractWriter {
         // BT-3: Invoice type code
         $xml->add('cbc:InvoiceTypeCode', (string) $invoice->getType());
 
-        // BT-22: Note
-        $note = $invoice->getNote();
-        if ($note !== null) {
+        // BT-22: Notes
+        foreach ($invoice->getNotes() as $note) {
             $xml->add('cbc:Note', $note);
         }
 
