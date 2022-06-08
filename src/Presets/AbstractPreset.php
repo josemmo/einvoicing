@@ -2,6 +2,7 @@
 namespace Einvoicing\Presets;
 
 use Einvoicing\Invoice;
+use UXML\UXML;
 
 abstract class AbstractPreset {
     /**
@@ -26,5 +27,15 @@ abstract class AbstractPreset {
      */
     public function setupInvoice(Invoice $invoice) {
         $invoice->setRoundingMatrix(['' => 2]);
+    }
+
+
+    /**
+     * Finalize UBL document
+     * @param  UXML $xml UBL document
+     * @return UXML      Modified UBL document
+     */
+    public function finalizeUbl(UXML $xml): UXML {
+        return $xml;
     }
 }

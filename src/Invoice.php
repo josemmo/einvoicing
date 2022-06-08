@@ -102,6 +102,15 @@ class Invoice {
 
 
     /**
+     * Get preset instance
+     * @return AbstractPreset|null Preset instance
+     */
+    public function getPreset(): ?AbstractPreset {
+        return $this->preset;
+    }
+
+
+    /**
      * Set rounding matrix
      * @param  array $matrix Rounding matrix
      * @return self          Invoice instance

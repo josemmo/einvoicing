@@ -76,7 +76,7 @@ $res['BR-03'] = static function(Invoice $inv) {
 ```
 
 ## Custom invoice modifications
-There may be some occasions when presets will require to initialise the invoice instance with some default values.
+There may be some occasions when presets will require to initialize the invoice instance with some default values.
 For example, setting a rounding matrix to define the number of decimal places allowed in certain fields.
 
 To achieve that, you can make use of the `setupInvoice()` method of a preset class, which will be called just before
@@ -93,6 +93,24 @@ class CustomPreset extends AbstractPreset {
             "line/netAmount" => 4,
             "" => 2
         ]);
+    }
+}
+```
+
+## Custom document modifications
+Presets can also modify the invoice document that will be exported. In order to do so, your preset needs to implement
+the `finalizeUbl()` method, which will be called after the UBL XML document tree has been generated:
+```php
+use Einvoicing\Invoice;
+use Einvoicing\Presets\AbstractPreset;
+use UXML\UXML;
+
+class CustomPreset extends AbstractPreset {
+    // [...]
+
+    public function finalizeUbl(UXML $xml): UXML {
+        $xml->add('CustomNode', 'The contents of this node');
+        return $xml;
     }
 }
 ```

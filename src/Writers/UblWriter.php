@@ -186,6 +186,12 @@ class UblWriter extends AbstractWriter {
             $this->addLineNode($xml, $line, $invoice, $lastGenId, $usedIds);
         }
 
+        // Apply preset modifications
+        $preset = $invoice->getPreset();
+        if ($preset !== null) {
+            $xml = $preset->finalizeUbl($xml);
+        }
+
         return $xml->asXML();
     }
 

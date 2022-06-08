@@ -1,6 +1,8 @@
 <?php
 namespace Einvoicing\Presets;
 
+use UXML\UXML;
+
 /**
  * NLCIUS
  * @author Standaardisatieplatform e-factureren
@@ -12,5 +14,18 @@ class Nlcius extends AbstractPreset {
      */
     public function getSpecification(): string {
         return "urn:cen.eu:en16931:2017#compliant#urn:fdc:nen.nl:nlcius:v1.0";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function finalizeUbl(UXML $xml): UXML {
+        foreach ($xml->getAll('//cac:TaxScheme/cbc:ID') as $taxIdNode) {
+            $taxIdNode->element()->setAttribute('schemeID', 'UN/ECE 5153');
+        }
+        foreach ($xml->getAll('//cbc:TaxExemptionReasonCode') as $exemptionReasonNode) {
+            $exemptionReasonNode->element()->setAttribute('listID', 'CWA 15577');
+        }
+        return $xml;
     }
 }
