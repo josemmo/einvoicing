@@ -16,6 +16,7 @@ use OutOfBoundsException;
 use function array_splice;
 use function count;
 use function is_subclass_of;
+use function round;
 
 class Invoice {
     const DEFAULT_DECIMALS = 8;
@@ -27,10 +28,11 @@ class Invoice {
     protected $number = null;
     protected $type = 380; // TODO: add constants
     protected $currency = "EUR"; // TODO: add constants
+    protected $vatCurrency = null;
     protected $issueDate = null;
     protected $dueDate = null;
     protected $taxPointDate = null;
-    protected $note = null;
+    protected $notes = [];
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
@@ -38,6 +40,7 @@ class Invoice {
     protected $contractReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
+    protected $customVatAmount = null;
     protected $seller = null;
     protected $buyer = null;
     protected $payee = null;
@@ -80,6 +83,21 @@ class Invoice {
      */
     public function getDecimals(string $field): int {
         return $this->roundingMatrix[$field] ?? $this->roundingMatrix[''] ?? self::DEFAULT_DECIMALS;
+    }
+
+
+    /**
+     * Round value
+     * @param  float  $value Value to round
+     * @param  string $field Field name
+     * @return float         Rounded value
+     */
+    public function round(float $value, string $field): float {
+        $rounded = round($value, $this->getDecimals($field));
+        if ($rounded == 0) {
+            $rounded += 0; // To fix negative zero
+        }
+        return $rounded;
     }
 
 
@@ -195,6 +213,26 @@ class Invoice {
 
 
     /**
+     * Get VAT accounting currency code
+     * @return string|null VAT accounting currency code or NULL if same as document's
+     */
+    public function getVatCurrency(): ?string {
+        return $this->vatCurrency;
+    }
+
+
+    /**
+     * Set VAT accounting currency code
+     * @param  string|null $currencyCode VAT accounting currency code or NULL if same as document's
+     * @return self                      Invoice instance
+     */
+    public function setVatCurrency(?string $currencyCode): self {
+        $this->vatCurrency = $currencyCode;
+        return $this;
+    }
+
+
+    /**
      * Get invoice issue date
      * @return DateTime|null Invoice issue date
      */
@@ -255,11 +293,58 @@ class Invoice {
 
 
     /**
+     * Get invoice notes
+     * @return string[] Invoice notes
+     */
+    public function getNotes(): array {
+        return $this->notes;
+    }
+
+
+    /**
+     * Add invoice note
+     * @param  string $note Invoice note
+     * @return self         Invoice instance
+     */
+    public function addNote(string $note): self {
+        $this->notes[] = $note;
+        return $this;
+    }
+
+
+    /**
+     * Remove invoice note
+     * @param  int  $index Invoice note index
+     * @return self        Invoice instance
+     * @throws OutOfBoundsException if invoice note index is out of bounds
+     */
+    public function removeNote(int $index): self {
+        if ($index < 0 || $index >= count($this->notes)) {
+            throw new OutOfBoundsException('Could not find invoice note by index');
+        }
+        array_splice($this->notes, $index, 1);
+        return $this;
+    }
+
+
+    /**
+     * Clear all invoice notes
+     * @return self Invoice instance
+     */
+    public function clearNotes(): self {
+        $this->notes = [];
+        return $this;
+    }
+
+
+    /**
      * Get invoice note
      * @return string|null Invoice note
+     * @deprecated 0.2.1
+     * @see Invoice::getNotes()
      */
     public function getNote(): ?string {
-        return $this->note;
+        return $this->notes[0] ?? null;
     }
 
 
@@ -267,9 +352,12 @@ class Invoice {
      * Set invoice note
      * @param  string|null $note Invoice note
      * @return self              Invoice instance
+     * @deprecated 0.2.1
+     * @see Invoice::addNote()
      */
     public function setNote(?string $note): self {
-        $this->note = $note;
+        // @phan-suppress-next-line PhanPartialTypeMismatchProperty
+        $this->notes = ($note === null) ? [] : [$note];
         return $this;
     }
 
@@ -410,6 +498,26 @@ class Invoice {
      */
     public function setRoundingAmount(float $roundingAmount): self {
         $this->roundingAmount = $roundingAmount;
+        return $this;
+    }
+
+
+    /**
+     * Get total VAT amount in VAT accounting currency
+     * @return float|null Total amount in accounting currency
+     */
+    public function getCustomVatAmount(): ?float {
+        return $this->customVatAmount;
+    }
+
+
+    /**
+     * Set total VAT amount in VAT accounting currency
+     * @param  float|null  $customVatAmount Total amount in accounting currency
+     * @return self                         Invoice instance
+     */
+    public function setCustomVatAmount(?float $customVatAmount): self {
+        $this->customVatAmount = $customVatAmount;
         return $this;
     }
 

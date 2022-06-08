@@ -11,6 +11,7 @@ class Party {
     protected $companyId = null;
     protected $vatNumber = null;
     protected $taxRegistrationId = null;
+    protected $legalInformation = null;
     protected $contactName = null;
     protected $contactPhone = null;
     protected $contactEmail = null;
@@ -134,6 +135,26 @@ class Party {
      */
     public function setTaxRegistrationId(?Identifier $taxRegistrationId): self {
         $this->taxRegistrationId = $taxRegistrationId;
+        return $this;
+    }
+
+
+    /**
+     * Get additional legal information
+     * @return string|null Additional legal information
+     */
+    public function getLegalInformation(): ?string {
+        return $this->legalInformation;
+    }
+
+
+    /**
+     * Set additional legal information
+     * @param string|null $legalInformation Additional legal information
+     * @return self                         Party instance
+     */
+    public function setLegalInformation(?string $legalInformation): self {
+        $this->legalInformation = $legalInformation;
         return $this;
     }
 

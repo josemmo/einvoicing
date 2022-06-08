@@ -11,9 +11,9 @@
 </p>
 
 ## About
-eInvoicing is a PHP library for creating and reading electronic invoices according to the [eInvoicing Directive and European standard](https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eInvoicing).
+eInvoicing is a PHP library for creating and reading electronic invoices according to the [eInvoicing Directive and European standard](https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/eInvoicing).
 
-It aims to be 100% compliant with [EN 16931](https://ec.europa.eu/cefdigital/wiki/x/kwFVBg) as well as with the most popular CIUS and extensions, such as [PEPPOL BIS](https://docs.peppol.eu/poacc/billing/3.0/bis/).
+It aims to be 100% compliant with [EN 16931](https://ec.europa.eu/digital-building-blocks/wikis/x/boTXGw) as well as with the most popular CIUS and extensions, such as [PEPPOL BIS](https://docs.peppol.eu/poacc/billing/3.0/bis/).
 
 ## Installation
 First of all, make sure your environment meets the following requirements:
@@ -98,7 +98,7 @@ echo $writer->export($inv);
 These are the expected features for the library and how's it going so far:
 
 - [x] Representation of invoices, parties and invoice lines as objects
-- [x] Compatibility with the most used [CIUS and extensions](https://ec.europa.eu/cefdigital/wiki/x/5xLoAg)
+- [x] Compatibility with the most used [CIUS and extensions](https://ec.europa.eu/digital-building-blocks/wikis/display/EINVCOMMUNITY/Registry+of+CIUS+%28Core+Invoice+Usage+Specifications%29+and+Extensions)
 - [x] Export invoices to UBL documents
 - [x] Import invoices from UBL documents
 - [ ] Export invoices to CII documents

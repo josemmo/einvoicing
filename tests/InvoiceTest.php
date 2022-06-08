@@ -31,6 +31,28 @@ final class InvoiceTest extends TestCase {
         new Invoice(self::class);
     }
 
+    public function testCanReadAndWriteNotes(): void {
+        $note = "This is a test";
+        $this->assertSame($note, $this->invoice->addNote($note)->getNotes()[0]);
+        $this->invoice->removeNote(0);
+        $this->assertEmpty($this->invoice->getNotes());
+    }
+
+    public function testCanRemoveNotes(): void {
+        $this->invoice
+            ->addNote('Note #1')
+            ->addNote('Note #2')
+            ->addNote('Note #3')
+            ->removeNote(2)
+            ->removeNote(0);
+        $this->assertSame('Note #2', $this->invoice->getNotes()[0]);
+    }
+
+    public function testCannotRemoveOutOfBoundsNotes(): void {
+        $this->expectException(OutOfBoundsException::class);
+        $this->invoice->addNote('A sample note')->removeNote(1);
+    }
+
     public function testCanReadAndWriteLines(): void {
         $this->assertSame($this->line, $this->invoice->addLine($this->line)->getLines()[0]);
         $this->invoice->removeLine(0);
@@ -50,6 +72,15 @@ final class InvoiceTest extends TestCase {
     public function testCannotRemoveOutOfBoundsLines(): void {
         $this->expectException(OutOfBoundsException::class);
         $this->invoice->addLine(new InvoiceLine)->removeLine(1);
+    }
+
+    public function testCanRoundNegativeZeroes(): void {
+        $this->assertEquals('-1', (string) $this->invoice->round(-0.9999, 'invoice/netAmount'));
+        $this->assertEquals('0',  (string) $this->invoice->round(-0.0001, 'invoice/netAmount'));
+        $this->assertEquals('0',  (string) $this->invoice->round(-0,      'invoice/netAmount'));
+        $this->assertEquals('0',  (string) $this->invoice->round(0,       'invoice/netAmount'));
+        $this->assertEquals('0',  (string) $this->invoice->round(0.0001,  'invoice/netAmount'));
+        $this->assertEquals('1',  (string) $this->invoice->round(0.9999,  'invoice/netAmount'));
     }
 
     public function testDecimalMatrixIsUsed(): void {

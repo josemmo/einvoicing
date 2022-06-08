@@ -15,7 +15,6 @@ use Einvoicing\Payments\Payment;
 use Einvoicing\Payments\Transfer;
 use UXML\UXML;
 use function in_array;
-use function round;
 
 class UblWriter extends AbstractWriter {
     const NS_INVOICE = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
@@ -66,9 +65,8 @@ class UblWriter extends AbstractWriter {
         // BT-3: Invoice type code
         $xml->add('cbc:InvoiceTypeCode', (string) $invoice->getType());
 
-        // BT-22: Note
-        $note = $invoice->getNote();
-        if ($note !== null) {
+        // BT-22: Notes
+        foreach ($invoice->getNotes() as $note) {
             $xml->add('cbc:Note', $note);
         }
 
@@ -80,6 +78,12 @@ class UblWriter extends AbstractWriter {
 
         // BT-5: Invoice currency code
         $xml->add('cbc:DocumentCurrencyCode', $invoice->getCurrency());
+
+        // BT-6: VAT accounting currency code
+        $vatCurrency = $invoice->getVatCurrency();
+        if ($vatCurrency !== null) {
+            $xml->add('cbc:TaxCurrencyCode', $vatCurrency);
+        }
 
         // BT-19: Buyer accounting reference
         $buyerAccountingReference = $invoice->getBuyerAccountingReference();
@@ -165,7 +169,7 @@ class UblWriter extends AbstractWriter {
         }
 
         // Invoice totals
-        $this->addTaxTotalNode($xml, $invoice, $totals);
+        $this->addTaxTotalNodes($xml, $invoice, $totals);
         $this->addDocumentTotalsNode($xml, $invoice, $totals);
 
         // Invoice lines
@@ -413,6 +417,12 @@ class UblWriter extends AbstractWriter {
         $companyId = $party->getCompanyId();
         if ($companyId !== null) {
             $this->addIdentifierNode($legalEntityNode, 'cbc:CompanyID', $companyId);
+        }
+
+        // BT-33: Seller additional legal information
+        $legalInformation = $party->getLegalInformation();
+        if ($legalInformation !== null) {
+            $legalEntityNode->add('cbc:CompanyLegalForm', $legalInformation);
         }
 
         // Contact point
@@ -686,7 +696,7 @@ class UblWriter extends AbstractWriter {
         $this->addAmountNode(
             $xml,
             'cbc:Amount',
-            round($item->getEffectiveAmount($baseAmount), $invoice->getDecimals('line/allowanceChargeAmount')),
+            $invoice->round($item->getEffectiveAmount($baseAmount), 'line/allowanceChargeAmount'),
             $invoice->getCurrency()
         );
 
@@ -695,7 +705,7 @@ class UblWriter extends AbstractWriter {
             $this->addAmountNode(
                 $xml,
                 'cbc:BaseAmount',
-                round($baseAmount, $invoice->getDecimals('line/netAmount')),
+                $invoice->round($baseAmount, 'line/netAmount'),
                 $invoice->getCurrency()
             );
         }
@@ -708,19 +718,19 @@ class UblWriter extends AbstractWriter {
 
 
     /**
-     * Add tax total node
+     * Add tax total nodes
      * @param UXML          $parent  Parent element
      * @param Invoice       $invoice Invoice instance
      * @param InvoiceTotals $totals  Unrounded invoice totals
      */
-    private function addTaxTotalNode(UXML $parent, Invoice $invoice, InvoiceTotals $totals) {
+    private function addTaxTotalNodes(UXML $parent, Invoice $invoice, InvoiceTotals $totals) {
         $xml = $parent->add('cac:TaxTotal');
 
         // Add tax amount
         $this->addAmountNode(
             $xml,
             'cbc:TaxAmount',
-            round($totals->vatAmount, $invoice->getDecimals('invoice/taxAmount')),
+            $invoice->round($totals->vatAmount, 'invoice/taxAmount'),
             $totals->currency
         );
 
@@ -730,13 +740,13 @@ class UblWriter extends AbstractWriter {
             $this->addAmountNode(
                 $vatBreakdownNode,
                 'cbc:TaxableAmount',
-                round($item->taxableAmount, $invoice->getDecimals('invoice/allowancesChargesAmount')),
+                $invoice->round($item->taxableAmount, 'invoice/allowancesChargesAmount'),
                 $totals->currency
             );
             $this->addAmountNode(
                 $vatBreakdownNode,
                 'cbc:TaxAmount',
-                round($item->taxAmount, $invoice->getDecimals('invoice/taxAmount')),
+                $invoice->round($item->taxAmount, 'invoice/taxAmount'),
                 $totals->currency
             );
             $this->addVatNode(
@@ -746,6 +756,17 @@ class UblWriter extends AbstractWriter {
                 $item->rate,
                 $item->exemptionReasonCode,
                 $item->exemptionReason
+            );
+        }
+
+        // Add tax amount in VAT accounting currency (if any)
+        $customVatAmount = $totals->customVatAmount;
+        if ($customVatAmount !== null) {
+            $this->addAmountNode(
+                $parent->add('cac:TaxTotal'),
+                'cbc:TaxAmount',
+                $invoice->round($customVatAmount, 'invoice/taxAmount'),
+                $totals->vatCurrency ?? $totals->currency
             );
         }
     }
@@ -762,45 +783,45 @@ class UblWriter extends AbstractWriter {
 
         // Build totals matrix
         $totalsMatrix = [];
-        $totalsMatrix['cbc:LineExtensionAmount'] = round(
+        $totalsMatrix['cbc:LineExtensionAmount'] = $invoice->round(
             $totals->netAmount,
-            $invoice->getDecimals('invoice/netAmount')
+            'invoice/netAmount'
         );
-        $totalsMatrix['cbc:TaxExclusiveAmount'] = round(
+        $totalsMatrix['cbc:TaxExclusiveAmount'] = $invoice->round(
             $totals->taxExclusiveAmount,
-            $invoice->getDecimals('invoice/taxExclusiveAmount')
+            'invoice/taxExclusiveAmount'
         );
-        $totalsMatrix['cbc:TaxInclusiveAmount'] = round(
+        $totalsMatrix['cbc:TaxInclusiveAmount'] = $invoice->round(
             $totals->taxInclusiveAmount,
-            $invoice->getDecimals('invoice/taxInclusiveAmount')
+            'invoice/taxInclusiveAmount'
         );
         if ($totals->allowancesAmount > 0) {
-            $totalsMatrix['cbc:AllowanceTotalAmount'] = round(
+            $totalsMatrix['cbc:AllowanceTotalAmount'] = $invoice->round(
                 $totals->allowancesAmount,
-                $invoice->getDecimals('invoice/allowancesChargesAmount')
+                'invoice/allowancesChargesAmount'
             );
         }
         if ($totals->chargesAmount > 0) {
-            $totalsMatrix['cbc:ChargeTotalAmount'] = round(
+            $totalsMatrix['cbc:ChargeTotalAmount'] = $invoice->round(
                 $totals->chargesAmount,
-                $invoice->getDecimals('invoice/allowancesChargesAmount')
+                'invoice/allowancesChargesAmount'
             );
         }
         if ($totals->paidAmount > 0) {
-            $totalsMatrix['cbc:PrepaidAmount'] = round(
+            $totalsMatrix['cbc:PrepaidAmount'] = $invoice->round(
                 $totals->paidAmount,
-                $invoice->getDecimals('invoice/paidAmount')
+                'invoice/paidAmount'
             );
         }
         if ($totals->roundingAmount > 0) {
-            $totalsMatrix['cbc:PayableRoundingAmount'] = round(
+            $totalsMatrix['cbc:PayableRoundingAmount'] = $invoice->round(
                 $totals->roundingAmount,
-                $invoice->getDecimals('invoice/roundingAmount')
+                'invoice/roundingAmount'
             );
         }
-        $totalsMatrix['cbc:PayableAmount'] = round(
+        $totalsMatrix['cbc:PayableAmount'] = $invoice->round(
             $totals->payableAmount,
-            $invoice->getDecimals('invoice/payableAmount')
+            'invoice/payableAmount'
         );
 
         // Create and append XML nodes
@@ -845,7 +866,7 @@ class UblWriter extends AbstractWriter {
             $this->addAmountNode(
                 $xml,
                 'cbc:LineExtensionAmount',
-                round($netAmount, $invoice->getDecimals('line/netAmount')),
+                $invoice->round($netAmount, 'line/netAmount'),
                 $invoice->getCurrency()
             );
         }
@@ -937,7 +958,7 @@ class UblWriter extends AbstractWriter {
             $this->addAmountNode(
                 $priceNode,
                 'cbc:PriceAmount',
-                round($price, $invoice->getDecimals('line/price')),
+                $invoice->round($price, 'line/price'),
                 $invoice->getCurrency()
             );
         }

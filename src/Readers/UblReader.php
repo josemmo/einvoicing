@@ -62,10 +62,8 @@ class UblReader extends AbstractReader {
                 throw new InvalidArgumentException('Missing <cbc:ID /> node from tax item');
             }
             $rateNode = $node->get("{{$cbc}}Percent");
-            if ($rateNode === null) {
-                throw new InvalidArgumentException('Missing <cbc:Percent /> node from tax item');
-            }
-            $key = "{$categoryNode->asText()}:{$rateNode->asText()}";
+            $rateKey = ($rateNode === null) ? '' : floatval($rateNode->asText());
+            $key = "{$categoryNode->asText()}:{$rateKey}";
 
             // Save reasons
             $taxExemptions[$key] = [
@@ -104,10 +102,9 @@ class UblReader extends AbstractReader {
             $invoice->setType((int) $typeNode->asText());
         }
 
-        // BT-22: Note
-        $noteNode = $xml->get("{{$cbc}}Note");
-        if ($noteNode !== null) {
-            $invoice->setNote($noteNode->asText());
+        // BT-22: Notes
+        foreach ($xml->getAll("{{$cbc}}Note") as $noteNode) {
+            $invoice->addNote($noteNode->asText());
         }
 
         // BT-7: Tax point date
@@ -120,6 +117,12 @@ class UblReader extends AbstractReader {
         $currencyNode = $xml->get("{{$cbc}}DocumentCurrencyCode");
         if ($currencyNode !== null) {
             $invoice->setCurrency($currencyNode->asText());
+        }
+
+        // BT-6: VAT accounting currency code
+        $vatCurrencyNode = $xml->get("{{$cbc}}TaxCurrencyCode");
+        if ($vatCurrencyNode !== null) {
+            $invoice->setVatCurrency($vatCurrencyNode->asText());
         }
 
         // BT-19: Buyer accounting reference
@@ -211,6 +214,18 @@ class UblReader extends AbstractReader {
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
             $this->addAllowanceOrCharge($invoice, $node, $taxExemptions);
+        }
+
+        // BT-111: Total VAT amount in accounting currency
+        foreach ($xml->getAll("{{$cac}}TaxTotal") as $taxTotalNode) {
+            if ($taxTotalNode->get("{{$cac}}TaxSubtotal") !== null) {
+                // The other tax total node, then
+                continue;
+            }
+            $taxAmountNode = $taxTotalNode->get("{{$cbc}}TaxAmount");
+            if ($taxAmountNode !== null) {
+                $invoice->setCustomVatAmount((float) $taxAmountNode->asText());
+            }
         }
 
         // BT-113: Paid amount
@@ -371,11 +386,17 @@ class UblReader extends AbstractReader {
         if ($legalNameNode !== null) {
             $party->setName($legalNameNode->asText());
         }
-        
+
         // Company ID
         $companyIdNode = $xml->get("{{$cac}}PartyLegalEntity/{{$cbc}}CompanyID");
         if ($companyIdNode !== null) {
             $party->setCompanyId($this->parseIdentifierNode($companyIdNode));
+        }
+
+        // BT-33: Seller additional legal information
+        $companyLegalFormNode = $xml->get("{{$cac}}PartyLegalEntity/{{$cbc}}CompanyLegalForm");
+        if ($companyLegalFormNode !== null) {
+            $party->setLegalInformation($companyLegalFormNode->asText());
         }
 
         // Contact name
@@ -639,7 +660,8 @@ class UblReader extends AbstractReader {
         }
 
         // Tax exemption reasons
-        $key = "{$target->getVatCategory()}:{$target->getVatRate()}";
+        $rateKey = $target->getVatRate() ?? '';
+        $key = "{$target->getVatCategory()}:{$rateKey}";
         $target->setVatExemptionReasonCode($taxExemptions[$key]['code'] ?? null);
         $target->setVatExemptionReason($taxExemptions[$key]['reason'] ?? null);
     }
