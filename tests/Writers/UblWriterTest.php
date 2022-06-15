@@ -38,6 +38,7 @@ final class UblWriterTest extends TestCase {
         $seller = (new Party)
             ->setElectronicAddress(new Identifier('9482348239847239874', '0088'))
             ->setCompanyId(new Identifier('COMPANY_ID', '0183'))
+            ->setTaxRegistrationId(new Identifier('12345678')) // NOTE: Missing scheme on purpose
             ->setName('Seller Name Ltd.')
             ->setTradingName('Seller Name')
             ->setVatNumber('ESA00000000')
