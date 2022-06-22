@@ -398,9 +398,11 @@ class UblWriter extends AbstractWriter {
         if ($taxRegistrationId !== null) {
             $taxRegistrationNode = $xml->add('cac:PartyTaxScheme');
             $taxRegistrationNode->add('cbc:CompanyID', $taxRegistrationId->getValue());
+
+            $taxRegistrationSchemeNode = $taxRegistrationNode->add('cac:TaxScheme');
             $taxRegistrationScheme = $taxRegistrationId->getScheme();
             if ($taxRegistrationScheme !== null) {
-                $taxRegistrationNode->add('cac:TaxScheme')->add('cbc:ID', $taxRegistrationScheme);
+                $taxRegistrationSchemeNode->add('cbc:ID', $taxRegistrationScheme);
             }
         }
 
