@@ -86,17 +86,17 @@ final class InvoiceTest extends TestCase {
     public function testDecimalMatrixIsUsed(): void {
         $this->invoice->setRoundingMatrix([
             'invoice/paidAmount' => 4,
-            'invoice/netAmount' => 8,
-            '' => 3
+            'invoice/netAmount' => 5,
+            '' => 8,
         ])->setPaidAmount(123.456789)
           ->setRoundingAmount(987.654321)
           ->addLine((new InvoiceLine)->setPrice(12.121212121))
           ->addLine((new InvoiceLine)->setPrice(34.343434343));
 
         $totals = $this->invoice->getTotals();
-        $this->assertEquals(123.4568,    $totals->paidAmount);
-        $this->assertEquals(987.654,     $totals->roundingAmount);
-        $this->assertEquals(46.46464646, $totals->netAmount);
+        $this->assertEquals(123.4568,   $totals->paidAmount);
+        $this->assertEquals(987.654321, $totals->roundingAmount);
+        $this->assertEquals(46.46465,   $totals->netAmount);
     }
 
     public function testTotalAmountsAreCalculatedCorrectly(): void {
@@ -105,13 +105,14 @@ final class InvoiceTest extends TestCase {
         $firstLine = (new InvoiceLine)->setPrice(100)->setVatRate(10);
         $secondLine = (new InvoiceLine)->setPrice(200.5)->setVatRate(21);
         $this->invoice->clearLines()
+            ->setRoundingMatrix(['' => 8]) // Increase decimal precision
             ->setPaidAmount(10.2)
             ->addLine($firstLine)
             ->addLine($secondLine)
             ->addAllowance($allowance)
             ->addCharge($charge);
 
-        $totals = $this->invoice->getTotals(false);
+        $totals = $this->invoice->getTotals();
         $this->assertEquals(300.5,    $totals->netAmount);
         $this->assertEquals(12.34,    $totals->allowancesAmount);
         $this->assertEquals(22.5375,  $totals->chargesAmount);

@@ -25,7 +25,7 @@ class UblWriter extends AbstractWriter {
      * @inheritdoc
      */
     public function export(Invoice $invoice): string {
-        $totals = $invoice->getTotals(false);
+        $totals = $invoice->getTotals();
         $xml = UXML::newInstance('Invoice', null, [
             'xmlns' => self::NS_INVOICE,
             'xmlns:cac' => self::NS_CAC,
@@ -169,8 +169,8 @@ class UblWriter extends AbstractWriter {
         }
 
         // Invoice totals
-        $this->addTaxTotalNodes($xml, $invoice, $totals);
-        $this->addDocumentTotalsNode($xml, $invoice, $totals);
+        $this->addTaxTotalNodes($xml, $totals);
+        $this->addDocumentTotalsNode($xml, $totals);
 
         // Invoice lines
         $lines = $invoice->getLines();
@@ -657,7 +657,7 @@ class UblWriter extends AbstractWriter {
      * @param AllowanceOrCharge  $item     Allowance or charge instance
      * @param boolean            $isCharge Is charge (TRUE) or allowance (FALSE)
      * @param Invoice            $invoice  Invoice instance
-     * @param InvoiceTotals|null $totals   Unrounded invoice totals or NULL in case at line level
+     * @param InvoiceTotals|null $totals   Invoice totals or NULL in case at line level
      * @param InvoiceLine|null   $line     Invoice line or NULL in case of at document level
      */
     private function addAllowanceOrCharge(
@@ -721,36 +721,20 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add tax total nodes
-     * @param UXML          $parent  Parent element
-     * @param Invoice       $invoice Invoice instance
-     * @param InvoiceTotals $totals  Unrounded invoice totals
+     * @param UXML          $parent Parent element
+     * @param InvoiceTotals $totals Invoice totals
      */
-    private function addTaxTotalNodes(UXML $parent, Invoice $invoice, InvoiceTotals $totals) {
+    private function addTaxTotalNodes(UXML $parent, InvoiceTotals $totals) {
         $xml = $parent->add('cac:TaxTotal');
 
         // Add tax amount
-        $this->addAmountNode(
-            $xml,
-            'cbc:TaxAmount',
-            $invoice->round($totals->vatAmount, 'invoice/taxAmount'),
-            $totals->currency
-        );
+        $this->addAmountNode($xml, 'cbc:TaxAmount', $totals->vatAmount, $totals->currency);
 
         // Add each tax details
         foreach ($totals->vatBreakdown as $item) {
             $vatBreakdownNode = $xml->add('cac:TaxSubtotal');
-            $this->addAmountNode(
-                $vatBreakdownNode,
-                'cbc:TaxableAmount',
-                $invoice->round($item->taxableAmount, 'invoice/allowancesChargesAmount'),
-                $totals->currency
-            );
-            $this->addAmountNode(
-                $vatBreakdownNode,
-                'cbc:TaxAmount',
-                $invoice->round($item->taxAmount, 'invoice/taxAmount'),
-                $totals->currency
-            );
+            $this->addAmountNode($vatBreakdownNode, 'cbc:TaxableAmount', $item->taxableAmount, $totals->currency);
+            $this->addAmountNode($vatBreakdownNode, 'cbc:TaxAmount', $item->taxAmount, $totals->currency);
             $this->addVatNode(
                 $vatBreakdownNode,
                 'cac:TaxCategory',
@@ -767,7 +751,7 @@ class UblWriter extends AbstractWriter {
             $this->addAmountNode(
                 $parent->add('cac:TaxTotal'),
                 'cbc:TaxAmount',
-                $invoice->round($customVatAmount, 'invoice/taxAmount'),
+                $customVatAmount,
                 $totals->vatCurrency ?? $totals->currency
             );
         }
@@ -776,55 +760,30 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add document totals node
-     * @param UXML          $parent  Parent element
-     * @param Invoice       $invoice Invoice instance
-     * @param InvoiceTotals $totals  Unrounded invoice totals
+     * @param UXML          $parent Parent element
+     * @param InvoiceTotals $totals Invoice totals
      */
-    private function addDocumentTotalsNode(UXML $parent, Invoice $invoice, InvoiceTotals $totals) {
+    private function addDocumentTotalsNode(UXML $parent, InvoiceTotals $totals) {
         $xml = $parent->add('cac:LegalMonetaryTotal');
 
         // Build totals matrix
         $totalsMatrix = [];
-        $totalsMatrix['cbc:LineExtensionAmount'] = $invoice->round(
-            $totals->netAmount,
-            'invoice/netAmount'
-        );
-        $totalsMatrix['cbc:TaxExclusiveAmount'] = $invoice->round(
-            $totals->taxExclusiveAmount,
-            'invoice/taxExclusiveAmount'
-        );
-        $totalsMatrix['cbc:TaxInclusiveAmount'] = $invoice->round(
-            $totals->taxInclusiveAmount,
-            'invoice/taxInclusiveAmount'
-        );
+        $totalsMatrix['cbc:LineExtensionAmount'] = $totals->netAmount;
+        $totalsMatrix['cbc:TaxExclusiveAmount'] = $totals->taxExclusiveAmount;
+        $totalsMatrix['cbc:TaxInclusiveAmount'] = $totals->taxInclusiveAmount;
         if ($totals->allowancesAmount > 0) {
-            $totalsMatrix['cbc:AllowanceTotalAmount'] = $invoice->round(
-                $totals->allowancesAmount,
-                'invoice/allowancesChargesAmount'
-            );
+            $totalsMatrix['cbc:AllowanceTotalAmount'] = $totals->allowancesAmount;
         }
         if ($totals->chargesAmount > 0) {
-            $totalsMatrix['cbc:ChargeTotalAmount'] = $invoice->round(
-                $totals->chargesAmount,
-                'invoice/allowancesChargesAmount'
-            );
+            $totalsMatrix['cbc:ChargeTotalAmount'] = $totals->chargesAmount;
         }
         if ($totals->paidAmount > 0) {
-            $totalsMatrix['cbc:PrepaidAmount'] = $invoice->round(
-                $totals->paidAmount,
-                'invoice/paidAmount'
-            );
+            $totalsMatrix['cbc:PrepaidAmount'] = $totals->paidAmount;
         }
         if ($totals->roundingAmount > 0) {
-            $totalsMatrix['cbc:PayableRoundingAmount'] = $invoice->round(
-                $totals->roundingAmount,
-                'invoice/roundingAmount'
-            );
+            $totalsMatrix['cbc:PayableRoundingAmount'] = $totals->roundingAmount;
         }
-        $totalsMatrix['cbc:PayableAmount'] = $invoice->round(
-            $totals->payableAmount,
-            'invoice/payableAmount'
-        );
+        $totalsMatrix['cbc:PayableAmount'] = $totals->payableAmount;
 
         // Create and append XML nodes
         foreach ($totalsMatrix as $field=>$amount) {

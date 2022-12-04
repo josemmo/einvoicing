@@ -86,11 +86,10 @@ class InvoiceTotals {
 
     /**
      * Create instance from invoice
-     * @param  Invoice $inv   Invoice instance
-     * @param  boolean $round Whether to round values or not
-     * @return self           Totals instance
+     * @param  Invoice $inv Invoice instance
+     * @return self         Totals instance
      */
-    static public function fromInvoice(Invoice $inv, bool $round=true): InvoiceTotals {
+    static public function fromInvoice(Invoice $inv): InvoiceTotals {
         $totals = new self();
         $vatMap = [];
 
@@ -100,56 +99,60 @@ class InvoiceTotals {
 
         // Process all invoice lines
         foreach ($inv->getLines() as $line) {
-            $lineNetAmount = $line->getNetAmount() ?? 0.0;
+            $lineNetAmount = $inv->round($line->getNetAmount() ?? 0.0, 'line/netAmount');
             $totals->netAmount += $lineNetAmount;
             self::updateVatMap($vatMap, $line, $lineNetAmount);
         }
+        $totals->netAmount = $inv->round($totals->netAmount, 'invoice/netAmount');
 
-        // Apply allowance and charge totals
+        // Process allowances
         foreach ($inv->getAllowances() as $item) {
-            $allowanceAmount = $item->getEffectiveAmount($totals->netAmount);
+            $allowanceAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
             $totals->allowancesAmount += $allowanceAmount;
             self::updateVatMap($vatMap, $item, -$allowanceAmount);
         }
+        $totals->allowancesAmount = $inv->round($totals->allowancesAmount, 'invoice/allowancesChargesAmount');
+
+        // Process charges
         foreach ($inv->getCharges() as $item) {
-            $chargeAmount = $item->getEffectiveAmount($totals->netAmount);
+            $chargeAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
             $totals->chargesAmount += $chargeAmount;
             self::updateVatMap($vatMap, $item, $chargeAmount);
         }
+        $totals->chargesAmount = $inv->round($totals->chargesAmount, 'invoice/allowancesChargesAmount');
 
         // Calculate VAT amounts
         foreach ($vatMap as $item) {
-            $item->taxAmount = $item->taxableAmount * ($item->rate / 100);
+            $item->taxableAmount = $inv->round($item->taxableAmount, 'invoice/allowancesChargesAmount');
+            $item->taxAmount = $inv->round($item->taxableAmount * ($item->rate / 100), 'invoice/vatAmount');
             $totals->vatAmount += $item->taxAmount;
         }
+        $totals->vatAmount = $inv->round($totals->vatAmount, 'invoice/vatAmount');
 
-        // Calculate rest of properties
-        $totals->taxExclusiveAmount = $totals->netAmount - $totals->allowancesAmount + $totals->chargesAmount;
-        $totals->taxInclusiveAmount = $totals->taxExclusiveAmount + $totals->vatAmount;
-        $totals->paidAmount = $inv->getPaidAmount();
-        $totals->roundingAmount = $inv->getRoundingAmount();
+        // Add custom VAT amount
         $totals->customVatAmount = $inv->getCustomVatAmount();
-        $totals->payableAmount = $totals->taxInclusiveAmount - $totals->paidAmount + $totals->roundingAmount;
+        if ($totals->customVatAmount !== null) {
+            $totals->customVatAmount = $inv->round($inv->getCustomVatAmount(), 'invoice/vatAmount');
+        }
 
         // Attach VAT breakdown
         $totals->vatBreakdown = array_values($vatMap);
 
-        // Round values
-        if ($round) {
-            $totals->netAmount = $inv->round($totals->netAmount, 'invoice/netAmount');
-            $totals->allowancesAmount = $inv->round($totals->allowancesAmount, 'invoice/allowancesChargesAmount');
-            $totals->chargesAmount = $inv->round($totals->chargesAmount, 'invoice/allowancesChargesAmount');
-            $totals->vatAmount = $inv->round($totals->vatAmount, 'invoice/vatAmount');
-            $totals->taxExclusiveAmount = $inv->round($totals->taxExclusiveAmount, 'invoice/taxExclusiveAmount');
-            $totals->taxInclusiveAmount = $inv->round($totals->taxInclusiveAmount, 'invoice/taxInclusiveAmount');
-            $totals->paidAmount = $inv->round($totals->paidAmount, 'invoice/paidAmount');
-            $totals->roundingAmount = $inv->round($totals->roundingAmount, 'invoice/roundingAmount');
-            $totals->payableAmount = $inv->round($totals->payableAmount, 'invoice/payableAmount');
-            foreach ($totals->vatBreakdown as $item) {
-                $item->taxableAmount = $inv->round($item->taxableAmount, 'invoice/allowancesChargesAmount');
-                $item->taxAmount = $inv->round($item->taxAmount, 'invoice/taxAmount');
-            }
-        }
+        // Calculate rest of properties
+        $totals->taxExclusiveAmount = $inv->round(
+            $totals->netAmount - $totals->allowancesAmount + $totals->chargesAmount,
+            'invoice/taxExclusiveAmount'
+        );
+        $totals->taxInclusiveAmount = $inv->round(
+            $totals->taxExclusiveAmount + $totals->vatAmount,
+            'invoice/taxInclusiveAmount'
+        );
+        $totals->paidAmount = $inv->round($inv->getPaidAmount(), 'invoice/paidAmount');
+        $totals->roundingAmount = $inv->round($inv->getRoundingAmount(), 'invoice/roundingAmount');
+        $totals->payableAmount = $inv->round(
+            $totals->taxInclusiveAmount - $totals->paidAmount + $totals->roundingAmount,
+            'invoice/payableAmount'
+        );
 
         return $totals;
     }
