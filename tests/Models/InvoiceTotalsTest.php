@@ -12,7 +12,7 @@ final class InvoiceTotalsTest extends TestCase {
     private $invoice;
 
     protected function setUp(): void {
-        $this->invoice = new Invoice();
+        $this->invoice = (new Invoice)->setRoundingMatrix(['' => 3]);
     }
 
     public function testClassConstructors(): void {
@@ -27,6 +27,19 @@ final class InvoiceTotalsTest extends TestCase {
         $this->assertInstanceOf(InvoiceTotals::class, $totalsB);
         $this->assertEquals(100, $totalsA->payableAmount);
         $this->assertEquals(100, $totalsB->payableAmount);
+    }
+
+    public function testRoundingOfTotals(): void {
+        $line = (new InvoiceLine())
+            ->setPrice(0.25)
+            ->setQuantity(26935.78)
+            ->setVatRate(19);
+        $this->invoice->addLine($line);
+
+        $totals = $this->invoice->getTotals();
+        $this->assertEquals(6733.945, $totals->taxExclusiveAmount);
+        $this->assertEquals(1279.45,  $totals->vatAmount);
+        $this->assertEquals(8013.395, $totals->taxInclusiveAmount);
     }
 
     public function testVatExemptionReasons(): void {

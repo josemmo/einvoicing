@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Based on example from https://github.com/josemmo/einvoicing/issues/31 -->
+<Invoice xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+        xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+        xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
+    <cbc:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0</cbc:CustomizationID>
+    <cbc:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</cbc:ProfileID>
+    <cbc:ID>SampleForDecimals</cbc:ID>
+    <cbc:IssueDate>2022-11-03</cbc:IssueDate>
+    <cbc:DueDate>2022-11-11</cbc:DueDate>
+    <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+    <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
+    <cac:AccountingSupplierParty>
+        <cac:Party>
+            <cbc:EndpointID schemeID="EM">admin@example.com</cbc:EndpointID>
+            <cac:PartyIdentification>
+                <cbc:ID>12345678</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PostalAddress>
+                <cbc:StreetName>Yellow Brick Road</cbc:StreetName>
+                <cbc:CityName>Kuki</cbc:CityName>
+                <cbc:PostalZone>400001</cbc:PostalZone>
+                <cbc:CountrySubentity>RO-CJ</cbc:CountrySubentity>
+                <cac:Country>
+                    <cbc:IdentificationCode>RO</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyTaxScheme>
+                <cbc:CompanyID>12345678</cbc:CompanyID>
+                <cac:TaxScheme/>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>Test S.r.o</cbc:RegistrationName>
+                <cbc:CompanyID>J12/1234/2016</cbc:CompanyID>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingSupplierParty>
+    <cac:AccountingCustomerParty>
+        <cac:Party>
+            <cac:PostalAddress>
+                <cbc:StreetName>Strada Zebreiou 432</cbc:StreetName>
+                <cbc:CityName>Bacau</cbc:CityName>
+                <cbc:PostalZone>57433</cbc:PostalZone>
+                <cbc:CountrySubentity>RO-BC</cbc:CountrySubentity>
+                <cac:Country>
+                    <cbc:IdentificationCode>RO</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyTaxScheme>
+                <cbc:CompanyID>RO17364910</cbc:CompanyID>
+                <cac:TaxScheme/>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>POP Alexandra SRL</cbc:RegistrationName>
+                <cbc:CompanyID>RO17364910</cbc:CompanyID>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingCustomerParty>
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode>31</cbc:PaymentMeansCode>
+    </cac:PaymentMeans>
+    <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="EUR">1279.45</cbc:TaxAmount>
+        <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="EUR">6733.95</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">1279.45</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>19</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:LegalMonetaryTotal>
+        <cbc:LineExtensionAmount currencyID="EUR">6733.95</cbc:LineExtensionAmount>
+        <cbc:TaxExclusiveAmount currencyID="EUR">6733.95</cbc:TaxExclusiveAmount>
+        <cbc:TaxInclusiveAmount currencyID="EUR">8013.4</cbc:TaxInclusiveAmount>
+        <cbc:PayableAmount currencyID="EUR">8013.4</cbc:PayableAmount>
+    </cac:LegalMonetaryTotal>
+    <cac:InvoiceLine>
+        <cbc:ID>101</cbc:ID>
+        <cbc:InvoicedQuantity unitCode="H87">26935.78</cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="EUR">6733.95</cbc:LineExtensionAmount>
+        <cac:Item>
+            <cbc:Name>Test</cbc:Name>
+            <cac:ClassifiedTaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>19</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+        </cac:Item>
+        <cac:Price>
+            <cbc:PriceAmount currencyID="EUR">0.25</cbc:PriceAmount>
+        </cac:Price>
+    </cac:InvoiceLine>
+</Invoice>

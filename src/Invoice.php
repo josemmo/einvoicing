@@ -669,10 +669,9 @@ class Invoice {
 
     /**
      * Get invoice total
-     * @param  boolean       $round Whether to round values or not
-     * @return InvoiceTotals        Invoice totals
+     * @return InvoiceTotals Invoice totals
      */
-    public function getTotals(bool $round=true): InvoiceTotals {
-        return InvoiceTotals::fromInvoice($this, $round);
+    public function getTotals(): InvoiceTotals {
+        return InvoiceTotals::fromInvoice($this);
     }
 }
