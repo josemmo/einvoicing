@@ -102,6 +102,11 @@ class UblReader extends AbstractReader {
             $invoice->setType((int) $typeNode->asText());
         }
 
+        $typeNode = $xml->get("{{$cbc}}CreditNoteTypeCode");
+        if ($typeNode !== null) {
+            $invoice->setType((int) $typeNode->asText());
+        }
+
         // BT-22: Notes
         foreach ($xml->getAll("{{$cbc}}Note") as $noteNode) {
             $invoice->addNote($noteNode->asText());

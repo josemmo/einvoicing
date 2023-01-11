@@ -20,13 +20,15 @@ use function round;
 
 class Invoice {
     const DEFAULT_DECIMALS = 8;
+    const TYPE_INVOICE = 380;
+    const TYPE_CREDIT_NOTE = 381;
 
     protected $preset = null;
     protected $roundingMatrix = null;
     protected $specification = null;
     protected $businessProcess = null;
     protected $number = null;
-    protected $type = 380; // TODO: add constants
+    protected $type = self::TYPE_INVOICE;
     protected $currency = "EUR"; // TODO: add constants
     protected $vatCurrency = null;
     protected $issueDate = null;
