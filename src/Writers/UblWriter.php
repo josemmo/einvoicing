@@ -1,6 +1,7 @@
 <?php
 namespace Einvoicing\Writers;
 
+use DateTime;
 use Einvoicing\AllowanceOrCharge;
 use Einvoicing\Attachment;
 use Einvoicing\Delivery;
@@ -18,6 +19,7 @@ use function in_array;
 
 class UblWriter extends AbstractWriter {
     const NS_INVOICE = "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2";
+    const NS_CREDIT_NOTE = "urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2";
     const NS_CAC = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2";
     const NS_CBC = "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2";
 
@@ -26,8 +28,12 @@ class UblWriter extends AbstractWriter {
      */
     public function export(Invoice $invoice): string {
         $totals = $invoice->getTotals();
-        $xml = UXML::newInstance('Invoice', null, [
-            'xmlns' => self::NS_INVOICE,
+        $isCreditNoteProfile = $this->isCreditNoteProfile($invoice);
+
+        // Create root element
+        $rootElementName = $isCreditNoteProfile ? 'CreditNote' : 'Invoice';
+        $xml = UXML::newInstance($rootElementName, null, [
+            'xmlns' => $isCreditNoteProfile ? self::NS_CREDIT_NOTE : self::NS_INVOICE,
             'xmlns:cac' => self::NS_CAC,
             'xmlns:cbc' => self::NS_CBC
         ]);
@@ -56,14 +62,15 @@ class UblWriter extends AbstractWriter {
             $xml->add('cbc:IssueDate', $issueDate->format('Y-m-d'));
         }
 
-        // BT-9: Due date
+        // BT-9: Due date (for invoice profile)
         $dueDate = $invoice->getDueDate();
-        if ($dueDate !== null) {
+        if (!$isCreditNoteProfile && $dueDate !== null) {
             $xml->add('cbc:DueDate', $dueDate->format('Y-m-d'));
         }
 
         // BT-3: Invoice type code
-        $xml->add('cbc:InvoiceTypeCode', (string) $invoice->getType());
+        $typeCodeName = $isCreditNoteProfile ? "cbc:CreditNoteTypeCode" : "cbc:InvoiceTypeCode";
+        $xml->add($typeCodeName, (string) $invoice->getType());
 
         // BT-22: Notes
         foreach ($invoice->getNotes() as $note) {
@@ -113,10 +120,9 @@ class UblWriter extends AbstractWriter {
             }
         }
 
-        // BT-17: Tender or lot reference
-        $tenderOrLotReference = $invoice->getTenderOrLotReference();
-        if ($tenderOrLotReference !== null) {
-            $xml->add('cac:OriginatorDocumentReference')->add('cbc:ID', $tenderOrLotReference);
+        // BT-17: Tender or lot reference (for invoice profile)
+        if (!$isCreditNoteProfile) {
+            $this->addTenderOrLotReferenceNode($xml, $invoice);
         }
 
         // BT-12: Contract reference
@@ -128,6 +134,11 @@ class UblWriter extends AbstractWriter {
         // BG-24: Attachments node
         foreach ($invoice->getAttachments() as $attachment) {
             $this->addAttachmentNode($xml, $attachment);
+        }
+
+        // BT-17: Tender or lot reference (for credit note profile)
+        if ($isCreditNoteProfile) {
+            $this->addTenderOrLotReferenceNode($xml, $invoice);
         }
 
         // Seller node
@@ -157,7 +168,7 @@ class UblWriter extends AbstractWriter {
         // Payment nodes
         $payment = $invoice->getPayment();
         if ($payment !== null) {
-            $this->addPaymentNodes($xml, $payment);
+            $this->addPaymentNodes($xml, $payment, $isCreditNoteProfile ? $dueDate : null);
         }
 
         // Allowances and charges
@@ -183,10 +194,27 @@ class UblWriter extends AbstractWriter {
             }
         }
         foreach ($lines as $line) {
-            $this->addLineNode($xml, $line, $invoice, $lastGenId, $usedIds);
+            $this->addLineNode($xml, $line, $invoice, $isCreditNoteProfile, $lastGenId, $usedIds);
         }
 
         return $xml->asXML();
+    }
+
+
+    /**
+     * Is credit note profile
+     * @param  Invoice $invoice Invoice invoice
+     * @return boolean          Whether document should use invoice or credit note profiles
+     */
+    private function isCreditNoteProfile(Invoice $invoice): bool {
+        $type = $invoice->getType();
+        return in_array($type, [
+            Invoice::TYPE_CREDIT_NOTE_RELATED_TO_GOODS_OR_SERVICES,
+            Invoice::TYPE_CREDIT_NOTE_RELATED_TO_FINANCIAL_ADJUSTMENTS,
+            Invoice::TYPE_CREDIT_NOTE,
+            Invoice::TYPE_FACTORED_CREDIT_NOTE,
+            Invoice::TYPE_FORWARDERS_CREDIT_NOTE
+        ]);
     }
 
 
@@ -248,6 +276,19 @@ class UblWriter extends AbstractWriter {
         // BT-14: Sales order reference
         if ($salesOrderReference !== null) {
             $orderReferenceNode->add('cbc:SalesOrderID', $salesOrderReference);
+        }
+    }
+
+
+    /**
+     * Add tender or lot reference node
+     * @param UXML    $parent  Parent element
+     * @param Invoice $invoice Invoice instance
+     */
+    private function addTenderOrLotReferenceNode(UXML $parent, Invoice $invoice) {
+        $tenderOrLotReference = $invoice->getTenderOrLotReference();
+        if ($tenderOrLotReference !== null) {
+            $parent->add('cac:OriginatorDocumentReference')->add('cbc:ID', $tenderOrLotReference);
         }
     }
 
@@ -522,10 +563,11 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add payment nodes
-     * @param UXML    $parent  Invoice element
-     * @param Payment $payment Payment instance
+     * @param UXML          $parent  Invoice element
+     * @param Payment       $payment Payment instance
+     * @param DateTime|null $dueDate Invoice due date (for credit note profile)
      */
-    private function addPaymentNodes(UXML $parent, Payment $payment) {
+    private function addPaymentNodes(UXML $parent, Payment $payment, ?DateTime $dueDate) {
         $xml = $parent->add('cac:PaymentMeans');
 
         // BT-81: Payment means code
@@ -535,6 +577,11 @@ class UblWriter extends AbstractWriter {
             $meansText = $payment->getMeansText();
             $attrs = ($meansText === null) ? [] : ['name' => $meansText];
             $xml->add('cbc:PaymentMeansCode', $meansCode, $attrs);
+        }
+
+        // BT-9: Due date (for credit note profile)
+        if ($dueDate !== null) {
+            $xml->add('cbc:PaymentDueDate', $dueDate->format('Y-m-d'));
         }
 
         // BT-83: Payment ID
@@ -794,14 +841,23 @@ class UblWriter extends AbstractWriter {
 
     /**
      * Add invoice line
-     * @param UXML        $parent     Parent XML element
-     * @param InvoiceLine $line       Invoice line
-     * @param Invoice     $invoice    Invoice instance
-     * @param int         &$lastGenId Last used auto-generated ID
-     * @param string[]    &$usedIds   Used invoice line IDs
+     * @param UXML        $parent              Parent XML element
+     * @param InvoiceLine $line                Invoice line
+     * @param Invoice     $invoice             Invoice instance
+     * @param boolean     $isCreditNoteProfile Is credit note profile
+     * @param int         &$lastGenId          Last used auto-generated ID
+     * @param string[]    &$usedIds            Used invoice line IDs
      */
-    private function addLineNode(UXML $parent, InvoiceLine $line, Invoice $invoice, int &$lastGenId, array &$usedIds) {
-        $xml = $parent->add('cac:InvoiceLine');
+    private function addLineNode(
+        UXML $parent,
+        InvoiceLine $line,
+        Invoice $invoice,
+        bool $isCreditNoteProfile,
+        int &$lastGenId,
+        array &$usedIds
+    ) {
+        $lineElementName = $isCreditNoteProfile ? "cac:CreditNoteLine" : "cac:InvoiceLine";
+        $xml = $parent->add($lineElementName);
 
         // BT-126: Invoice line identifier
         $lineId = $line->getId();
@@ -819,7 +875,8 @@ class UblWriter extends AbstractWriter {
         }
 
         // BT-129: Invoiced quantity
-        $xml->add('cbc:InvoicedQuantity', (string) $line->getQuantity(), ['unitCode' => $line->getUnit()]);
+        $quantityElementName = $isCreditNoteProfile ? "cbc:CreditedQuantity" : "cbc:InvoicedQuantity";
+        $xml->add($quantityElementName, (string) $line->getQuantity(), ['unitCode' => $line->getUnit()]);
 
         // BT-131: Line net amount
         $netAmount = $line->getNetAmount();

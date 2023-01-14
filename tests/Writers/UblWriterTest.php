@@ -9,6 +9,7 @@ use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
 use Einvoicing\InvoiceReference;
 use Einvoicing\Party;
+use Einvoicing\Payments\Payment;
 use Einvoicing\Presets\Peppol;
 use Einvoicing\Writers\UblWriter;
 use PHPUnit\Framework\TestCase;
@@ -117,6 +118,7 @@ final class UblWriterTest extends TestCase {
         ]);
         $res = curl_exec($ch);
         curl_close($ch);
+        unset($ch);
 
         // Validate response
         return (strpos($res, '<ns3:result>SUCCESS</ns3:result>') !== false);
@@ -127,6 +129,15 @@ final class UblWriterTest extends TestCase {
         $invoice->validate();
         $contents = $this->writer->export($invoice);
         $this->assertTrue($this->validateInvoice($contents, 'ubl'));
+    }
+
+    public function testCanGenerateValidCreditNote(): void {
+        $invoice = $this->getSampleInvoice();
+        $invoice->setType(Invoice::TYPE_CREDIT_NOTE);
+        $invoice->setPayment((new Payment)->setMeansCode('10')->setMeansText('In cash'));
+        $invoice->validate();
+        $contents = $this->writer->export($invoice);
+        $this->assertTrue($this->validateInvoice($contents, 'credit'));
     }
 
     public function testCanHaveLinesWithForcedDuplicateIdentifiers(): void {
