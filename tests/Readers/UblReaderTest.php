@@ -18,34 +18,32 @@ final class UblReaderTest extends TestCase {
         $this->reader = new UblReader();
     }
 
-    public function testItCanReadCreditNote(): void {
+    public function testCanReadCreditNote(): void {
         $creditNote = $this->reader->import(file_get_contents(self::CREDIT_NOTE_PATH));
         $creditNote->validate();
 
-        $this->assertSame(Invoice::TYPE_CREDIT_NOTE, $creditNote->getType());
+        $this->assertSame(Invoice::TYPE_CREDIT_NOTE_RELATED_TO_GOODS_OR_SERVICES, $creditNote->getType());
 
         $lines = $creditNote->getLines();
-        $this->assertEquals('1', $lines[0]->getId());
-        $this->assertEquals('2', $lines[1]->getId());
+        $this->assertEquals('1000', $lines[0]->getId());
+        $this->assertEquals('2000', $lines[1]->getId());
 
         $totals = $creditNote->getTotals();
         $this->assertEquals(1300, $totals->netAmount);
-        $this->assertEquals(1325, $totals->taxExclusiveAmount);
-        $this->assertEquals(331.25, $totals->vatAmount);
+        $this->assertEquals(1300, $totals->taxExclusiveAmount);
+        $this->assertEquals(325, $totals->vatAmount);
         $this->assertEquals(0, $totals->allowancesAmount);
-        $this->assertEquals(25, $totals->chargesAmount);
-        $this->assertEquals(1656.25, $totals->payableAmount);
+        $this->assertEquals(0, $totals->chargesAmount);
+        $this->assertEquals(1625, $totals->payableAmount);
         $this->assertEquals('S', $totals->vatBreakdown[0]->category);
         $this->assertEquals(25, $totals->vatBreakdown[0]->rate);
-        $this->assertEquals('INV-123', $creditNote->getPrecedingInvoiceReferences()[0]->getValue());
-        $this->assertEquals('This is a sample string', $creditNote->getAttachments()[0]->getContents());
     }
 
     public function testCanReadInvoice(): void {
         $invoice = $this->reader->import(file_get_contents(self::INVOICE_PATH));
         $invoice->validate();
 
-        $this->assertSame(Invoice::TYPE_INVOICE, $invoice->getType());
+        $this->assertSame(Invoice::TYPE_COMMERCIAL_INVOICE, $invoice->getType());
 
         $lines = $invoice->getLines();
         $this->assertEquals('1', $lines[0]->getId());

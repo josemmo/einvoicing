@@ -1,29 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Downloaded from https://git.io/JUQHB -->
-<Invoice xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+<!-- Based on https://github.com/OpenPEPPOL/peppol-bis-invoice-3/blob/master/rules/examples/base-creditnote-correction.xml -->
+<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
     xmlns:ns="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
-    xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
+    xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">
     <ns:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0</ns:CustomizationID>
     <ns:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</ns:ProfileID>
     <ns:ID>Snippet1</ns:ID>
     <ns:IssueDate>2017-11-13</ns:IssueDate>
-    <ns:DueDate>2017-12-01</ns:DueDate>
-    <ns:CreditNoteTypeCode>381</ns:CreditNoteTypeCode>
+    <ns:CreditNoteTypeCode>81</ns:CreditNoteTypeCode>
     <ns:DocumentCurrencyCode>EUR</ns:DocumentCurrencyCode>
-    <ns:AccountingCost>4025:123:4343</ns:AccountingCost>
     <ns:BuyerReference>0150abc</ns:BuyerReference>
-    <cac:BillingReference>
-        <cac:InvoiceDocumentReference>
-            <ns:ID>INV-123</ns:ID>
-        </cac:InvoiceDocumentReference>
-    </cac:BillingReference>
-    <cac:AdditionalDocumentReference>
-        <ns:ID>ABC-123</ns:ID>
-        <ns:DocumentDescription>Invoice ABC-123</ns:DocumentDescription>
-        <cac:Attachment>
-            <ns:EmbeddedDocumentBinaryObject mimeCode="text/plain" filename="att.txt">VGhpcyBpcyBhIHNhbXBsZSBzdHJpbmc=</ns:EmbeddedDocumentBinaryObject>
-        </cac:Attachment>
-    </cac:AdditionalDocumentReference>
     <cac:AccountingSupplierParty>
         <cac:Party>
             <ns:EndpointID schemeID="0088">9482348239847239874</ns:EndpointID>
@@ -89,60 +75,14 @@
             </cac:Contact>
         </cac:Party>
     </cac:AccountingCustomerParty>
-    <cac:Delivery>
-        <ns:ActualDeliveryDate>2017-11-01</ns:ActualDeliveryDate>
-        <cac:DeliveryLocation>
-            <ns:ID schemeID="0088">9483759475923478</ns:ID>
-            <cac:Address>
-                <ns:StreetName>Delivery street 2</ns:StreetName>
-                <ns:AdditionalStreetName>Building 56</ns:AdditionalStreetName>
-                <ns:CityName>Stockholm</ns:CityName>
-                <ns:PostalZone>21234</ns:PostalZone>
-                <cac:Country>
-                    <ns:IdentificationCode>SE</ns:IdentificationCode>
-                </cac:Country>
-            </cac:Address>
-        </cac:DeliveryLocation>
-        <cac:DeliveryParty>
-            <cac:PartyName>
-                <ns:Name>Delivery party Name</ns:Name>
-            </cac:PartyName>
-        </cac:DeliveryParty>
-    </cac:Delivery>
-    <cac:PaymentMeans>
-        <ns:PaymentMeansCode name="Credit transfer">30</ns:PaymentMeansCode>
-        <ns:PaymentID>Snippet1</ns:PaymentID>
-        <cac:PayeeFinancialAccount>
-            <ns:ID>IBAN32423940</ns:ID>
-            <ns:Name>AccountName</ns:Name>
-            <cac:FinancialInstitutionBranch>
-                <ns:ID>BIC324098</ns:ID>
-            </cac:FinancialInstitutionBranch>
-        </cac:PayeeFinancialAccount>
-    </cac:PaymentMeans>
-    <cac:PaymentTerms>
-        <ns:Note>Payment within 10 days, 2% discount</ns:Note>
-    </cac:PaymentTerms>
-        <cac:AllowanceCharge>
-            <ns:ChargeIndicator>true</ns:ChargeIndicator>
-            <ns:AllowanceChargeReason>Insurance</ns:AllowanceChargeReason>
-            <ns:Amount currencyID="EUR">25</ns:Amount>
-            <cac:TaxCategory>
-                <ns:ID>S</ns:ID>
-                <ns:Percent>25.0</ns:Percent>
-                <cac:TaxScheme>
-                    <ns:ID>VAT</ns:ID>
-                </cac:TaxScheme>
-            </cac:TaxCategory>
-        </cac:AllowanceCharge>
     <cac:TaxTotal>
-        <ns:TaxAmount currencyID="EUR">331.25</ns:TaxAmount>
+        <ns:TaxAmount currencyID="EUR">325</ns:TaxAmount>
         <cac:TaxSubtotal>
-            <ns:TaxableAmount currencyID="EUR">1325</ns:TaxableAmount>
-            <ns:TaxAmount currencyID="EUR">331.25</ns:TaxAmount>
+            <ns:TaxableAmount currencyID="EUR">1300</ns:TaxableAmount>
+            <ns:TaxAmount currencyID="EUR">325</ns:TaxAmount>
             <cac:TaxCategory>
                 <ns:ID>S</ns:ID>
-                <ns:Percent>25.0</ns:Percent>
+                <ns:Percent>25</ns:Percent>
                 <cac:TaxScheme>
                     <ns:ID>VAT</ns:ID>
                 </cac:TaxScheme>
@@ -151,21 +91,19 @@
     </cac:TaxTotal>
     <cac:LegalMonetaryTotal>
         <ns:LineExtensionAmount currencyID="EUR">1300</ns:LineExtensionAmount>
-        <ns:TaxExclusiveAmount currencyID="EUR">1325</ns:TaxExclusiveAmount>
-        <ns:TaxInclusiveAmount currencyID="EUR">1656.25</ns:TaxInclusiveAmount>
-        <ns:ChargeTotalAmount currencyID="EUR">25</ns:ChargeTotalAmount>
-        <ns:PayableAmount currencyID="EUR">1656.25</ns:PayableAmount>
+        <ns:TaxExclusiveAmount currencyID="EUR">1300</ns:TaxExclusiveAmount>
+        <ns:TaxInclusiveAmount currencyID="EUR">1625</ns:TaxInclusiveAmount>
+        <ns:PayableAmount currencyID="EUR">1625</ns:PayableAmount>
     </cac:LegalMonetaryTotal>
-    
-<cac:InvoiceLine>
-        <ns:ID>1</ns:ID>
-    <ns:InvoicedQuantity unitCode="DAY">7</ns:InvoicedQuantity>
-    <ns:LineExtensionAmount currencyID= "EUR">2800</ns:LineExtensionAmount>
+    <cac:CreditNoteLine>
+        <ns:ID>1000</ns:ID>
+        <ns:CreditedQuantity unitCode="DAY">7</ns:CreditedQuantity>
+        <ns:LineExtensionAmount currencyID="EUR">2800</ns:LineExtensionAmount>
         <ns:AccountingCost>Konteringsstreng</ns:AccountingCost>
-       <cac:OrderLineReference>
+        <cac:OrderLineReference>
             <ns:LineID>123</ns:LineID>
         </cac:OrderLineReference>
-    <cac:Item>
+        <cac:Item>
             <ns:Description>Description of item</ns:Description>
             <ns:Name>item name</ns:Name>
             <cac:StandardItemIdentification>
@@ -179,45 +117,45 @@
             </cac:CommodityClassification>
             <cac:ClassifiedTaxCategory>
                 <ns:ID>S</ns:ID>
-                <ns:Percent>25.0</ns:Percent>
+                <ns:Percent>25</ns:Percent>
                 <cac:TaxScheme>
                     <ns:ID>VAT</ns:ID>
                 </cac:TaxScheme>
             </cac:ClassifiedTaxCategory>
         </cac:Item>
-    <cac:Price>
-        <ns:PriceAmount currencyID="EUR">400</ns:PriceAmount>
-    </cac:Price>
-    </cac:InvoiceLine>
-<cac:InvoiceLine>
-    <ns:ID>2</ns:ID>
-    <ns:InvoicedQuantity unitCode="DAY">-3</ns:InvoicedQuantity>
-    <ns:LineExtensionAmount currencyID="EUR">-1500</ns:LineExtensionAmount>
-    <cac:OrderLineReference>
-        <ns:LineID>123</ns:LineID>
-    </cac:OrderLineReference>
-    <cac:Item>
-        <ns:Description>Description 2</ns:Description>
-        <ns:Name>item name 2</ns:Name>
-        <cac:StandardItemIdentification>
-            <ns:ID schemeID="0088">21382183120983</ns:ID>
-        </cac:StandardItemIdentification>
-        <cac:OriginCountry>
-            <ns:IdentificationCode>NO</ns:IdentificationCode>
-        </cac:OriginCountry>
-        <cac:CommodityClassification>
-            <ns:ItemClassificationCode listID="SRV">09348023</ns:ItemClassificationCode>
-        </cac:CommodityClassification>
-        <cac:ClassifiedTaxCategory>
-            <ns:ID>S</ns:ID>
-            <ns:Percent>25.0</ns:Percent>
-            <cac:TaxScheme>
-                <ns:ID>VAT</ns:ID>
-            </cac:TaxScheme>
-        </cac:ClassifiedTaxCategory>
-    </cac:Item>
-    <cac:Price>
-        <ns:PriceAmount currencyID="EUR">500</ns:PriceAmount>
-    </cac:Price>
-</cac:InvoiceLine>
-</Invoice>
+        <cac:Price>
+            <ns:PriceAmount currencyID="EUR">400</ns:PriceAmount>
+        </cac:Price>
+    </cac:CreditNoteLine>
+    <cac:CreditNoteLine>
+        <ns:ID>2000</ns:ID>
+        <ns:CreditedQuantity unitCode="DAY">-3</ns:CreditedQuantity>
+        <ns:LineExtensionAmount currencyID="EUR">-1500</ns:LineExtensionAmount>
+        <cac:OrderLineReference>
+            <ns:LineID>123</ns:LineID>
+        </cac:OrderLineReference>
+        <cac:Item>
+            <ns:Description>Description 2</ns:Description>
+            <ns:Name>item name 2</ns:Name>
+            <cac:StandardItemIdentification>
+                <ns:ID schemeID="0088">21382183120983</ns:ID>
+            </cac:StandardItemIdentification>
+            <cac:OriginCountry>
+                <ns:IdentificationCode>NO</ns:IdentificationCode>
+            </cac:OriginCountry>
+            <cac:CommodityClassification>
+                <ns:ItemClassificationCode listID="SRV">09348023</ns:ItemClassificationCode>
+            </cac:CommodityClassification>
+            <cac:ClassifiedTaxCategory>
+                <ns:ID>S</ns:ID>
+                <ns:Percent>25</ns:Percent>
+                <cac:TaxScheme>
+                    <ns:ID>VAT</ns:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+        </cac:Item>
+        <cac:Price>
+            <ns:PriceAmount currencyID="EUR">500</ns:PriceAmount>
+        </cac:Price>
+    </cac:CreditNoteLine>
+</CreditNote>
