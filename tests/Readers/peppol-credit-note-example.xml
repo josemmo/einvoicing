@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Based on https://github.com/OpenPEPPOL/peppol-bis-invoice-3/blob/master/rules/examples/base-creditnote-correction.xml -->
+<CreditNote xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:ns="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+    xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">
+    <ns:CustomizationID>urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0</ns:CustomizationID>
+    <ns:ProfileID>urn:fdc:peppol.eu:2017:poacc:billing:01:1.0</ns:ProfileID>
+    <ns:ID>Snippet1</ns:ID>
+    <ns:IssueDate>2017-11-13</ns:IssueDate>
+    <ns:CreditNoteTypeCode>81</ns:CreditNoteTypeCode>
+    <ns:DocumentCurrencyCode>EUR</ns:DocumentCurrencyCode>
+    <ns:BuyerReference>0150abc</ns:BuyerReference>
+    <cac:AccountingSupplierParty>
+        <cac:Party>
+            <ns:EndpointID schemeID="0088">9482348239847239874</ns:EndpointID>
+            <cac:PartyIdentification>
+                <ns:ID>99887766</ns:ID>
+            </cac:PartyIdentification>
+            <cac:PartyName>
+                <ns:Name>SupplierTradingName Ltd.</ns:Name>
+            </cac:PartyName>
+            <cac:PostalAddress>
+                <ns:StreetName>Main street 1</ns:StreetName>
+                <ns:AdditionalStreetName>Postbox 123</ns:AdditionalStreetName>
+                <ns:CityName>London</ns:CityName>
+                <ns:PostalZone>GB 123 EW</ns:PostalZone>
+                <cac:Country>
+                    <ns:IdentificationCode>GB</ns:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyTaxScheme>
+                <ns:CompanyID>GB1232434</ns:CompanyID>
+                <cac:TaxScheme>
+                    <ns:ID>VAT</ns:ID>
+                </cac:TaxScheme>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <ns:RegistrationName>SupplierOfficialName Ltd</ns:RegistrationName>
+                <ns:CompanyID>GB983294</ns:CompanyID>
+            </cac:PartyLegalEntity>
+        </cac:Party>
+    </cac:AccountingSupplierParty>
+    <cac:AccountingCustomerParty>
+        <cac:Party>
+            <ns:EndpointID schemeID="0002">FR23342</ns:EndpointID>
+            <cac:PartyIdentification>
+                <ns:ID schemeID="0002">FR23342</ns:ID>
+            </cac:PartyIdentification>
+            <cac:PartyName>
+                <ns:Name>BuyerTradingName AS</ns:Name>
+            </cac:PartyName>
+            <cac:PostalAddress>
+                <ns:StreetName>Hovedgatan 32</ns:StreetName>
+                <ns:AdditionalStreetName>Po box 878</ns:AdditionalStreetName>
+                <ns:CityName>Stockholm</ns:CityName>
+                <ns:PostalZone>456 34</ns:PostalZone>
+                <cac:Country>
+                    <ns:IdentificationCode>SE</ns:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyTaxScheme>
+                <ns:CompanyID>SE4598375937</ns:CompanyID>
+                <cac:TaxScheme>
+                    <ns:ID>VAT</ns:ID>
+                </cac:TaxScheme>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <ns:RegistrationName>Buyer Official Name</ns:RegistrationName>
+                <ns:CompanyID schemeID="0183">39937423947</ns:CompanyID>
+            </cac:PartyLegalEntity>
+            <cac:Contact>
+                <ns:Name>Lisa Johnson</ns:Name>
+                <ns:Telephone>23434234</ns:Telephone>
+                <ns:ElectronicMail>lj@buyer.se</ns:ElectronicMail>
+            </cac:Contact>
+        </cac:Party>
+    </cac:AccountingCustomerParty>
+    <cac:TaxTotal>
+        <ns:TaxAmount currencyID="EUR">325</ns:TaxAmount>
+        <cac:TaxSubtotal>
+            <ns:TaxableAmount currencyID="EUR">1300</ns:TaxableAmount>
+            <ns:TaxAmount currencyID="EUR">325</ns:TaxAmount>
+            <cac:TaxCategory>
+                <ns:ID>S</ns:ID>
+                <ns:Percent>25</ns:Percent>
+                <cac:TaxScheme>
+                    <ns:ID>VAT</ns:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:LegalMonetaryTotal>
+        <ns:LineExtensionAmount currencyID="EUR">1300</ns:LineExtensionAmount>
+        <ns:TaxExclusiveAmount currencyID="EUR">1300</ns:TaxExclusiveAmount>
+        <ns:TaxInclusiveAmount currencyID="EUR">1625</ns:TaxInclusiveAmount>
+        <ns:PayableAmount currencyID="EUR">1625</ns:PayableAmount>
+    </cac:LegalMonetaryTotal>
+    <cac:CreditNoteLine>
+        <ns:ID>1000</ns:ID>
+        <ns:CreditedQuantity unitCode="DAY">7</ns:CreditedQuantity>
+        <ns:LineExtensionAmount currencyID="EUR">2800</ns:LineExtensionAmount>
+        <ns:AccountingCost>Konteringsstreng</ns:AccountingCost>
+        <cac:OrderLineReference>
+            <ns:LineID>123</ns:LineID>
+        </cac:OrderLineReference>
+        <cac:Item>
+            <ns:Description>Description of item</ns:Description>
+            <ns:Name>item name</ns:Name>
+            <cac:StandardItemIdentification>
+                <ns:ID schemeID="0088">21382183120983</ns:ID>
+            </cac:StandardItemIdentification>
+            <cac:OriginCountry>
+                <ns:IdentificationCode>NO</ns:IdentificationCode>
+            </cac:OriginCountry>
+            <cac:CommodityClassification>
+                <ns:ItemClassificationCode listID="SRV">09348023</ns:ItemClassificationCode>
+            </cac:CommodityClassification>
+            <cac:ClassifiedTaxCategory>
+                <ns:ID>S</ns:ID>
+                <ns:Percent>25</ns:Percent>
+                <cac:TaxScheme>
+                    <ns:ID>VAT</ns:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+        </cac:Item>
+        <cac:Price>
+            <ns:PriceAmount currencyID="EUR">400</ns:PriceAmount>
+        </cac:Price>
+    </cac:CreditNoteLine>
+    <cac:CreditNoteLine>
+        <ns:ID>2000</ns:ID>
+        <ns:CreditedQuantity unitCode="DAY">-3</ns:CreditedQuantity>
+        <ns:LineExtensionAmount currencyID="EUR">-1500</ns:LineExtensionAmount>
+        <cac:OrderLineReference>
+            <ns:LineID>123</ns:LineID>
+        </cac:OrderLineReference>
+        <cac:Item>
+            <ns:Description>Description 2</ns:Description>
+            <ns:Name>item name 2</ns:Name>
+            <cac:StandardItemIdentification>
+                <ns:ID schemeID="0088">21382183120983</ns:ID>
+            </cac:StandardItemIdentification>
+            <cac:OriginCountry>
+                <ns:IdentificationCode>NO</ns:IdentificationCode>
+            </cac:OriginCountry>
+            <cac:CommodityClassification>
+                <ns:ItemClassificationCode listID="SRV">09348023</ns:ItemClassificationCode>
+            </cac:CommodityClassification>
+            <cac:ClassifiedTaxCategory>
+                <ns:ID>S</ns:ID>
+                <ns:Percent>25</ns:Percent>
+                <cac:TaxScheme>
+                    <ns:ID>VAT</ns:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+        </cac:Item>
+        <cac:Price>
+            <ns:PriceAmount currencyID="EUR">500</ns:PriceAmount>
+        </cac:Price>
+    </cac:CreditNoteLine>
+</CreditNote>

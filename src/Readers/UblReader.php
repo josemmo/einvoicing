@@ -91,13 +91,13 @@ class UblReader extends AbstractReader {
         }
 
         // BT-9: Due date
-        $dueDateNode = $xml->get("{{$cbc}}DueDate");
+        $dueDateNode = $xml->get("{{$cbc}}DueDate | {{$cac}}PaymentMeans/{{$cbc}}PaymentDueDate");
         if ($dueDateNode !== null) {
             $invoice->setDueDate(new DateTime($dueDateNode->asText()));
         }
 
         // BT-3: Invoice type code
-        $typeNode = $xml->get("{{$cbc}}InvoiceTypeCode");
+        $typeNode = $xml->get("{{$cbc}}InvoiceTypeCode | {{$cbc}}CreditNoteTypeCode");
         if ($typeNode !== null) {
             $invoice->setType((int) $typeNode->asText());
         }
@@ -241,7 +241,7 @@ class UblReader extends AbstractReader {
         }
 
         // Invoice lines
-        foreach ($xml->getAll("{{$cac}}InvoiceLine") as $node) {
+        foreach ($xml->getAll("{{$cac}}InvoiceLine | {{$cac}}CreditNoteLine") as $node) {
             $invoice->addLine($this->parseInvoiceLine($node, $taxExemptions));
         }
 
@@ -744,7 +744,7 @@ class UblReader extends AbstractReader {
         }
 
         // Quantity
-        $quantityNode = $xml->get("{{$cbc}}InvoicedQuantity");
+        $quantityNode = $xml->get("{{$cbc}}InvoicedQuantity | {{$cbc}}CreditedQuantity");
         if ($quantityNode !== null) {
             $line->setQuantity((float) $quantityNode->asText());
             $line->setUnit($quantityNode->element()->getAttribute('unitCode'));
