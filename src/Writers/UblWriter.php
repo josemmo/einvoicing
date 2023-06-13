@@ -741,7 +741,7 @@ class UblWriter extends AbstractWriter {
         // Amount
         $baseAmount = $atDocumentLevel ?
             $totals->netAmount :          // @phan-suppress-current-line PhanPossiblyUndeclaredProperty
-            $line->getNetAmount() ?? 0.0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+            $line->getNetAmountBeforeAllowancesCharges() ?? 0.0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
         $this->addAmountNode(
             $xml,
             'cbc:Amount',
