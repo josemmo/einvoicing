@@ -208,8 +208,8 @@
             <cbc:AllowanceChargeReasonCode>CG</cbc:AllowanceChargeReasonCode>
             <cbc:AllowanceChargeReason>Cleaning</cbc:AllowanceChargeReason>
             <cbc:MultiplierFactorNumeric>1</cbc:MultiplierFactorNumeric>
-            <cbc:Amount currencyID="EUR">40.4</cbc:Amount>
-            <cbc:BaseAmount currencyID="EUR">4040</cbc:BaseAmount>
+            <cbc:Amount currencyID="EUR">41</cbc:Amount>
+            <cbc:BaseAmount currencyID="EUR">4100</cbc:BaseAmount>
         </cac:AllowanceCharge>
         <cac:Item>
             <cbc:Description>Description of item</cbc:Description>
@@ -298,8 +298,8 @@
             <cbc:AllowanceChargeReasonCode>CG</cbc:AllowanceChargeReasonCode>
             <cbc:AllowanceChargeReason>Charge</cbc:AllowanceChargeReason>
             <cbc:MultiplierFactorNumeric>1</cbc:MultiplierFactorNumeric>
-            <cbc:Amount currencyID="EUR">9.09</cbc:Amount>
-            <cbc:BaseAmount currencyID="EUR">909</cbc:BaseAmount>
+            <cbc:Amount currencyID="EUR">10</cbc:Amount>
+            <cbc:BaseAmount currencyID="EUR">1000</cbc:BaseAmount>
         </cac:AllowanceCharge>
         <cac:Item>
             <cbc:Description>Description of item</cbc:Description>
