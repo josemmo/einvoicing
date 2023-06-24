@@ -296,7 +296,7 @@ class InvoiceLine {
 
     /**
      * Get total net amount (without VAT) before allowances/charges
-     * @return float|null           Net amount before allowances/charges
+     * @return float|null Net amount before allowances/charges
      */
     public function getNetAmountBeforeAllowancesCharges(): ?float {
         if ($this->price === null) {
@@ -308,7 +308,7 @@ class InvoiceLine {
 
     /**
      * Get allowances total amount
-     * @return float           Allowances total amount
+     * @return float Allowances total amount
      */
     public function getAllowancesAmount(): float {
         $allowancesAmount = 0;
@@ -322,7 +322,7 @@ class InvoiceLine {
 
     /**
      * Get charges total amount
-     * @return float           Charges total amount
+     * @return float Charges total amount
      */
     public function getChargesAmount(): float {
         $chargesAmount = 0;
@@ -337,7 +337,7 @@ class InvoiceLine {
     /**
      * Get total net amount (without VAT)
      * NOTE: inclusive of line level allowances and charges
-     * @return float|null           Net amount
+     * @return float|null Net amount
      */
     public function getNetAmount(): ?float {
         $netAmount = $this->getNetAmountBeforeAllowancesCharges();
