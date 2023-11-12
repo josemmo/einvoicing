@@ -134,7 +134,7 @@ class Invoice {
     /**
      * Forwarder's invoice discrepancy report
      *
-     * Document/message reporting invoice discrepancies indentified by the forwarder.
+     * Document/message reporting invoice discrepancies identified by the forwarder.
      */
     const TYPE_FORWARDERS_INVOICE_DISCREPANCY_REPORT = 553;
 
