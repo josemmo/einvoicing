@@ -13,6 +13,7 @@ use Einvoicing\Party;
 use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Mandate;
 use Einvoicing\Payments\Payment;
+use Einvoicing\Payments\PaymentTerms;
 use Einvoicing\Payments\Transfer;
 use UXML\UXML;
 use function in_array;
@@ -166,9 +167,14 @@ class UblWriter extends AbstractWriter {
         }
 
         // Payment nodes
-        $payment = $invoice->getPayment();
-        if ($payment !== null) {
+        foreach ($invoice->getPayments() as $payment) {
             $this->addPaymentNodes($xml, $payment, $isCreditNoteProfile ? $dueDate : null);
+        }
+
+        // Payment Terms node
+        $paymentTerms = $invoice->getPaymentTerms();
+        if ($paymentTerms !== null) {
+            $this->addPaymentTermsNodes($xml, $paymentTerms);
         }
 
         // Allowances and charges
@@ -471,7 +477,7 @@ class UblWriter extends AbstractWriter {
         // Contact point
         if ($party->hasContactInformation()) {
             $contactNode = $xml->add('cac:Contact');
-            
+
             $contactName = $party->getContactName();
             if ($contactName !== null) {
                 $contactNode->add('cbc:Name', $contactName);
@@ -611,11 +617,26 @@ class UblWriter extends AbstractWriter {
         if ($xml->isEmpty()) {
             $xml->remove();
         }
+    }
+
+
+    /**
+     * Add payment terms nodes
+     * @param UXML                $parent  Invoice element
+     * @param PaymentTerms       $paymentTerms Payment instance
+     */
+    private function addPaymentTermsNodes(UXML $parent, PaymentTerms $paymentTerms) {
+        $xml = $parent->add('cac:PaymentTerms');
 
         // BT-20: Payment terms
-        $terms = $payment->getTerms();
-        if ($terms !== null) {
-            $parent->add('cac:PaymentTerms')->add('cbc:Note', $terms);
+        $note = $paymentTerms->getNote();
+        if ($note !== null) {
+            $xml->add('cbc:Note', $note);
+        }
+
+        // Remove PaymentTerms node if empty
+        if ($xml->isEmpty()) {
+            $xml->remove();
         }
     }
 

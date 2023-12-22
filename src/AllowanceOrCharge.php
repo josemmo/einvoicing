@@ -6,7 +6,7 @@ use Einvoicing\Traits\VatTrait;
 class AllowanceOrCharge {
     protected $reasonCode = null;
     protected $reason = null;
-    protected $amount = 0;
+    protected $amount = null;
     protected $isPercentage = false;
 
     use VatTrait;

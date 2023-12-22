@@ -19,17 +19,17 @@ The main repository branch is only for stable releases.
 
 ### 2. Passes static analysis inspection
 ```
-vendor/bin/phan --allow-polyfill-parser
+vendor/bin/phan --testdox
 ```
 
 ### 3. Passes all tests
 ```
-vendor/bin/simple-phpunit --testdox
+vendor/bin/simple-phpunit
 ```
 
 ### 4. Complies with EN 16931
 Although the most popular European Invoicing CIUS is [PEPPOL BIS Billing 3.0](https://docs.peppol.eu/poacc/billing/3.0/),
-the real deal is the "European Standard for Electronic invoicing" or EN 16931.
+the real deal is the "European Standard for Electronic invocing" or EN 16931.
 
 This means that, while most users will use the [Peppol](src/Presets/Peppol.php) preset for reading and writing invoices,
 there are other CIUS/extensions from various member states and business sectors which might not be an exact match to PEPPOL.

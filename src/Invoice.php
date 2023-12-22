@@ -4,6 +4,7 @@ namespace Einvoicing;
 use DateTime;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Payments\Payment;
+use Einvoicing\Payments\PaymentTerms;
 use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\AttachmentsTrait;
@@ -134,7 +135,7 @@ class Invoice {
     /**
      * Forwarder's invoice discrepancy report
      *
-     * Document/message reporting invoice discrepancies identified by the forwarder.
+     * Document/message reporting invoice discrepancies indentified by the forwarder.
      */
     const TYPE_FORWARDERS_INVOICE_DISCREPANCY_REPORT = 553;
 
@@ -203,7 +204,7 @@ class Invoice {
 
     /**
      * Credit note related to goods or services
-     * 
+     *
      * Document message used to provide credit information related to a transaction for goods or services to the
      * relevant party.
      */
@@ -211,7 +212,7 @@ class Invoice {
 
     /**
      * Credit note related to financial adjustments
-     * 
+     *
      * Document message for providing credit information related to financial adjustments to the relevant party,
      * e.g., bonuses.
      */
@@ -219,21 +220,21 @@ class Invoice {
 
     /**
      * Credit note
-     * 
+     *
      * Document/message for providing credit information to the relevant party.
      */
     const TYPE_CREDIT_NOTE = 381;
 
     /**
      * Factored credit note
-     * 
+     *
      * Credit note related to assigned invoice(s).
      */
     const TYPE_FACTORED_CREDIT_NOTE = 396;
 
     /**
      * Forwarder's credit note
-     * 
+     *
      * Document/message for providing credit information to the relevant party.
      */
     const TYPE_FORWARDERS_CREDIT_NOTE = 532;
@@ -262,7 +263,8 @@ class Invoice {
     protected $buyer = null;
     protected $payee = null;
     protected $delivery = null;
-    protected $payment = null;
+    protected $payments = [];
+    protected $paymentTerms = null;
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
@@ -820,21 +822,41 @@ class Invoice {
 
 
     /**
-     * Get payment information
-     * @return Payment|null Payment instance
+     * Get payment terms information
+     * @return PaymentTerms|null PaymentTerms instance
      */
-    public function getPayment(): ?Payment {
-        return $this->payment;
+    public function getPaymentTerms(): ?PaymentTerms {
+        return $this->paymentTerms;
+    }
+
+
+    /**
+     * Set payment terms information
+     * @param  PaymentTerms|null $paymentTerms PaymentTerms instance
+     * @return self                            Invoice instance
+     */
+    public function setPaymentTerms(?PaymentTerms $paymentTerms): self {
+        $this->paymentTerms = $paymentTerms;
+        return $this;
+    }
+
+
+    /**
+     * Get payment information
+     * @return Payment[] Payment instance
+     */
+    public function getPayments(): array {
+        return $this->payments;
     }
 
 
     /**
      * Set payment information
-     * @param  Payment|null $payment Payment instance
-     * @return self                  Invoice instance
+     * @param  Payment  $payment  Payment instance
+     * @return self               Invoice instance
      */
-    public function setPayment(?Payment $payment): self {
-        $this->payment = $payment;
+    public function addPayment(Payment $payment): self {
+        $this->payments[] = $payment;
         return $this;
     }
 

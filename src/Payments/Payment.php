@@ -9,7 +9,6 @@ class Payment {
     protected $id = null;
     protected $meansCode = null;
     protected $meansText = null;
-    protected $terms = null;
     protected $transfers = [];
     protected $card = null;
     protected $mandate = null;
@@ -70,26 +69,6 @@ class Payment {
      */
     public function setMeansText(?string $meansText): self {
         $this->meansText = $meansText;
-        return $this;
-    }
-
-
-    /**
-     * Get payment terms
-     * @return string|null Payment terms
-     */
-    public function getTerms(): ?string {
-        return $this->terms;
-    }
-
-
-    /**
-     * Set payment terms
-     * @param  string|null $terms Payment terms
-     * @return self               Payment instance
-     */
-    public function setTerms(?string $terms): self {
-        $this->terms = $terms;
         return $this;
     }
 
