@@ -36,16 +36,24 @@ class Peppol extends AbstractPreset {
             return "A buyer reference or purchase order reference MUST be provided.";
         };
         $res['PEPPOL-EN16931-R061'] = static function(Invoice $inv) {
-            if ($inv->getPayment() === null) return;
-            if ($inv->getPayment()->getMandate() === null) return;
-            if ($inv->getPayment()->getMandate()->getReference() === null) {
-                return "Mandate reference MUST be provided for direct debit";
+            foreach ($inv->getPayments() as $payment) {
+                if ($payment === null) continue;
+                if ($payment->getMandate() === null) continue;
+                if ($payment->getMandate()->getReference() === null) {
+                    return "Mandate reference MUST be provided for direct debit";
+                }
             }
+
+            return;
         };
         $res['BG-17'] = static function(Invoice $inv) {
-            if ($inv->getPayment() !== null && count($inv->getPayment()->getTransfers()) > 1) {
-                return "An Invoice shall not have multiple credit transfers";
+            foreach ($inv->getPayments() as $payment) {
+                if ($payment !== null && count($payment->getTransfers()) > 1) {
+                    return "An Invoice shall not have multiple credit transfers";
+                }
             }
+
+            return;
         };
 
         return $res;

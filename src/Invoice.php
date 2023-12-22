@@ -4,6 +4,7 @@ namespace Einvoicing;
 use DateTime;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Payments\Payment;
+use Einvoicing\Payments\PaymentTerms;
 use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\AttachmentsTrait;
@@ -262,7 +263,8 @@ class Invoice {
     protected $buyer = null;
     protected $payee = null;
     protected $delivery = null;
-    protected $payment = null;
+    protected $payments = [];
+    protected $paymentTerms = null;
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
@@ -820,21 +822,41 @@ class Invoice {
 
 
     /**
-     * Get payment information
-     * @return Payment|null Payment instance
+     * Get payment terms information
+     * @return Delivery|null PaymentTerms instance
      */
-    public function getPayment(): ?Payment {
-        return $this->payment;
+    public function getPaymentTerms(): ?PaymentTerms {
+        return $this->paymentTerms;
+    }
+
+
+    /**
+     * Set payment terms information
+     * @param  PaymentTerms|null $paymentTerms PaymentTerms instance
+     * @return self                            Invoice instance
+     */
+    public function setPaymentTerms(?PaymentTerms $paymentTerms): self {
+        $this->paymentTerms = $paymentTerms;
+        return $this;
+    }
+
+
+    /**
+     * Get payment information
+     * @return Payment[] Payment instance
+     */
+    public function getPayments(): array {
+        return $this->payments;
     }
 
 
     /**
      * Set payment information
-     * @param  Payment|null $payment Payment instance
-     * @return self                  Invoice instance
+     * @param  Payment  $payment  Payment instance
+     * @return self               Invoice instance
      */
-    public function setPayment(?Payment $payment): self {
-        $this->payment = $payment;
+    public function addPayment(Payment $payment): self {
+        $this->payments[] = $payment;
         return $this;
     }
 

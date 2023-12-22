@@ -168,26 +168,38 @@ trait InvoiceValidationTrait {
             }
         };
         $res['BR-49'] = static function(Invoice $inv) {
-            if ($inv->getPayment() !== null && $inv->getPayment()->getMeansCode() === null) {
-                return "A Payment instruction (BG-16) shall specify the Payment means type code (BT-81)";
-            }
-        };
-        $res['BR-50'] = static function(Invoice $inv) {
-            if ($inv->getPayment() === null) return;
-            foreach ($inv->getPayment()->getTransfers() as $transfer) {
-                if ($transfer->getAccountId() === null) {
-                    return "A Payment account identifier (BT-84) shall be present if Credit transfer (BG-17) " .
-                        "information is provided in the Invoice";
+            foreach ($inv->getPayments() as $payment) {
+                if ($payment !== null && $payment->getMeansCode() === null) {
+                    return "A Payment instruction (BG-16) shall specify the Payment means type code (BT-81)";
                 }
             }
+
+            return;
+        };
+        $res['BR-50'] = static function(Invoice $inv) {
+            foreach ($inv->getPayments() as $payment) {
+                if ($payment === null) return;
+                foreach ($payment->getTransfers() as $transfer) {
+                    if ($transfer->getAccountId() === null) {
+                        return "A Payment account identifier (BT-84) shall be present if Credit transfer (BG-17) " .
+                            "information is provided in the Invoice";
+                    }
+                }
+            }
+
+            return;
         };
         $res['BR-51'] = static function(Invoice $inv) {
-            if ($inv->getPayment() === null) return;
-            if ($inv->getPayment()->getCard() === null) return;
-            if ($inv->getPayment()->getCard()->getPan() === null) {
-                return "The last 4 to 6 digits of the Payment card primary account number (BT-87) " .
-                    "shall be present if Payment card information (BG-18) is provided in the Invoice";
+            foreach ($inv->getPayments() as $payment) {
+                if ($payment === null) return;
+                if ($payment->getCard() === null) return;
+                if ($payment->getCard()->getPan() === null) {
+                    return "The last 4 to 6 digits of the Payment card primary account number (BT-87) " .
+                        "shall be present if Payment card information (BG-18) is provided in the Invoice";
+                }
             }
+
+            return;
         };
         $res['BR-52'] = static function(Invoice $inv) {
             foreach ($inv->getAttachments() as $attachment) {
@@ -197,12 +209,16 @@ trait InvoiceValidationTrait {
             }
         };
         $res['BR-61'] = static function(Invoice $inv) {
-            if ($inv->getPayment() === null) return;
-            if (!in_array($inv->getPayment()->getMeansCode(), ['30', '58'])) return;
-            if (empty($inv->getPayment()->getTransfers())) {
-                return "If the Payment means type code (BT-81) means SEPA credit transfer, Local credit transfer or " .
-                    "Non-SEPA international credit transfer, the Payment account identifier (BT-84) shall be present";
+            foreach ($inv->getPayments() as $payment) {
+                if ($payment === null) return;
+                if (!in_array($payment->getMeansCode(), ['30', '58'])) return;
+                if (empty($payment->getTransfers())) {
+                    return "If the Payment means type code (BT-81) means SEPA credit transfer, Local credit transfer or " .
+                        "Non-SEPA international credit transfer, the Payment account identifier (BT-84) shall be present";
+                }
             }
+
+            return;
         };
         $res['BR-64'] = static function(Invoice $inv) {
             foreach ($inv->getLines() as $line) {
