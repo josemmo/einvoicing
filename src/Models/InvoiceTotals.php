@@ -99,7 +99,7 @@ class InvoiceTotals {
 
         // Process all invoice lines
         foreach ($inv->getLines() as $line) {
-            $lineNetAmount = $inv->round($line->getNetAmount() ?? 0.0, 'line/netAmount');
+            $lineNetAmount = $line->getNetAmount() ?? 0.0;
             $totals->netAmount += $lineNetAmount;
             self::updateVatMap($vatMap, $line, $lineNetAmount);
         }
@@ -123,8 +123,9 @@ class InvoiceTotals {
 
         // Calculate VAT amounts
         foreach ($vatMap as $item) {
-            $item->taxableAmount = $inv->round($item->taxableAmount, 'invoice/allowancesChargesAmount');
-            $item->taxAmount = $inv->round($item->taxableAmount * ($item->rate / 100), 'invoice/vatAmount');
+            $taxAmount = $inv->round($item->taxableAmount, 'line/taxAmount');
+            $item->taxableAmount = $inv->round($item->taxableAmount, 'line/taxableAmount');
+            $item->taxAmount = $inv->round($taxAmount * ($item->rate / 100), 'invoice/vatAmount');
             $totals->vatAmount += $item->taxAmount;
         }
         $totals->vatAmount = $inv->round($totals->vatAmount, 'invoice/vatAmount');

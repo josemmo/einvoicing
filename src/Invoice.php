@@ -823,7 +823,7 @@ class Invoice {
 
     /**
      * Get payment terms information
-     * @return Delivery|null PaymentTerms instance
+     * @return PaymentTerms|null PaymentTerms instance
      */
     public function getPaymentTerms(): ?PaymentTerms {
         return $this->paymentTerms;
