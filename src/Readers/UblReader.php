@@ -843,7 +843,9 @@ class UblReader extends AbstractReader {
 
         // Line Extension Amount
         $lineExtensionAmountNode = $xml->get("{{$cbc}}LineExtensionAmount");
-        if ($lineExtensionAmountNode !== null) {
+        if ($lineExtensionAmountNode === null || $line->getQuantity() === 0.0) {
+            $line->setPrice(0.0);
+        } elseif ($lineExtensionAmountNode !== null) {
             $basePrice = (float) $lineExtensionAmountNode->asText();
 
             foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $allowanceChargeNode) {
