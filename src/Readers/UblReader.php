@@ -829,16 +829,39 @@ class UblReader extends AbstractReader {
             $line->addClassificationIdentifier($this->parseIdentifierNode($classNode, 'listID'));
         }
 
-        // Price amount
-        $priceNode = $xml->get("{{$cac}}Price/{{$cbc}}PriceAmount");
-        if ($priceNode !== null) {
-            $line->setPrice((float) $priceNode->asText());
-        }
+//        // Price amount
+//        $priceNode = $xml->get("{{$cac}}Price/{{$cbc}}PriceAmount");
+//        if ($priceNode !== null) {
+//            $line->setPrice((float) $priceNode->asText());
+//        }
 
         // Base quantity
         $baseQuantityNode = $xml->get("{{$cac}}Price/{{$cbc}}BaseQuantity");
         if ($baseQuantityNode !== null) {
             $line->setBaseQuantity((float) $baseQuantityNode->asText());
+        }
+
+        // Line Extension Amount
+        $lineExtensionAmountNode = $xml->get("{{$cbc}}LineExtensionAmount");
+        if ($lineExtensionAmountNode !== null) {
+            $basePrice = (float) $lineExtensionAmountNode->asText();
+
+            foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $allowanceChargeNode) {
+                $amountNode = $allowanceChargeNode->get("{{$cbc}}Amount");
+
+                if ($amountNode === null) {
+                    continue;
+                }
+
+                $chargeIndicatorNode = $allowanceChargeNode->get("{{$cbc}}ChargeIndicator");
+                if ($chargeIndicatorNode !== null && $chargeIndicatorNode->asText() === "true") {
+                    $basePrice -= (float) $amountNode->asText();
+                } else {
+                    $basePrice += (float) $amountNode->asText();
+                }
+            }
+
+            $line->setPrice(($basePrice / $line->getQuantity()) * $line->getBaseQuantity());
         }
 
         // VAT attributes
