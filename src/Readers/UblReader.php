@@ -847,11 +847,17 @@ class UblReader extends AbstractReader {
             $basePrice = (float) $lineExtensionAmountNode->asText();
 
             foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $allowanceChargeNode) {
+                $amountNode = $allowanceChargeNode->get("{{$cbc}}Amount");
+
+                if ($amountNode === null) {
+                    continue;
+                }
+
                 $chargeIndicatorNode = $allowanceChargeNode->get("{{$cbc}}ChargeIndicator");
                 if ($chargeIndicatorNode !== null && $chargeIndicatorNode->asText() === "true") {
-                    $basePrice -= (float) $allowanceChargeNode->get("{{$cbc}}Amount")->asText();
+                    $basePrice -= (float) $amountNode->asText();
                 } else {
-                    $basePrice += (float) $allowanceChargeNode->get("{{$cbc}}Amount")->asText();
+                    $basePrice += (float) $amountNode->asText();
                 }
             }
 
