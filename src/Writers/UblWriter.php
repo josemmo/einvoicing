@@ -437,9 +437,7 @@ class UblWriter extends AbstractWriter {
         if ($vatNumber !== null) {
             $taxNode = $xml->add('cac:PartyTaxScheme');
             $taxNode->add('cbc:CompanyID', $vatNumber);
-            if (! is_numeric(substr($vatNumber, 0, 2))) {
-                $taxNode->add('cac:TaxScheme')->add('cbc:ID', 'VAT');
-            }
+            $taxNode->add('cac:TaxScheme')->add('cbc:ID', 'VAT');
         }
 
         // Tax registration identifier
