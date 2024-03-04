@@ -436,6 +436,7 @@ class UblWriter extends AbstractWriter {
         $vatNumber = $party->getVatNumber();
         if ($vatNumber !== null) {
             $taxNode = $xml->add('cac:PartyTaxScheme');
+            $taxNode->add('cbc:CompanyID', $vatNumber);
             $taxNode->add('cac:TaxScheme')->add('cbc:ID', 'VAT');
         }
 
