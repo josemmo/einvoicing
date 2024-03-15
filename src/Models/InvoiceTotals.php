@@ -119,7 +119,7 @@ class InvoiceTotals
         foreach ($inv->getLines() as $line) {
             $lineNetAmount = $inv->round($line->getNetAmount() ?? 0.0, 'line/netAmount');
             $totals->netAmount += $lineNetAmount;
-            self::updateVatMap($vatMap, $line, $line->getNetAmount() ?? 0.0);
+            self::updateVatMap($inv, $vatMap, $line, $line->getNetAmount() ?? 0.0);
         }
         $totals->netAmount = $inv->round($totals->netAmount, 'invoice/netAmount');
 
@@ -127,7 +127,7 @@ class InvoiceTotals
         foreach ($inv->getAllowances() as $item) {
             $allowanceAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
             $totals->allowancesAmount += $allowanceAmount;
-            self::updateVatMap($vatMap, $item, -$item->getEffectiveAmount($totals->netAmount));
+            self::updateVatMap($inv, $vatMap, $item, -$item->getEffectiveAmount($totals->netAmount));
         }
         $totals->allowancesAmount = $inv->round($totals->allowancesAmount, 'invoice/allowancesChargesAmount');
 
@@ -135,13 +135,13 @@ class InvoiceTotals
         foreach ($inv->getCharges() as $item) {
             $chargeAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
             $totals->chargesAmount += $chargeAmount;
-            self::updateVatMap($vatMap, $item, $item->getEffectiveAmount($totals->netAmount));
+            self::updateVatMap($inv, $vatMap, $item, $item->getEffectiveAmount($totals->netAmount));
         }
         $totals->chargesAmount = $inv->round($totals->chargesAmount, 'invoice/allowancesChargesAmount');
 
         // Calculate VAT amounts
         foreach ($vatMap as $item) {
-            if (false) {
+            if ($inv->getLegacySum()) {
                 $item->taxableAmount = $inv->round($item->taxableAmount, 'line/taxableAmount');
                 $item->taxAmount = $inv->round($item->taxableAmount * ($item->rate / 100), 'line/vatAmount');
             } else {
@@ -182,12 +182,13 @@ class InvoiceTotals
     /**
      * Update VAT map
      *
+     * @param  Invoice  $inv  Invoice instance
      * @param  VatBreakdown[string] &$vatMap          VAT map reference
      * @param  VatTrait  $item  Item instance
      * @param  float|null  $rate  VAT rate
      * @param  float  $addTaxableAmount  Taxable amount to add
      */
-    private static function updateVatMap(array &$vatMap, $item, float $addTaxableAmount)
+    private static function updateVatMap(Invoice $inv, array &$vatMap, $item, float $addTaxableAmount)
     {
         $category = $item->getVatCategory();
         $rate = $item->getVatRate();
@@ -211,7 +212,7 @@ class InvoiceTotals
         }
 
         // Increase taxable amount
-        if (false) {
+        if ($inv->getLegacySum()) {
             $vatMap[$key]->taxableAmount += $addTaxableAmount;
         } else {
             $vatMap[$key]->taxableAmount += round($addTaxableAmount, 2);

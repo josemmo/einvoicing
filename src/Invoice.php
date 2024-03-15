@@ -245,6 +245,7 @@ class Invoice {
     protected $businessProcess = null;
     protected $number = null;
     protected $type = self::TYPE_COMMERCIAL_INVOICE;
+    protected $legacySum = true;
     protected $currency = "EUR"; // TODO: add constants
     protected $vatCurrency = null;
     protected $issueDate = null;
@@ -387,6 +388,25 @@ class Invoice {
      */
     public function setNumber(string $number): self {
         $this->number = $number;
+        return $this;
+    }
+
+    /**
+     * Get legacy sum
+     * @return bool legacy sum
+     */
+    public function getLegacySum(): bool {
+        return $this->legacySum;
+    }
+
+
+    /**
+     * Set legacy sum
+     * @param  bool $legacySum legacy sum
+     * @return self           Invoice instance
+     */
+    public function setLegacySum(bool $legacySum): self {
+        $this->legacySum = $legacySum;
         return $this;
     }
 
