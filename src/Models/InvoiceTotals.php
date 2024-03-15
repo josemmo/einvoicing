@@ -119,7 +119,11 @@ class InvoiceTotals
         foreach ($inv->getLines() as $line) {
             $lineNetAmount = $inv->round($line->getNetAmount() ?? 0.0, 'line/netAmount');
             $totals->netAmount += $lineNetAmount;
-            self::updateVatMap($inv, $vatMap, $line, $line->getNetAmount() ?? 0.0);
+            if ($inv->getLegacySum()) {
+                self::updateVatMap($inv, $vatMap, $line, $lineNetAmount ?? 0.0);
+            } else {
+                self::updateVatMap($inv, $vatMap, $line, $line->getNetAmount() ?? 0.0);
+            }
         }
         $totals->netAmount = $inv->round($totals->netAmount, 'invoice/netAmount');
 
@@ -127,7 +131,11 @@ class InvoiceTotals
         foreach ($inv->getAllowances() as $item) {
             $allowanceAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
             $totals->allowancesAmount += $allowanceAmount;
-            self::updateVatMap($inv, $vatMap, $item, -$item->getEffectiveAmount($totals->netAmount));
+            if ($inv->getLegacySum()) {
+                self::updateVatMap($inv, $vatMap, $item, -$allowanceAmount);
+            } else {
+                self::updateVatMap($inv, $vatMap, $item, -$item->getEffectiveAmount($totals->netAmount));
+            }
         }
         $totals->allowancesAmount = $inv->round($totals->allowancesAmount, 'invoice/allowancesChargesAmount');
 
@@ -135,7 +143,11 @@ class InvoiceTotals
         foreach ($inv->getCharges() as $item) {
             $chargeAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
             $totals->chargesAmount += $chargeAmount;
-            self::updateVatMap($inv, $vatMap, $item, $item->getEffectiveAmount($totals->netAmount));
+            if ($inv->getLegacySum()) {
+                self::updateVatMap($inv, $vatMap, $item, $chargeAmount);
+            } else {
+                self::updateVatMap($inv, $vatMap, $item, $item->getEffectiveAmount($totals->netAmount));
+            }
         }
         $totals->chargesAmount = $inv->round($totals->chargesAmount, 'invoice/allowancesChargesAmount');
 
