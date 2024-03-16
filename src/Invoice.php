@@ -264,6 +264,7 @@ class Invoice {
     protected $delivery = null;
     protected $payment = null;
     protected $lines = [];
+    protected $totals = null;
 
     use AllowanceOrChargeTrait;
     use AttachmentsTrait;
@@ -889,6 +890,21 @@ class Invoice {
      * @return InvoiceTotals Invoice totals
      */
     public function getTotals(): InvoiceTotals {
+        if (!empty($this->totals)) {
+            return $this->totals;
+        }
+
         return InvoiceTotals::fromInvoice($this);
+    }
+
+    /**
+     * Set invoice total
+     * @param  InvoiceTotals $totals Invoice totals
+     * @return self                   Invoice instance
+     */
+    public function setTotals(InvoiceTotals $totals): self
+    {
+        $this->totals = $totals;
+        return $this;
     }
 }
