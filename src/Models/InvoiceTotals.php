@@ -157,6 +157,8 @@ class InvoiceTotals
                 $item->taxableAmount = $inv->round($item->taxableAmount, 'line/taxableAmount');
                 $item->taxAmount = $inv->round($item->taxableAmount * ($item->rate / 100), 'line/vatAmount');
             } else {
+                $item->taxableAmount = $inv->round($item->taxableAmount, 'line/taxableAmount');
+                $item->taxAmount = $inv->round($item->taxAmount, 'line/vatAmount');
             }
 
             $totals->vatAmount += $item->taxAmount;

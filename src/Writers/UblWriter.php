@@ -854,7 +854,7 @@ class UblWriter extends AbstractWriter {
         $totalsMatrix['cbc:PayableAmount'] = $totals->payableAmount;
 
         // Create and append XML nodes
-        foreach ($totalsMatrix as $field=>$amount) {
+        foreach ($totalsMatrix as $field => $amount) {
             $this->addAmountNode($xml, $field, $amount, $totals->currency);
         }
     }
