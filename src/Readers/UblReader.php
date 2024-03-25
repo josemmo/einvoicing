@@ -317,7 +317,7 @@ class UblReader extends AbstractReader {
             $totals->roundingAmount = (float) $roundingAmountNode->asText();
         }
 
-        $totals->vatAmount = $totals->taxInclusiveAmount - $totals->taxExclusiveAmount;
+        $totals->vatAmount = $invoice->round($totals->taxInclusiveAmount - $totals->taxExclusiveAmount, 'invoice/vatAmount');
 
         // Invoice lines
         foreach ($xml->getAll("{{$cac}}InvoiceLine | {{$cac}}CreditNoteLine") as $node) {
