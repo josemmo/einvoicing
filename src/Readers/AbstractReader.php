@@ -65,7 +65,8 @@ abstract class AbstractReader {
     /**
      * Import invoice
      * @param  string  $document Document contents
+     * @param  bool  $readTotals Read totals from XML contents
      * @return Invoice           Invoice instance
      */
-    abstract public function import(string $document): Invoice;
+    abstract public function import(string $document, bool $readTotals = false): Invoice;
 }
