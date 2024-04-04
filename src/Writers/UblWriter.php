@@ -845,7 +845,7 @@ class UblWriter extends AbstractWriter {
         if ($totals->chargesAmount > 0) {
             $totalsMatrix['cbc:ChargeTotalAmount'] = $totals->chargesAmount;
         }
-        if ($totals->paidAmount > 0) {
+        if ($totals->paidAmount != 0) {
             $totalsMatrix['cbc:PrepaidAmount'] = $totals->paidAmount;
         }
         if ($totals->roundingAmount != 0) {
