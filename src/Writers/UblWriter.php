@@ -111,6 +111,9 @@ class UblWriter extends AbstractWriter {
         // Order reference node
         $this->addOrderReferenceNode($xml, $invoice);
 
+        // Project reference node
+        $this->addProjectReferenceNode($xml, $invoice);
+
         // BG-3: Preceding invoice reference
         foreach ($invoice->getPrecedingInvoiceReferences() as $invoiceReference) {
             $invoiceDocumentReferenceNode = $xml->add('cac:BillingReference')->add('cac:InvoiceDocumentReference');
@@ -283,6 +286,22 @@ class UblWriter extends AbstractWriter {
         if ($salesOrderReference !== null) {
             $orderReferenceNode->add('cbc:SalesOrderID', $salesOrderReference);
         }
+    }
+
+
+    /**
+     * Add project reference node
+     * @param UXML    $parent  Parent element
+     * @param Invoice $invoice Invoice instance
+     */
+    private function addProjectReferenceNode(UXML $parent, Invoice $invoice) {
+        $projectReference = $invoice->getProjectReference();
+        if ($projectReference === null) return;
+
+        $projectReferenceNode = $parent->add('cac:ProjectReference');
+
+        // BT-11: Project reference
+        $projectReferenceNode->add('cbc:ID', $projectReference);
     }
 
 

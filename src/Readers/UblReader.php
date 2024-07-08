@@ -146,6 +146,12 @@ class UblReader extends AbstractReader {
         // BG-14: Invoice period
         $this->parsePeriodFields($xml, $invoice);
 
+        // BT-11: Project reference
+        $projectReferenceNode = $xml->get("{{$cac}}ProjectReference/{{$cbc}}ID");
+        if ($projectReferenceNode !== null) {
+            $invoice->setProjectReference($projectReferenceNode->asText());
+        }
+
         // BT-13: Purchase order reference
         $purchaseOrderReferenceNode = $xml->get("{{$cac}}OrderReference/{{$cbc}}ID");
         if ($purchaseOrderReferenceNode !== null) {

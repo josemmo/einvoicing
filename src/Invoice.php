@@ -255,6 +255,7 @@ class Invoice {
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
+    protected $projectReference = null;
     protected $tenderOrLotReference = null;
     protected $contractReference = null;
     protected $paidAmount = 0;
@@ -638,6 +639,26 @@ class Invoice {
      */
     public function setPurchaseOrderReference(?string $purchaseOrderReference): self {
         $this->purchaseOrderReference = $purchaseOrderReference;
+        return $this;
+    }
+
+
+    /**
+     * Get project reference
+     * @return string|null Project reference
+     */
+    public function getProjectReference(): ?string {
+        return $this->projectReference;
+    }
+
+
+    /**
+     * Set project reference
+     * @param  string|null $projectReference Project reference
+     * @return self                                Invoice instance
+     */
+    public function setProjectReference(?string $projectReference): self {
+        $this->projectReference = $projectReference;
         return $this;
     }
 
