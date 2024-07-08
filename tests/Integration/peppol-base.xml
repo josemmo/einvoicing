@@ -12,12 +12,12 @@
     <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
     <cbc:AccountingCost>4025:123:4343</cbc:AccountingCost>
     <cbc:BuyerReference>0150abc</cbc:BuyerReference>
-    <cac:OrderReference>
-        <cbc:ID>854777</cbc:ID>
-    </cac:OrderReference>
     <cac:ProjectReference>
         <cbc:ID>123projref</cbc:ID>
     </cac:ProjectReference>
+    <cac:OrderReference>
+        <cbc:ID>854777</cbc:ID>
+    </cac:OrderReference>
     <cac:BillingReference>
         <cac:InvoiceDocumentReference>
             <cbc:ID>INV-122</cbc:ID>
