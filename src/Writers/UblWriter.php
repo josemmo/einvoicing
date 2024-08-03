@@ -141,6 +141,12 @@ class UblWriter extends AbstractWriter {
             $this->addTenderOrLotReferenceNode($xml, $invoice);
         }
 
+        // BT-11: Project reference
+        $projectReference = $invoice->getProjectReference();
+        if ($projectReference !== null) {
+            $xml->add('cac:ProjectReference')->add('cbc:ID', $projectReference);
+        }
+
         // Seller node
         $seller = $invoice->getSeller();
         if ($seller !== null) {

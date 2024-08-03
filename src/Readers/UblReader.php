@@ -183,6 +183,12 @@ class UblReader extends AbstractReader {
             $invoice->addAttachment($this->parseAttachmentNode($node));
         }
 
+        // BT-11: Project reference
+        $projectReferenceNode = $xml->get("{{$cac}}ProjectReference/{{$cbc}}ID");
+        if ($projectReferenceNode !== null) {
+            $invoice->setProjectReference($projectReferenceNode->asText());
+        }
+
         // Seller node
         $sellerNode = $xml->get("{{$cac}}AccountingSupplierParty/{{$cac}}Party");
         if ($sellerNode !== null) {

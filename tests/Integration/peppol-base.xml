@@ -51,6 +51,9 @@
             <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="ATT-1234.pdf">VGhlIGF0dGFjaG1lbnQgcmF3IGNvbnRlbnRz</cbc:EmbeddedDocumentBinaryObject>  
         </cac:Attachment>
     </cac:AdditionalDocumentReference>
+    <cac:ProjectReference>
+        <cbc:ID>PROJ-1234</cbc:ID>
+    </cac:ProjectReference>
     <cac:AccountingSupplierParty>
         <cac:Party>
             <cbc:EndpointID schemeID="0088">9482348239847239874</cbc:EndpointID>
