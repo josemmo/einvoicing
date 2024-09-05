@@ -164,6 +164,12 @@ class UblReader extends AbstractReader {
             $invoice->setSalesOrderReference($salesOrderReferenceNode->asText());
         }
 
+        // BT-16: Purchase order reference
+        $despatchDocumentReferenceNode = $xml->get("{{$cac}}DespatchDocumentReference/{{$cbc}}ID");
+        if ($despatchDocumentReferenceNode !== null) {
+            $invoice->setDespatchDocumentReference($despatchDocumentReferenceNode->asText());
+        }
+
         // BG-3: Preceding invoice references
         foreach ($xml->getAll("{{$cac}}BillingReference/{{$cac}}InvoiceDocumentReference") as $node) {
             $invoiceReferenceValueNode = $node->get("{{$cbc}}ID");

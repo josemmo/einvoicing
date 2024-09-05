@@ -121,6 +121,9 @@ class UblWriter extends AbstractWriter {
             }
         }
 
+        // BT-16: Despatch Document Reference
+        $this->addDespatchDocumentReference($xml, $invoice);
+
         // BT-17: Tender or lot reference (for invoice profile)
         if (!$isCreditNoteProfile) {
             $this->addTenderOrLotReferenceNode($xml, $invoice);
@@ -286,6 +289,23 @@ class UblWriter extends AbstractWriter {
         if ($salesOrderReference !== null) {
             $orderReferenceNode->add('cbc:SalesOrderID', $salesOrderReference);
         }
+    }
+
+
+    /**
+     * Add order reference node
+     * @param UXML    $parent  Parent element
+     * @param Invoice $invoice Invoice instance
+     */
+    private function addDespatchDocumentReference(UXML $parent, Invoice $invoice) {
+        $despatchDocumentReference = $invoice->getDespatchDocumentReference();
+
+        if ($despatchDocumentReference === null) return;
+
+        $despatchDocumentReferenceNode = $parent->add('cac:DespatchDocumentReference');
+
+        // BT-16: Purchase order reference
+        $despatchDocumentReferenceNode->add('cbc:ID', $despatchDocumentReference);
     }
 
 
