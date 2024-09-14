@@ -3,7 +3,7 @@ Thanks for taking your time to contribute to this project!
 This document will get you on the right track to help improve eInvoicing.
 
 ## How to Get Started
-Use the following sites to get more information about the European electronic invocing specification:
+Use the following sites to get more information about the European electronic invoicing specification:
 
 - [EU e-Invoicing core concepts](https://josemmo.github.io/einvoicing/getting-started/eu-einvoicing-concepts/)
 - [Compliance with the European standard on eInvoicing](https://ec.europa.eu/cefdigital/wiki/x/ggTvB)
