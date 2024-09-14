@@ -249,6 +249,7 @@ class Invoice {
     protected $issueDate = null;
     protected $dueDate = null;
     protected $taxPointDate = null;
+    /** @var string[] */
     protected $notes = [];
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
@@ -264,6 +265,7 @@ class Invoice {
     protected $payee = null;
     protected $delivery = null;
     protected $payment = null;
+    /** @var InvoiceLine[] */
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
@@ -574,7 +576,6 @@ class Invoice {
      * @see Invoice::addNote()
      */
     public function setNote(?string $note): self {
-        // @phan-suppress-next-line PhanPartialTypeMismatchProperty
         $this->notes = ($note === null) ? [] : [$note];
         return $this;
     }
