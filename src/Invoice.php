@@ -13,8 +13,10 @@ use Einvoicing\Traits\PeriodTrait;
 use Einvoicing\Traits\PrecedingInvoiceReferencesTrait;
 use InvalidArgumentException;
 use OutOfBoundsException;
+use const E_USER_DEPRECATED;
 use function array_splice;
 use function count;
+use function trigger_error;
 use function is_subclass_of;
 use function round;
 
@@ -566,6 +568,7 @@ class Invoice {
      * @see Invoice::getNotes()
      */
     public function getNote(): ?string {
+        trigger_error('Invoice::getNote() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
         return $this->notes[0] ?? null;
     }
 
@@ -578,6 +581,7 @@ class Invoice {
      * @see Invoice::addNote()
      */
     public function setNote(?string $note): self {
+        trigger_error('Invoice::setNote() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
         $this->notes = ($note === null) ? [] : [$note];
         return $this;
     }
@@ -890,11 +894,15 @@ class Invoice {
 
     /**
      * Get payment information
-     * @return Payment|null Payment instance
+     * @param  boolean      $internal Whether call comes from the library itself
+     * @return Payment|null           Payment instance
      * @deprecated 0.2.8
      * @see Invoice::getPayments()
      */
-    public function getPayment(): ?Payment {
+    public function getPayment(bool $internal = false): ?Payment {
+        if (!$internal) {
+            trigger_error('Invoice::getPayment() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
+        }
         return $this->payments[0] ?? null;
     }
 
@@ -907,6 +915,7 @@ class Invoice {
      * @see Invoice::addPayment()
      */
     public function setPayment(?Payment $payment): self {
+        trigger_error('Invoice::setPayment() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
         $this->payments = ($payment === null) ? [] : [$payment];
         return $this;
     }

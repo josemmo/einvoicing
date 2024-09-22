@@ -223,9 +223,9 @@ class UblReader extends AbstractReader {
         $termsNode = $xml->get("{{$cac}}PaymentTerms/{{$cbc}}Note");
         if ($termsNode !== null) {
             $invoice->setPaymentTerms($termsNode->asText());
-            $firstPayment = $invoice->getPayment(); // @phan-suppress-current-line PhanDeprecatedFunction
+            $firstPayment = $invoice->getPayment(true); // @phan-suppress-current-line PhanDeprecatedFunction
             if ($firstPayment !== null) {
-                $firstPayment->setTerms($termsNode->asText()); // @phan-suppress-current-line PhanDeprecatedFunction
+                $firstPayment->setTerms($termsNode->asText(), true); // @phan-suppress-current-line PhanDeprecatedFunction
             }
         }
 

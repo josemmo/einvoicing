@@ -2,8 +2,10 @@
 namespace Einvoicing\Payments;
 
 use OutOfBoundsException;
+use const E_USER_DEPRECATED;
 use function array_splice;
 use function count;
+use function trigger_error;
 
 class Payment {
     protected $id = null;
@@ -76,23 +78,31 @@ class Payment {
 
     /**
      * Get payment terms
-     * @return string|null Payment terms
+     * @param  boolean     $internal Whether call comes from the library itself
+     * @return string|null           Payment terms
      * @deprecated 0.2.8
      * @see Invoice::getPaymentTerms()
      */
-    public function getTerms(): ?string {
+    public function getTerms(bool $internal = false): ?string {
+        if (!$internal) {
+            trigger_error('Payment::getTerms() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
+        }
         return $this->terms;
     }
 
 
     /**
      * Set payment terms
-     * @param  string|null $terms Payment terms
-     * @return self               Payment instance
+     * @param  string|null $terms    Payment terms
+     * @param  boolean     $internal Whether call comes from the library itself
+     * @return self                  Payment instance
      * @deprecated 0.2.8
      * @see Invoice::setPaymentTerms()
      */
-    public function setTerms(?string $terms): self {
+    public function setTerms(?string $terms, bool $internal = false): self {
+        if (!$internal) {
+            trigger_error('Payment::setTerms() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
+        }
         $this->terms = $terms;
         return $this;
     }

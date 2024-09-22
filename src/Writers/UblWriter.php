@@ -177,8 +177,8 @@ class UblWriter extends AbstractWriter {
         }
 
         // BT-20: Payment terms
-        $firstPayment = $invoice->getPayment(); // @phan-suppress-current-line PhanDeprecatedFunction
-        $paymentTerms = $invoice->getPaymentTerms() ?? ($firstPayment === null ? null : $firstPayment->getTerms()); // @phan-suppress-current-line PhanDeprecatedFunction
+        $firstPayment = $invoice->getPayment(true); // @phan-suppress-current-line PhanDeprecatedFunction
+        $paymentTerms = $invoice->getPaymentTerms() ?? ($firstPayment === null ? null : $firstPayment->getTerms(true)); // @phan-suppress-current-line PhanDeprecatedFunction
         if ($paymentTerms !== null) {
             $xml->add('cac:PaymentTerms')->add('cbc:Note', $paymentTerms);
         }
