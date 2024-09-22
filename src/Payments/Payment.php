@@ -77,6 +77,8 @@ class Payment {
     /**
      * Get payment terms
      * @return string|null Payment terms
+     * @deprecated 0.2.8
+     * @see Invoice::getPaymentTerms()
      */
     public function getTerms(): ?string {
         return $this->terms;
@@ -87,6 +89,8 @@ class Payment {
      * Set payment terms
      * @param  string|null $terms Payment terms
      * @return self               Payment instance
+     * @deprecated 0.2.8
+     * @see Invoice::setPaymentTerms()
      */
     public function setTerms(?string $terms): self {
         $this->terms = $terms;

@@ -264,7 +264,9 @@ class Invoice {
     protected $buyer = null;
     protected $payee = null;
     protected $delivery = null;
-    protected $payment = null;
+    /** @var Payment[] */
+    protected $payments = [];
+    protected $paymentTerms = null;
     /** @var InvoiceLine[] */
     protected $lines = [];
 
@@ -842,11 +844,58 @@ class Invoice {
 
 
     /**
+     * Get invoice payments
+     * @return Payment[] Invoice payments
+     */
+    public function getPayments(): array {
+        return $this->payments;
+    }
+
+
+    /**
+     * Add invoice payment
+     * @param  Payment $payment Invoice payment
+     * @return self             Invoice instance
+     */
+    public function addPayment(Payment $payment): self {
+        $this->payments[] = $payment;
+        return $this;
+    }
+
+
+    /**
+     * Remove invoice payment
+     * @param  int  $index Invoice payment index
+     * @return self        Invoice instance
+     * @throws OutOfBoundsException if invoice payment index is out of bounds
+     */
+    public function removePayment(int $index): self {
+        if ($index < 0 || $index >= count($this->payments)) {
+            throw new OutOfBoundsException('Could not find invoice payment by index');
+        }
+        array_splice($this->payments, $index, 1);
+        return $this;
+    }
+
+
+    /**
+     * Clear all invoice payments
+     * @return self Invoice instance
+     */
+    public function clearPayments(): self {
+        $this->payments = [];
+        return $this;
+    }
+
+
+    /**
      * Get payment information
      * @return Payment|null Payment instance
+     * @deprecated 0.2.8
+     * @see Invoice::getPayments()
      */
     public function getPayment(): ?Payment {
-        return $this->payment;
+        return $this->payments[0] ?? null;
     }
 
 
@@ -854,9 +903,31 @@ class Invoice {
      * Set payment information
      * @param  Payment|null $payment Payment instance
      * @return self                  Invoice instance
+     * @deprecated 0.2.8
+     * @see Invoice::addPayment()
      */
     public function setPayment(?Payment $payment): self {
-        $this->payment = $payment;
+        $this->payments = ($payment === null) ? [] : [$payment];
+        return $this;
+    }
+
+
+    /**
+     * Get payment terms
+     * @return string|null Payment terms
+     */
+    public function getPaymentTerms(): ?string {
+        return $this->paymentTerms;
+    }
+
+
+    /**
+     * Set payment terms
+     * @param  string|null $paymentTerms Payment terms
+     * @return self                      Invoice instance
+     */
+    public function setPaymentTerms(?string $paymentTerms): self {
+        $this->paymentTerms = $paymentTerms;
         return $this;
     }
 

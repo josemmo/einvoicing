@@ -134,7 +134,7 @@ final class UblWriterTest extends TestCase {
     public function testCanGenerateValidCreditNote(): void {
         $invoice = $this->getSampleInvoice();
         $invoice->setType(Invoice::TYPE_CREDIT_NOTE);
-        $invoice->setPayment((new Payment)->setMeansCode('10')->setMeansText('In cash'));
+        $invoice->addPayment((new Payment)->setMeansCode('10')->setMeansText('In cash'));
         $invoice->validate();
         $contents = $this->writer->export($invoice);
         $this->assertTrue($this->validateInvoice($contents, 'credit'));

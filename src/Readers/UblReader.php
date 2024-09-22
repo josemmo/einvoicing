@@ -213,9 +213,21 @@ class UblReader extends AbstractReader {
             $invoice->setDelivery($this->parseDeliveryNode($deliveryNode));
         }
 
-        // Payment nodes
-        $payment = $this->parsePaymentNodes($xml);
-        $invoice->setPayment($payment);
+        // Payment means nodes
+        foreach ($xml->getAll("{{$cac}}PaymentMeans") as $paymentMeansNode) {
+            $payment = $this->parsePaymentMeansNode($paymentMeansNode);
+            $invoice->addPayment($payment);
+        }
+
+        // BT-20: Payment terms
+        $termsNode = $xml->get("{{$cac}}PaymentTerms/{{$cbc}}Note");
+        if ($termsNode !== null) {
+            $invoice->setPaymentTerms($termsNode->asText());
+            $firstPayment = $invoice->getPayment(); // @phan-suppress-current-line PhanDeprecatedFunction
+            if ($firstPayment !== null) {
+                $firstPayment->setTerms($termsNode->asText()); // @phan-suppress-current-line PhanDeprecatedFunction
+            }
+        }
 
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
@@ -497,24 +509,18 @@ class UblReader extends AbstractReader {
 
 
     /**
-     * Parse payment nodes
-     * @param  UXML         $xml XML node
-     * @return Payment|null      Payment instance or NULL if not found
+     * Parse payment means node
+     * @param  UXML    $xml Payment means node
+     * @return Payment      Payment instance
      */
-    private function parsePaymentNodes(UXML $xml): ?Payment {
+    private function parsePaymentMeansNode(UXML $xml): Payment {
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
-
-        // Get root nodes
-        $meansNode = $xml->get("{{$cac}}PaymentMeans");
-        $termsNode = $xml->get("{{$cac}}PaymentTerms/{{$cbc}}Note");
-        if ($meansNode === null && $termsNode === null) return null;
-
         $payment = new Payment();
 
         // BT-81: Payment means code
         // BT-82: Payment means name
-        $meansCodeNode = $xml->get("{{$cac}}PaymentMeans/{{$cbc}}PaymentMeansCode");
+        $meansCodeNode = $xml->get("{{$cbc}}PaymentMeansCode");
         if ($meansCodeNode !== null) {
             $payment->setMeansCode($meansCodeNode->asText());
             if ($meansCodeNode->element()->hasAttribute('name')) {
@@ -523,32 +529,27 @@ class UblReader extends AbstractReader {
         }
 
         // BT-83: Payment ID
-        $paymentIdNode = $xml->get("{{$cac}}PaymentMeans/{{$cbc}}PaymentID");
+        $paymentIdNode = $xml->get("{{$cbc}}PaymentID");
         if ($paymentIdNode !== null) {
             $payment->setId($paymentIdNode->asText());
         }
 
         // BG-18: Payment card
-        $cardNode = $xml->get("{{$cac}}PaymentMeans/{{$cac}}CardAccount");
+        $cardNode = $xml->get("{{$cac}}CardAccount");
         if ($cardNode !== null) {
             $payment->setCard($this->parsePaymentCardNode($cardNode));
         }
 
         // BG-17: Payment transfers
-        $transferNodes = $xml->getAll("{{$cac}}PaymentMeans/{{$cac}}PayeeFinancialAccount");
+        $transferNodes = $xml->getAll("{{$cac}}PayeeFinancialAccount");
         foreach ($transferNodes as $transferNode) {
             $payment->addTransfer($this->parsePaymentTransferNode($transferNode));
         }
 
         // BG-19: Payment mandate
-        $mandateNode = $xml->get("{{$cac}}PaymentMeans/{{$cac}}PaymentMandate");
+        $mandateNode = $xml->get("{{$cac}}PaymentMandate");
         if ($mandateNode !== null) {
             $payment->setMandate($this->parsePaymentMandateNode($mandateNode));
-        }
-
-        // BT-20: Payment terms
-        if ($termsNode !== null) {
-            $payment->setTerms($termsNode->asText());
         }
 
         return $payment;

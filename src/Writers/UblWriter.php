@@ -171,10 +171,16 @@ class UblWriter extends AbstractWriter {
             $this->addDeliveryNode($xml, $delivery);
         }
 
-        // Payment nodes
-        $payment = $invoice->getPayment();
-        if ($payment !== null) {
-            $this->addPaymentNodes($xml, $payment, $isCreditNoteProfile ? $dueDate : null);
+        // Payment means nodes
+        foreach ($invoice->getPayments() as $payment) {
+            $this->addPaymentMeansNode($xml, $payment, $isCreditNoteProfile ? $dueDate : null);
+        }
+
+        // BT-20: Payment terms
+        $firstPayment = $invoice->getPayment(); // @phan-suppress-current-line PhanDeprecatedFunction
+        $paymentTerms = $invoice->getPaymentTerms() ?? ($firstPayment === null ? null : $firstPayment->getTerms()); // @phan-suppress-current-line PhanDeprecatedFunction
+        if ($paymentTerms !== null) {
+            $xml->add('cac:PaymentTerms')->add('cbc:Note', $paymentTerms);
         }
 
         // Allowances and charges
@@ -568,12 +574,12 @@ class UblWriter extends AbstractWriter {
 
 
     /**
-     * Add payment nodes
+     * Add payment means node
      * @param UXML          $parent  Invoice element
      * @param Payment       $payment Payment instance
      * @param DateTime|null $dueDate Invoice due date (for credit note profile)
      */
-    private function addPaymentNodes(UXML $parent, Payment $payment, ?DateTime $dueDate) {
+    private function addPaymentMeansNode(UXML $parent, Payment $payment, ?DateTime $dueDate) {
         $xml = $parent->add('cac:PaymentMeans');
 
         // BT-81: Payment means code
@@ -616,12 +622,6 @@ class UblWriter extends AbstractWriter {
         // Remove PaymentMeans node if empty
         if ($xml->isEmpty()) {
             $xml->remove();
-        }
-
-        // BT-20: Payment terms
-        $terms = $payment->getTerms();
-        if ($terms !== null) {
-            $parent->add('cac:PaymentTerms')->add('cbc:Note', $terms);
         }
     }
 
