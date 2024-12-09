@@ -804,9 +804,16 @@ class UblReader extends AbstractReader {
         // Amount
         $factorNode = $xml->get("{{$cbc}}MultiplierFactorNumeric");
         $amountNode = $xml->get("{{$cbc}}Amount");
-        if ($factorNode !== null) {
+        $baseAmountNode = $xml->get("{{$cbc}}BaseAmount");
+        if ($factorNode !== null && $baseAmountNode !== null && $amountNode !== null) {
             $percent = (float) $factorNode->asText();
-            $allowanceOrCharge->markAsPercentage()->setAmount($percent);
+            $baseAmount = (float) $baseAmountNode->asText();
+            $amount = (float) $amountNode->asText();
+            $allowanceOrCharge
+                ->markAsPercentage()
+                ->setBaseAmount($baseAmount)
+                ->setFactorMultiplier($percent)
+                ->setAmount($amount);
         } elseif ($amountNode !== null) {
             $amount = (float) $amountNode->asText();
             $allowanceOrCharge->setAmount($amount);

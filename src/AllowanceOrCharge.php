@@ -7,6 +7,8 @@ class AllowanceOrCharge {
     protected $reasonCode = null;
     protected $reason = null;
     protected $amount = null;
+    protected $baseAmount = null;
+    protected $factorMultiplier = null;
     protected $isPercentage = false;
 
     use VatTrait;
@@ -72,6 +74,46 @@ class AllowanceOrCharge {
 
 
     /**
+     * Get base amount
+     * @return float|null Allowance/charge base amount
+     */
+    public function getBaseAmount(): ?float {
+        return $this->baseAmount;
+    }
+
+
+    /**
+     * Set base amount
+     * @param  float $baseAmount Allowance/charge base amount
+     * @return self          This instance
+     */
+    public function setBaseAmount(float $baseAmount): self {
+        $this->baseAmount = $baseAmount;
+        return $this;
+    }
+
+
+    /**
+     * Get factor multiplier
+     * @return float|null Allowance/charge factor multiplier
+     */
+    public function getFactorMultiplier(): ?float {
+        return $this->factorMultiplier;
+    }
+
+
+    /**
+     * Set factor multiplier
+     * @param  float $factorMultiplier Allowance/charge factor multiplier
+     * @return self          This instance
+     */
+    public function setFactorMultiplier(float $factorMultiplier): self {
+        $this->factorMultiplier = $factorMultiplier;
+        return $this;
+    }
+
+
+    /**
      * Is percentage
      * @return boolean Whether amount is a percentage or not
      */
@@ -102,15 +144,13 @@ class AllowanceOrCharge {
 
     /**
      * Get effective amount relative to base amount
-     * @param  float $baseAmount Base amount
      * @return float             Effective amount
      */
-    public function getEffectiveAmount(float $baseAmount): float {
-        $amount = $this->getAmount();
+    public function getEffectiveAmount(): float {
         if ($this->isPercentage()) {
-            $amount = $baseAmount * ($amount / 100);
+            return $this->baseAmount * ($this->factorMultiplier / 100);
         }
 
-        return $amount;
+        return $this->getAmount();
     }
 }

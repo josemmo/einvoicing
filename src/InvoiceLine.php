@@ -312,9 +312,8 @@ class InvoiceLine {
      */
     public function getAllowancesAmount(): float {
         $allowancesAmount = 0;
-        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0.0;
         foreach ($this->getAllowances() as $item) {
-            $allowancesAmount += $item->getEffectiveAmount($baseAmount);
+            $allowancesAmount += $item->getEffectiveAmount();
         }
         return $allowancesAmount;
     }
@@ -326,9 +325,8 @@ class InvoiceLine {
      */
     public function getChargesAmount(): float {
         $chargesAmount = 0;
-        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0.0;
         foreach ($this->getCharges() as $item) {
-            $chargesAmount += $item->getEffectiveAmount($baseAmount);
+            $chargesAmount += $item->getEffectiveAmount();
         }
         return $chargesAmount;
     }

@@ -129,24 +129,24 @@ class InvoiceTotals
 
         // Process allowances
         foreach ($inv->getAllowances() as $item) {
-            $allowanceAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
+            $allowanceAmount = $inv->round($item->getEffectiveAmount(), 'line/allowanceChargeAmount');
             $totals->allowancesAmount += $allowanceAmount;
             if ($inv->getLegacySum()) {
                 self::updateVatMap($inv, $vatMap, $item, -$allowanceAmount);
             } else {
-                self::updateVatMap($inv, $vatMap, $item, -$item->getEffectiveAmount($totals->netAmount));
+                self::updateVatMap($inv, $vatMap, $item, -$item->getEffectiveAmount());
             }
         }
         $totals->allowancesAmount = $inv->round($totals->allowancesAmount, 'invoice/allowancesChargesAmount');
 
         // Process charges
         foreach ($inv->getCharges() as $item) {
-            $chargeAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
+            $chargeAmount = $inv->round($item->getEffectiveAmount(), 'line/allowanceChargeAmount');
             $totals->chargesAmount += $chargeAmount;
             if ($inv->getLegacySum()) {
                 self::updateVatMap($inv, $vatMap, $item, $chargeAmount);
             } else {
-                self::updateVatMap($inv, $vatMap, $item, $item->getEffectiveAmount($totals->netAmount));
+                self::updateVatMap($inv, $vatMap, $item, $item->getEffectiveAmount());
             }
         }
         $totals->chargesAmount = $inv->round($totals->chargesAmount, 'invoice/allowancesChargesAmount');

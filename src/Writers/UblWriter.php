@@ -185,10 +185,10 @@ class UblWriter extends AbstractWriter {
 
         // Allowances and charges
         foreach ($invoice->getAllowances() as $item) {
-            $this->addAllowanceOrCharge($xml, $item, false, $invoice, $totals, null);
+            $this->addAllowanceOrCharge($xml, $item, false, $invoice, null);
         }
         foreach ($invoice->getCharges() as $item) {
-            $this->addAllowanceOrCharge($xml, $item, true, $invoice, $totals, null);
+            $this->addAllowanceOrCharge($xml, $item, true, $invoice, null);
         }
 
         // Invoice totals
@@ -764,7 +764,6 @@ class UblWriter extends AbstractWriter {
      * @param AllowanceOrCharge  $item     Allowance or charge instance
      * @param boolean            $isCharge Is charge (TRUE) or allowance (FALSE)
      * @param Invoice            $invoice  Invoice instance
-     * @param InvoiceTotals|null $totals   Invoice totals or NULL in case at line level
      * @param InvoiceLine|null   $line     Invoice line or NULL in case of at document level
      */
     private function addAllowanceOrCharge(
@@ -772,7 +771,6 @@ class UblWriter extends AbstractWriter {
         AllowanceOrCharge $item,
         bool $isCharge,
         Invoice $invoice,
-        ?InvoiceTotals $totals,
         ?InvoiceLine $line
     ) {
         $atDocumentLevel = ($line === null);
@@ -795,26 +793,21 @@ class UblWriter extends AbstractWriter {
 
         // Percentage
         if ($item->isPercentage()) {
-            $xml->add('cbc:MultiplierFactorNumeric', (string) $item->getAmount());
+            $xml->add('cbc:MultiplierFactorNumeric', (string) $item->getFactorMultiplier());
         }
 
-        // Amount
-        $baseAmount = $atDocumentLevel ?
-            $totals->netAmount :                                 // @phan-suppress-current-line PhanPossiblyUndeclaredProperty
-            $line->getNetAmountBeforeAllowancesCharges() ?? 0.0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
         $this->addAmountNode(
             $xml,
             'cbc:Amount',
-            $invoice->round($item->getEffectiveAmount($baseAmount), 'line/allowanceChargeAmount'),
+            $invoice->round($item->getAmount(), 'line/allowanceChargeAmount'),
             $invoice->getCurrency()
         );
 
-        // Base amount
-        if ($item->isPercentage()) {
+        if ($item->getBaseAmount()) {
             $this->addAmountNode(
                 $xml,
                 'cbc:BaseAmount',
-                $invoice->round($baseAmount, 'line/netAmount'),
+                $invoice->round($item->getBaseAmount(), 'line/netAmount'),
                 $invoice->getCurrency()
             );
         }
@@ -966,10 +959,10 @@ class UblWriter extends AbstractWriter {
 
         // Allowances and charges
         foreach ($line->getAllowances() as $item) {
-            $this->addAllowanceOrCharge($xml, $item, false, $invoice, null, $line);
+            $this->addAllowanceOrCharge($xml, $item, false, $invoice, $line);
         }
         foreach ($line->getCharges() as $item) {
-            $this->addAllowanceOrCharge($xml, $item, true, $invoice, null, $line);
+            $this->addAllowanceOrCharge($xml, $item, true, $invoice, $line);
         }
 
         // Initial item node
