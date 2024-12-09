@@ -811,12 +811,12 @@ class UblReader extends AbstractReader {
             $amount = (float) $amountNode->asText();
             $allowanceOrCharge
                 ->markAsPercentage()
-                ->setBaseAmount($baseAmount)
-                ->setFactorMultiplier($percent)
-                ->setAmount($amount);
+                ->setBaseAmount(abs($baseAmount))
+                ->setFactorMultiplier(abs($percent))
+                ->setAmount(abs($amount));
         } elseif ($amountNode !== null) {
             $amount = (float) $amountNode->asText();
-            $allowanceOrCharge->setAmount($amount);
+            $allowanceOrCharge->setAmount(abs($amount));
         } else {
             throw new InvalidArgumentException('Missing both <cbc:Amount /> and <cbc:MultiplierFactorNumeric />' .
                 ' nodes from allowance/charge');
