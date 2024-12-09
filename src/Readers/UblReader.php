@@ -943,9 +943,9 @@ class UblReader extends AbstractReader {
 
                 $chargeIndicatorNode = $allowanceChargeNode->get("{{$cbc}}ChargeIndicator");
                 if ($chargeIndicatorNode !== null && $chargeIndicatorNode->asText() === "true") {
-                    $basePrice -= (float) $amountNode->asText();
+                    $basePrice -= abs((float) $amountNode->asText());
                 } else {
-                    $basePrice += (float) $amountNode->asText();
+                    $basePrice += abs((float) $amountNode->asText());
                 }
             }
 
