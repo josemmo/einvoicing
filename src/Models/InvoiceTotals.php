@@ -101,6 +101,16 @@ class InvoiceTotals
     public $vatBreakdown = [];
 
     /**
+     * Get total amount of the invoice/credit note
+     *
+     * @return float
+     */
+    public function getTotalAmount(): float
+    {
+        return $this->taxInclusiveAmount + $this->roundingAmount;
+    }
+
+    /**
      * Create instance from invoice
      *
      * @param  Invoice  $inv  Invoice instance
