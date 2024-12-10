@@ -21,7 +21,7 @@ class InvoiceLine {
     protected $quantity = 1;
     protected $unit = "C62"; // TODO: add constants
     protected $price = null;
-    protected $baseQuantity = 1;
+    protected $baseQuantity = 1.0;
 
     use AllowanceOrChargeTrait;
     use AttributesTrait;
@@ -289,7 +289,7 @@ class InvoiceLine {
      * @return self                Invoice line instance
      */
     public function setBaseQuantity(float $baseQuantity): self {
-        $this->baseQuantity = $baseQuantity;
+        $this->baseQuantity = $baseQuantity != 0.0 ? $baseQuantity : 1.0;
         return $this;
     }
 
@@ -312,9 +312,8 @@ class InvoiceLine {
      */
     public function getAllowancesAmount(): float {
         $allowancesAmount = 0;
-        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0.0;
         foreach ($this->getAllowances() as $item) {
-            $allowancesAmount += $item->getEffectiveAmount($baseAmount);
+            $allowancesAmount += $item->getEffectiveAmount();
         }
         return $allowancesAmount;
     }
@@ -326,9 +325,8 @@ class InvoiceLine {
      */
     public function getChargesAmount(): float {
         $chargesAmount = 0;
-        $baseAmount = $this->getNetAmountBeforeAllowancesCharges() ?? 0.0;
         foreach ($this->getCharges() as $item) {
-            $chargesAmount += $item->getEffectiveAmount($baseAmount);
+            $chargesAmount += $item->getEffectiveAmount();
         }
         return $chargesAmount;
     }

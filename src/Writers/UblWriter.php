@@ -13,6 +13,7 @@ use Einvoicing\Party;
 use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Mandate;
 use Einvoicing\Payments\Payment;
+use Einvoicing\Payments\PaymentTerms;
 use Einvoicing\Payments\Transfer;
 use UXML\UXML;
 use function in_array;
@@ -120,6 +121,9 @@ class UblWriter extends AbstractWriter {
             }
         }
 
+        // BT-16: Despatch Document Reference
+        $this->addDespatchDocumentReference($xml, $invoice);
+
         // BT-17: Tender or lot reference (for invoice profile)
         if (!$isCreditNoteProfile) {
             $this->addTenderOrLotReferenceNode($xml, $invoice);
@@ -140,6 +144,9 @@ class UblWriter extends AbstractWriter {
         if ($isCreditNoteProfile) {
             $this->addTenderOrLotReferenceNode($xml, $invoice);
         }
+
+        // Project reference node
+        $this->addProjectReferenceNode($xml, $invoice);
 
         // Seller node
         $seller = $invoice->getSeller();
@@ -166,17 +173,22 @@ class UblWriter extends AbstractWriter {
         }
 
         // Payment nodes
-        $payment = $invoice->getPayment();
-        if ($payment !== null) {
+        foreach ($invoice->getPayments() as $payment) {
             $this->addPaymentNodes($xml, $payment, $isCreditNoteProfile ? $dueDate : null);
+        }
+
+        // Payment Terms node
+        $paymentTerms = $invoice->getPaymentTerms();
+        if ($paymentTerms !== null) {
+            $this->addPaymentTermsNodes($xml, $paymentTerms);
         }
 
         // Allowances and charges
         foreach ($invoice->getAllowances() as $item) {
-            $this->addAllowanceOrCharge($xml, $item, false, $invoice, $totals, null);
+            $this->addAllowanceOrCharge($xml, $item, false, $invoice, null);
         }
         foreach ($invoice->getCharges() as $item) {
-            $this->addAllowanceOrCharge($xml, $item, true, $invoice, $totals, null);
+            $this->addAllowanceOrCharge($xml, $item, true, $invoice, null);
         }
 
         // Invoice totals
@@ -277,6 +289,39 @@ class UblWriter extends AbstractWriter {
         if ($salesOrderReference !== null) {
             $orderReferenceNode->add('cbc:SalesOrderID', $salesOrderReference);
         }
+    }
+
+
+    /**
+     * Add order reference node
+     * @param UXML    $parent  Parent element
+     * @param Invoice $invoice Invoice instance
+     */
+    private function addDespatchDocumentReference(UXML $parent, Invoice $invoice) {
+        $despatchDocumentReference = $invoice->getDespatchDocumentReference();
+
+        if ($despatchDocumentReference === null) return;
+
+        $despatchDocumentReferenceNode = $parent->add('cac:DespatchDocumentReference');
+
+        // BT-16: Purchase order reference
+        $despatchDocumentReferenceNode->add('cbc:ID', $despatchDocumentReference);
+    }
+
+
+    /**
+     * Add project reference node
+     * @param UXML    $parent  Parent element
+     * @param Invoice $invoice Invoice instance
+     */
+    private function addProjectReferenceNode(UXML $parent, Invoice $invoice) {
+        $projectReference = $invoice->getProjectReference();
+        if ($projectReference === null) return;
+
+        $projectReferenceNode = $parent->add('cac:ProjectReference');
+
+        // BT-11: Project reference
+        $projectReferenceNode->add('cbc:ID', $projectReference);
     }
 
 
@@ -611,11 +656,26 @@ class UblWriter extends AbstractWriter {
         if ($xml->isEmpty()) {
             $xml->remove();
         }
+    }
+
+
+    /**
+     * Add payment terms nodes
+     * @param UXML                $parent  Invoice element
+     * @param PaymentTerms       $paymentTerms Payment instance
+     */
+    private function addPaymentTermsNodes(UXML $parent, PaymentTerms $paymentTerms) {
+        $xml = $parent->add('cac:PaymentTerms');
 
         // BT-20: Payment terms
-        $terms = $payment->getTerms();
-        if ($terms !== null) {
-            $parent->add('cac:PaymentTerms')->add('cbc:Note', $terms);
+        $note = $paymentTerms->getNote();
+        if ($note !== null) {
+            $xml->add('cbc:Note', $note);
+        }
+
+        // Remove PaymentTerms node if empty
+        if ($xml->isEmpty()) {
+            $xml->remove();
         }
     }
 
@@ -704,7 +764,6 @@ class UblWriter extends AbstractWriter {
      * @param AllowanceOrCharge  $item     Allowance or charge instance
      * @param boolean            $isCharge Is charge (TRUE) or allowance (FALSE)
      * @param Invoice            $invoice  Invoice instance
-     * @param InvoiceTotals|null $totals   Invoice totals or NULL in case at line level
      * @param InvoiceLine|null   $line     Invoice line or NULL in case of at document level
      */
     private function addAllowanceOrCharge(
@@ -712,7 +771,6 @@ class UblWriter extends AbstractWriter {
         AllowanceOrCharge $item,
         bool $isCharge,
         Invoice $invoice,
-        ?InvoiceTotals $totals,
         ?InvoiceLine $line
     ) {
         $atDocumentLevel = ($line === null);
@@ -735,26 +793,21 @@ class UblWriter extends AbstractWriter {
 
         // Percentage
         if ($item->isPercentage()) {
-            $xml->add('cbc:MultiplierFactorNumeric', (string) $item->getAmount());
+            $xml->add('cbc:MultiplierFactorNumeric', (string) $item->getFactorMultiplier());
         }
 
-        // Amount
-        $baseAmount = $atDocumentLevel ?
-            $totals->netAmount :                                 // @phan-suppress-current-line PhanPossiblyUndeclaredProperty
-            $line->getNetAmountBeforeAllowancesCharges() ?? 0.0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
         $this->addAmountNode(
             $xml,
             'cbc:Amount',
-            $invoice->round($item->getEffectiveAmount($baseAmount), 'line/allowanceChargeAmount'),
+            $invoice->round($item->getAmount(), 'line/allowanceChargeAmount'),
             $invoice->getCurrency()
         );
 
-        // Base amount
-        if ($item->isPercentage()) {
+        if ($item->getBaseAmount()) {
             $this->addAmountNode(
                 $xml,
                 'cbc:BaseAmount',
-                $invoice->round($baseAmount, 'line/netAmount'),
+                $invoice->round($item->getBaseAmount(), 'line/netAmount'),
                 $invoice->getCurrency()
             );
         }
@@ -824,7 +877,7 @@ class UblWriter extends AbstractWriter {
         if ($totals->chargesAmount > 0) {
             $totalsMatrix['cbc:ChargeTotalAmount'] = $totals->chargesAmount;
         }
-        if ($totals->paidAmount > 0) {
+        if ($totals->paidAmount != 0) {
             $totalsMatrix['cbc:PrepaidAmount'] = $totals->paidAmount;
         }
         if ($totals->roundingAmount != 0) {
@@ -833,7 +886,7 @@ class UblWriter extends AbstractWriter {
         $totalsMatrix['cbc:PayableAmount'] = $totals->payableAmount;
 
         // Create and append XML nodes
-        foreach ($totalsMatrix as $field=>$amount) {
+        foreach ($totalsMatrix as $field => $amount) {
             $this->addAmountNode($xml, $field, $amount, $totals->currency);
         }
     }
@@ -906,10 +959,10 @@ class UblWriter extends AbstractWriter {
 
         // Allowances and charges
         foreach ($line->getAllowances() as $item) {
-            $this->addAllowanceOrCharge($xml, $item, false, $invoice, null, $line);
+            $this->addAllowanceOrCharge($xml, $item, false, $invoice, $line);
         }
         foreach ($line->getCharges() as $item) {
-            $this->addAllowanceOrCharge($xml, $item, true, $invoice, null, $line);
+            $this->addAllowanceOrCharge($xml, $item, true, $invoice, $line);
         }
 
         // Initial item node

@@ -1,95 +1,123 @@
 <?php
+
 namespace Einvoicing\Models;
 
 use Einvoicing\Invoice;
 use Einvoicing\Traits\VatTrait;
+
 use function array_values;
 
-class InvoiceTotals {
+class InvoiceTotals
+{
     /**
      * Invoice currency code
+     *
      * @var string
      */
     public $currency;
 
     /**
      * VAT accounting currency code
+     *
      * @var string|null
      */
     public $vatCurrency = null;
 
     /**
      * Sum of all invoice line net amounts
+     *
      * @var float
      */
     public $netAmount = 0;
 
     /**
      * Sum of all allowances on document level
+     *
      * @var float
      */
     public $allowancesAmount = 0;
 
     /**
      * Sum of all charges on document level
+     *
      * @var float
      */
     public $chargesAmount = 0;
 
     /**
      * Total VAT amount for the invoice
+     *
      * @var float
      */
     public $vatAmount = 0;
 
     /**
      * Invoice total amount without VAT
+     *
      * @var float
      */
     public $taxExclusiveAmount = 0;
 
     /**
      * Invoice total amount with VAT
+     *
      * @var float
      */
     public $taxInclusiveAmount = 0;
-    
+
     /**
      * The sum of amounts which have been paid in advance
+     *
      * @var float
      */
     public $paidAmount = 0;
 
     /**
      * The amount to be added to the invoice total to round the amount to be paid
+     *
      * @var float
      */
     public $roundingAmount = 0;
 
     /**
      * Total VAT amount in accounting currency
+     *
      * @var float|null
      */
     public $customVatAmount = null;
 
     /**
      * Amount due for payment
+     *
      * @var float
      */
     public $payableAmount = 0;
 
     /**
      * Group of business terms providing information about VAT breakdown
+     *
      * @var VatBreakdown[]
      */
     public $vatBreakdown = [];
 
     /**
-     * Create instance from invoice
-     * @param  Invoice $inv Invoice instance
-     * @return self         Totals instance
+     * Get total amount of the invoice/credit note
+     *
+     * @return float
      */
-    static public function fromInvoice(Invoice $inv): InvoiceTotals {
+    public function getTotalAmount(): float
+    {
+        return $this->taxInclusiveAmount + $this->roundingAmount;
+    }
+
+    /**
+     * Create instance from invoice
+     *
+     * @param  Invoice  $inv  Invoice instance
+     * @return self Totals instance
+     */
+    public static function fromInvoice(Invoice $inv): InvoiceTotals
+    {
         $totals = new self();
         $vatMap = [];
 
@@ -101,30 +129,48 @@ class InvoiceTotals {
         foreach ($inv->getLines() as $line) {
             $lineNetAmount = $inv->round($line->getNetAmount() ?? 0.0, 'line/netAmount');
             $totals->netAmount += $lineNetAmount;
-            self::updateVatMap($vatMap, $line, $lineNetAmount);
+            if ($inv->getLegacySum()) {
+                self::updateVatMap($inv, $vatMap, $line, $lineNetAmount ?? 0.0);
+            } else {
+                self::updateVatMap($inv, $vatMap, $line, $line->getNetAmount() ?? 0.0);
+            }
         }
         $totals->netAmount = $inv->round($totals->netAmount, 'invoice/netAmount');
 
         // Process allowances
         foreach ($inv->getAllowances() as $item) {
-            $allowanceAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
+            $allowanceAmount = $inv->round($item->getEffectiveAmount(), 'line/allowanceChargeAmount');
             $totals->allowancesAmount += $allowanceAmount;
-            self::updateVatMap($vatMap, $item, -$allowanceAmount);
+            if ($inv->getLegacySum()) {
+                self::updateVatMap($inv, $vatMap, $item, -$allowanceAmount);
+            } else {
+                self::updateVatMap($inv, $vatMap, $item, -$item->getEffectiveAmount());
+            }
         }
         $totals->allowancesAmount = $inv->round($totals->allowancesAmount, 'invoice/allowancesChargesAmount');
 
         // Process charges
         foreach ($inv->getCharges() as $item) {
-            $chargeAmount = $inv->round($item->getEffectiveAmount($totals->netAmount), 'line/allowanceChargeAmount');
+            $chargeAmount = $inv->round($item->getEffectiveAmount(), 'line/allowanceChargeAmount');
             $totals->chargesAmount += $chargeAmount;
-            self::updateVatMap($vatMap, $item, $chargeAmount);
+            if ($inv->getLegacySum()) {
+                self::updateVatMap($inv, $vatMap, $item, $chargeAmount);
+            } else {
+                self::updateVatMap($inv, $vatMap, $item, $item->getEffectiveAmount());
+            }
         }
         $totals->chargesAmount = $inv->round($totals->chargesAmount, 'invoice/allowancesChargesAmount');
 
         // Calculate VAT amounts
         foreach ($vatMap as $item) {
-            $item->taxableAmount = $inv->round($item->taxableAmount, 'invoice/allowancesChargesAmount');
-            $item->taxAmount = $inv->round($item->taxableAmount * ($item->rate / 100), 'invoice/vatAmount');
+            if ($inv->getLegacySum()) {
+                $item->taxableAmount = $inv->round($item->taxableAmount, 'line/taxableAmount');
+                $item->taxAmount = $inv->round($item->taxableAmount * ($item->rate / 100), 'line/vatAmount');
+            } else {
+                $item->taxableAmount = $inv->round($item->taxableAmount, 'line/taxableAmount');
+                $item->taxAmount = $inv->round($item->taxAmount, 'line/vatAmount');
+            }
+
             $totals->vatAmount += $item->taxAmount;
         }
         $totals->vatAmount = $inv->round($totals->vatAmount, 'invoice/vatAmount');
@@ -157,21 +203,23 @@ class InvoiceTotals {
         return $totals;
     }
 
-
     /**
      * Update VAT map
-     * @param VatBreakdown[string] &$vatMap          VAT map reference
-     * @param VatTrait             $item             Item instance
-     * @param float|null           $rate             VAT rate
-     * @param float                $addTaxableAmount Taxable amount to add
+     *
+     * @param  Invoice  $inv  Invoice instance
+     * @param  VatBreakdown[string] &$vatMap          VAT map reference
+     * @param  VatTrait  $item  Item instance
+     * @param  float|null  $rate  VAT rate
+     * @param  float  $addTaxableAmount  Taxable amount to add
      */
-    static private function updateVatMap(array &$vatMap, $item, float $addTaxableAmount) {
+    private static function updateVatMap(Invoice $inv, array &$vatMap, $item, float $addTaxableAmount)
+    {
         $category = $item->getVatCategory();
         $rate = $item->getVatRate();
         $key = "$category:$rate";
 
         // Initialize VAT breakdown
-        if (!isset($vatMap[$key])) {
+        if (! isset($vatMap[$key])) {
             $vatMap[$key] = new VatBreakdown();
             $vatMap[$key]->category = $category;
             $vatMap[$key]->rate = $rate;
@@ -188,6 +236,11 @@ class InvoiceTotals {
         }
 
         // Increase taxable amount
-        $vatMap[$key]->taxableAmount += $addTaxableAmount;
+        if ($inv->getLegacySum()) {
+            $vatMap[$key]->taxableAmount += $addTaxableAmount;
+        } else {
+            $vatMap[$key]->taxableAmount += round($addTaxableAmount, 2);
+            $vatMap[$key]->taxAmount += round($addTaxableAmount * ($rate / 100), 2);
+        }
     }
 }

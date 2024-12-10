@@ -101,7 +101,7 @@ final class InvoiceTest extends TestCase {
 
     public function testTotalAmountsAreCalculatedCorrectly(): void {
         $allowance = (new AllowanceOrCharge)->setAmount(12.34);
-        $charge = (new AllowanceOrCharge)->setAmount(7.5)->markAsPercentage();
+        $charge = (new AllowanceOrCharge)->setFactorMultiplier(7.5)->setBaseAmount(300.5)->markAsPercentage();
         $firstLine = (new InvoiceLine)->setPrice(100)->setVatRate(10);
         $secondLine = (new InvoiceLine)->setPrice(200.5)->setVatRate(21);
         $this->invoice->clearLines()

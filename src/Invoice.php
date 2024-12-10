@@ -4,6 +4,7 @@ namespace Einvoicing;
 use DateTime;
 use Einvoicing\Models\InvoiceTotals;
 use Einvoicing\Payments\Payment;
+use Einvoicing\Payments\PaymentTerms;
 use Einvoicing\Presets\AbstractPreset;
 use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\AttachmentsTrait;
@@ -244,6 +245,7 @@ class Invoice {
     protected $businessProcess = null;
     protected $number = null;
     protected $type = self::TYPE_COMMERCIAL_INVOICE;
+    protected $legacySum = true;
     protected $currency = "EUR"; // TODO: add constants
     protected $vatCurrency = null;
     protected $issueDate = null;
@@ -252,7 +254,9 @@ class Invoice {
     protected $notes = [];
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
+    protected $despatchDocumentReference = null;
     protected $salesOrderReference = null;
+    protected $projectReference = null;
     protected $tenderOrLotReference = null;
     protected $contractReference = null;
     protected $paidAmount = 0;
@@ -262,8 +266,10 @@ class Invoice {
     protected $buyer = null;
     protected $payee = null;
     protected $delivery = null;
-    protected $payment = null;
+    protected $payments = [];
+    protected $paymentTerms = null;
     protected $lines = [];
+    protected $totals = null;
 
     use AllowanceOrChargeTrait;
     use AttachmentsTrait;
@@ -385,6 +391,25 @@ class Invoice {
      */
     public function setNumber(string $number): self {
         $this->number = $number;
+        return $this;
+    }
+
+    /**
+     * Get legacy sum
+     * @return bool legacy sum
+     */
+    public function getLegacySum(): bool {
+        return $this->legacySum;
+    }
+
+
+    /**
+     * Set legacy sum
+     * @param  bool $legacySum legacy sum
+     * @return self           Invoice instance
+     */
+    public function setLegacySum(bool $legacySum): self {
+        $this->legacySum = $legacySum;
         return $this;
     }
 
@@ -620,6 +645,46 @@ class Invoice {
 
 
     /**
+     * Get despatch document reference
+     * @return string|null despatch document reference
+     */
+    public function getDespatchDocumentReference(): ?string {
+        return $this->despatchDocumentReference;
+    }
+
+
+    /**
+     * Set despatch document reference
+     * @param  string|null $despatchDocumentReference despatch document reference
+     * @return self                                Invoice instance
+     */
+    public function setDespatchDocumentReference(?string $despatchDocumentReference): self {
+        $this->despatchDocumentReference = $despatchDocumentReference;
+        return $this;
+    }
+
+
+    /**
+     * Get project reference
+     * @return string|null Project reference
+     */
+    public function getProjectReference(): ?string {
+        return $this->projectReference;
+    }
+
+
+    /**
+     * Set project reference
+     * @param  string|null $projectReference Project reference
+     * @return self                                Invoice instance
+     */
+    public function setProjectReference(?string $projectReference): self {
+        $this->projectReference = $projectReference;
+        return $this;
+    }
+
+
+    /**
      * Get sales order reference
      * @return string|null Sales order reference
      */
@@ -820,21 +885,41 @@ class Invoice {
 
 
     /**
-     * Get payment information
-     * @return Payment|null Payment instance
+     * Get payment terms information
+     * @return PaymentTerms|null PaymentTerms instance
      */
-    public function getPayment(): ?Payment {
-        return $this->payment;
+    public function getPaymentTerms(): ?PaymentTerms {
+        return $this->paymentTerms;
+    }
+
+
+    /**
+     * Set payment terms information
+     * @param  PaymentTerms|null $paymentTerms PaymentTerms instance
+     * @return self                            Invoice instance
+     */
+    public function setPaymentTerms(?PaymentTerms $paymentTerms): self {
+        $this->paymentTerms = $paymentTerms;
+        return $this;
+    }
+
+
+    /**
+     * Get payment information
+     * @return Payment[] Payment instance
+     */
+    public function getPayments(): array {
+        return $this->payments;
     }
 
 
     /**
      * Set payment information
-     * @param  Payment|null $payment Payment instance
-     * @return self                  Invoice instance
+     * @param  Payment  $payment  Payment instance
+     * @return self               Invoice instance
      */
-    public function setPayment(?Payment $payment): self {
-        $this->payment = $payment;
+    public function addPayment(Payment $payment): self {
+        $this->payments[] = $payment;
         return $this;
     }
 
@@ -889,6 +974,20 @@ class Invoice {
      * @return InvoiceTotals Invoice totals
      */
     public function getTotals(): InvoiceTotals {
+        if (! empty($this->totals)) {
+            return $this->totals;
+        }
+
         return InvoiceTotals::fromInvoice($this);
+    }
+
+
+    /**
+     * Set invoice total
+     * @return self Invoice instance
+     */
+    public function setTotals(InvoiceTotals $invoiceTotals): self {
+        $this->totals = $invoiceTotals;
+        return $this;
     }
 }

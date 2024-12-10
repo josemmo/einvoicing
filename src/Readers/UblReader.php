@@ -10,10 +10,13 @@ use Einvoicing\Identifier;
 use Einvoicing\Invoice;
 use Einvoicing\InvoiceLine;
 use Einvoicing\InvoiceReference;
+use Einvoicing\Models\InvoiceTotals;
+use Einvoicing\Models\VatBreakdown;
 use Einvoicing\Party;
 use Einvoicing\Payments\Card;
 use Einvoicing\Payments\Mandate;
 use Einvoicing\Payments\Payment;
+use Einvoicing\Payments\PaymentTerms;
 use Einvoicing\Payments\Transfer;
 use Einvoicing\Traits\VatTrait;
 use Einvoicing\Writers\UblWriter;
@@ -27,8 +30,9 @@ class UblReader extends AbstractReader {
      * @inheritdoc
      * @throws InvalidArgumentException if failed to parse XML
      */
-    public function import(string $document): Invoice {
+    public function import(string $document, bool $readTotals = false): Invoice {
         $invoice = new Invoice();
+        $totals = new InvoiceTotals();
 
         // Load XML document
         $xml = UXML::fromString($document);
@@ -117,12 +121,14 @@ class UblReader extends AbstractReader {
         $currencyNode = $xml->get("{{$cbc}}DocumentCurrencyCode");
         if ($currencyNode !== null) {
             $invoice->setCurrency($currencyNode->asText());
+            $totals->currency = $invoice->getCurrency();
         }
 
         // BT-6: VAT accounting currency code
         $vatCurrencyNode = $xml->get("{{$cbc}}TaxCurrencyCode");
         if ($vatCurrencyNode !== null) {
             $invoice->setVatCurrency($vatCurrencyNode->asText());
+            $totals->vatCurrency = $invoice->getVatCurrency();
         }
 
         // BT-19: Buyer accounting reference
@@ -140,6 +146,12 @@ class UblReader extends AbstractReader {
         // BG-14: Invoice period
         $this->parsePeriodFields($xml, $invoice);
 
+        // BT-11: Project reference
+        $projectReferenceNode = $xml->get("{{$cac}}ProjectReference/{{$cbc}}ID");
+        if ($projectReferenceNode !== null) {
+            $invoice->setProjectReference($projectReferenceNode->asText());
+        }
+
         // BT-13: Purchase order reference
         $purchaseOrderReferenceNode = $xml->get("{{$cac}}OrderReference/{{$cbc}}ID");
         if ($purchaseOrderReferenceNode !== null) {
@@ -150,6 +162,12 @@ class UblReader extends AbstractReader {
         $salesOrderReferenceNode = $xml->get("{{$cac}}OrderReference/{{$cbc}}SalesOrderID");
         if ($salesOrderReferenceNode !== null) {
             $invoice->setSalesOrderReference($salesOrderReferenceNode->asText());
+        }
+
+        // BT-16: Purchase order reference
+        $despatchDocumentReferenceNode = $xml->get("{{$cac}}DespatchDocumentReference/{{$cbc}}ID");
+        if ($despatchDocumentReferenceNode !== null) {
+            $invoice->setDespatchDocumentReference($despatchDocumentReferenceNode->asText());
         }
 
         // BG-3: Preceding invoice references
@@ -207,9 +225,17 @@ class UblReader extends AbstractReader {
             $invoice->setDelivery($this->parseDeliveryNode($deliveryNode));
         }
 
+        // Payment term node
+        $termsNode = $xml->get("{{$cac}}PaymentTerms");
+        if ($termsNode !== null) {
+            $invoice->setPaymentTerms($this->parsePaymentTermsNode($termsNode));
+        }
+
         // Payment nodes
-        $payment = $this->parsePaymentNodes($xml);
-        $invoice->setPayment($payment);
+        foreach ($xml->getAll("{{$cac}}PaymentMeans") as $node) {
+            $payment = $this->parsePaymentNode($node);
+            $invoice->addPayment($payment);
+        }
 
         // Allowances and charges
         foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $node) {
@@ -218,31 +244,100 @@ class UblReader extends AbstractReader {
 
         // BT-111: Total VAT amount in accounting currency
         foreach ($xml->getAll("{{$cac}}TaxTotal") as $taxTotalNode) {
-            if ($taxTotalNode->get("{{$cac}}TaxSubtotal") !== null) {
+            $taxSubtotals = $taxTotalNode->getAll("{{$cac}}TaxSubtotal");
+            if (! empty($taxSubtotals)) {
+                foreach ($taxSubtotals as $taxSubtotal) {
+                    $vatBreakdown = new VatBreakdown();
+                    if (($taxableAmountNode = $taxSubtotal->get("{{$cbc}}TaxableAmount")) !== null) {
+                        $vatBreakdown->taxableAmount = (float) $taxableAmountNode->asText();
+                    }
+                    if (($taxAmountNode = $taxSubtotal->get("{{$cbc}}TaxAmount")) !== null) {
+                        $vatBreakdown->taxAmount = (float) $taxAmountNode->asText();
+                    }
+                    if (($categoryNode = $taxSubtotal->get("{{$cac}}TaxCategory/{{$cbc}}ID")) !== null) {
+                        $vatBreakdown->category = $categoryNode->asText();
+                    }
+                    if (($rateNode = $taxSubtotal->get("{{$cac}}TaxCategory/{{$cbc}}Percent")) !== null) {
+                        $vatBreakdown->rate = (float) $rateNode->asText();
+                    }
+                    if (($exemptionReasonNode = $taxSubtotal->get("{{$cac}}TaxCategory/{{$cbc}}TaxExemptionReason")) !== null) {
+                        $vatBreakdown->exemptionReason = $exemptionReasonNode->asText();
+                    }
+                    if (($exemptionReasonCodeNode = $taxSubtotal->get("{{$cac}}TaxCategory/{{$cbc}}TaxExemptionReasonCode")) !== null) {
+                        $vatBreakdown->exemptionReasonCode = $exemptionReasonCodeNode->asText();
+                    }
+
+                    $totals->vatBreakdown[] = $vatBreakdown;
+                }
                 // The other tax total node, then
                 continue;
             }
             $taxAmountNode = $taxTotalNode->get("{{$cbc}}TaxAmount");
             if ($taxAmountNode !== null) {
                 $invoice->setCustomVatAmount((float) $taxAmountNode->asText());
+                $totals->customVatAmount = (float) $taxAmountNode->asText();
             }
+        }
+
+        // BT-106: Line Extension Amount
+        $lineExtensionAmount = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}LineExtensionAmount");
+        if ($lineExtensionAmount !== null) {
+            $totals->netAmount = (float) $lineExtensionAmount->asText();
+        }
+
+        // BT-107: Allowance Total Amount
+        $allowanceTotalAmount = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}AllowanceTotalAmount");
+        if ($allowanceTotalAmount !== null) {
+            $totals->allowancesAmount = (float) $allowanceTotalAmount->asText();
+        }
+
+        // BT-108: Charge Total Amount
+        $chargeTotalAmount = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}ChargeTotalAmount");
+        if ($chargeTotalAmount !== null) {
+            $totals->chargesAmount = (float) $chargeTotalAmount->asText();
+        }
+
+        // BT-109: Tax Exclusive Amount
+        $taxExclusiveAmount = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}TaxExclusiveAmount");
+        if ($taxExclusiveAmount !== null) {
+            $totals->taxExclusiveAmount = (float) $taxExclusiveAmount->asText();
+        }
+
+        // BT-112: Tax Inclusive Amount
+        $taxInclusiveAmount = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}TaxInclusiveAmount");
+        if ($taxInclusiveAmount !== null) {
+            $totals->taxInclusiveAmount = (float) $taxInclusiveAmount->asText();
+        }
+
+        // BT-115: Payable Amount
+        $payableAmount = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}PayableAmount");
+        if ($payableAmount !== null) {
+            $totals->payableAmount = (float) $payableAmount->asText();
         }
 
         // BT-113: Paid amount
         $paidAmountNode = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}PrepaidAmount");
         if ($paidAmountNode !== null) {
             $invoice->setPaidAmount((float) $paidAmountNode->asText());
+            $totals->paidAmount = (float) $paidAmountNode->asText();
         }
 
         // BT-114: Rounding amount
         $roundingAmountNode = $xml->get("{{$cac}}LegalMonetaryTotal/{{$cbc}}PayableRoundingAmount");
         if ($roundingAmountNode !== null) {
             $invoice->setRoundingAmount((float) $roundingAmountNode->asText());
+            $totals->roundingAmount = (float) $roundingAmountNode->asText();
         }
+
+        $totals->vatAmount = $invoice->round($totals->taxInclusiveAmount - $totals->taxExclusiveAmount, 'invoice/vatAmount');
 
         // Invoice lines
         foreach ($xml->getAll("{{$cac}}InvoiceLine | {{$cac}}CreditNoteLine") as $node) {
             $invoice->addLine($this->parseInvoiceLine($node, $taxExemptions));
+        }
+
+        if ($readTotals) {
+            $invoice->setTotals($totals);
         }
 
         return $invoice;
@@ -489,26 +584,39 @@ class UblReader extends AbstractReader {
         return $delivery;
     }
 
+    /**
+     * Parse payment terms node
+     * @param  UXML     $xml XML node
+     * @return PaymentTerms      Delivery instance
+     */
+    private function parsePaymentTermsNode(UXML $xml): PaymentTerms {
+        $paymentTerms = new PaymentTerms();
+        $cbc = UblWriter::NS_CBC;
+
+        // BT-20: Payment terms
+        $noteNode = $xml->get("{{$cbc}}Note");
+        if ($noteNode !== null) {
+            $paymentTerms->setNote($noteNode->asText());
+        }
+
+        return $paymentTerms;
+    }
+
 
     /**
      * Parse payment nodes
      * @param  UXML         $xml XML node
-     * @return Payment|null      Payment instance or NULL if not found
+     * @return Payment      Payment instance or NULL if not found
      */
-    private function parsePaymentNodes(UXML $xml): ?Payment {
+    private function parsePaymentNode(UXML $xml): Payment {
         $cac = UblWriter::NS_CAC;
         $cbc = UblWriter::NS_CBC;
-
-        // Get root nodes
-        $meansNode = $xml->get("{{$cac}}PaymentMeans");
-        $termsNode = $xml->get("{{$cac}}PaymentTerms/{{$cbc}}Note");
-        if ($meansNode === null && $termsNode === null) return null;
 
         $payment = new Payment();
 
         // BT-81: Payment means code
         // BT-82: Payment means name
-        $meansCodeNode = $xml->get("{{$cac}}PaymentMeans/{{$cbc}}PaymentMeansCode");
+        $meansCodeNode = $xml->get("{{$cbc}}PaymentMeansCode");
         if ($meansCodeNode !== null) {
             $payment->setMeansCode($meansCodeNode->asText());
             if ($meansCodeNode->element()->hasAttribute('name')) {
@@ -517,32 +625,27 @@ class UblReader extends AbstractReader {
         }
 
         // BT-83: Payment ID
-        $paymentIdNode = $xml->get("{{$cac}}PaymentMeans/{{$cbc}}PaymentID");
+        $paymentIdNode = $xml->get("{{$cbc}}PaymentID");
         if ($paymentIdNode !== null) {
             $payment->setId($paymentIdNode->asText());
         }
 
         // BG-18: Payment card
-        $cardNode = $xml->get("{{$cac}}PaymentMeans/{{$cac}}CardAccount");
+        $cardNode = $xml->get("{{$cac}}CardAccount");
         if ($cardNode !== null) {
             $payment->setCard($this->parsePaymentCardNode($cardNode));
         }
 
         // BG-17: Payment transfers
-        $transferNodes = $xml->getAll("{{$cac}}PaymentMeans/{{$cac}}PayeeFinancialAccount");
+        $transferNodes = $xml->getAll("{{$cac}}PayeeFinancialAccount");
         foreach ($transferNodes as $transferNode) {
             $payment->addTransfer($this->parsePaymentTransferNode($transferNode));
         }
 
         // BG-19: Payment mandate
-        $mandateNode = $xml->get("{{$cac}}PaymentMeans/{{$cac}}PaymentMandate");
+        $mandateNode = $xml->get("{{$cac}}PaymentMandate");
         if ($mandateNode !== null) {
             $payment->setMandate($this->parsePaymentMandateNode($mandateNode));
-        }
-
-        // BT-20: Payment terms
-        if ($termsNode !== null) {
-            $payment->setTerms($termsNode->asText());
         }
 
         return $payment;
@@ -701,12 +804,19 @@ class UblReader extends AbstractReader {
         // Amount
         $factorNode = $xml->get("{{$cbc}}MultiplierFactorNumeric");
         $amountNode = $xml->get("{{$cbc}}Amount");
-        if ($factorNode !== null) {
+        $baseAmountNode = $xml->get("{{$cbc}}BaseAmount");
+        if ($factorNode !== null && $baseAmountNode !== null && $amountNode !== null) {
             $percent = (float) $factorNode->asText();
-            $allowanceOrCharge->markAsPercentage()->setAmount($percent);
+            $baseAmount = (float) $baseAmountNode->asText();
+            $amount = (float) $amountNode->asText();
+            $allowanceOrCharge
+                ->markAsPercentage()
+                ->setBaseAmount(abs($baseAmount))
+                ->setFactorMultiplier(abs($percent))
+                ->setAmount(abs($amount));
         } elseif ($amountNode !== null) {
             $amount = (float) $amountNode->asText();
-            $allowanceOrCharge->setAmount($amount);
+            $allowanceOrCharge->setAmount(abs($amount));
         } else {
             throw new InvalidArgumentException('Missing both <cbc:Amount /> and <cbc:MultiplierFactorNumeric />' .
                 ' nodes from allowance/charge');
@@ -812,16 +922,41 @@ class UblReader extends AbstractReader {
             $line->addClassificationIdentifier($this->parseIdentifierNode($classNode, 'listID'));
         }
 
-        // Price amount
-        $priceNode = $xml->get("{{$cac}}Price/{{$cbc}}PriceAmount");
-        if ($priceNode !== null) {
-            $line->setPrice((float) $priceNode->asText());
-        }
+//        // Price amount
+//        $priceNode = $xml->get("{{$cac}}Price/{{$cbc}}PriceAmount");
+//        if ($priceNode !== null) {
+//            $line->setPrice((float) $priceNode->asText());
+//        }
 
         // Base quantity
         $baseQuantityNode = $xml->get("{{$cac}}Price/{{$cbc}}BaseQuantity");
         if ($baseQuantityNode !== null) {
             $line->setBaseQuantity((float) $baseQuantityNode->asText());
+        }
+
+        // Line Extension Amount
+        $lineExtensionAmountNode = $xml->get("{{$cbc}}LineExtensionAmount");
+        if ($lineExtensionAmountNode === null || $line->getQuantity() === 0.0) {
+            $line->setPrice(0.0);
+        } elseif ($lineExtensionAmountNode !== null) {
+            $basePrice = (float) $lineExtensionAmountNode->asText();
+
+            foreach ($xml->getAll("{{$cac}}AllowanceCharge") as $allowanceChargeNode) {
+                $amountNode = $allowanceChargeNode->get("{{$cbc}}Amount");
+
+                if ($amountNode === null) {
+                    continue;
+                }
+
+                $chargeIndicatorNode = $allowanceChargeNode->get("{{$cbc}}ChargeIndicator");
+                if ($chargeIndicatorNode !== null && $chargeIndicatorNode->asText() === "true") {
+                    $basePrice -= abs((float) $amountNode->asText());
+                } else {
+                    $basePrice += abs((float) $amountNode->asText());
+                }
+            }
+
+            $line->setPrice(($basePrice / $line->getQuantity()) * $line->getBaseQuantity());
         }
 
         // VAT attributes

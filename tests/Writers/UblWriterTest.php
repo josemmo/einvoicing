@@ -84,7 +84,14 @@ final class UblWriterTest extends TestCase {
             ->addLine((new InvoiceLine)->setName('Line #2')->setPrice(40, 2)->setVatRate(21)->setQuantity(4))
             ->addLine((new InvoiceLine)->setName('Line #3')->setPrice(0.56)->setVatRate(10)->setQuantity(2))
             ->addLine((new InvoiceLine)->setName('Line #4')->setPrice(0.56)->setVatRate(10)->setQuantity(2))
-            ->addAllowance((new AllowanceOrCharge)->setReason('5% discount')->setAmount(5)->markAsPercentage()->setVatRate(21))
+            ->addAllowance(
+                (new AllowanceOrCharge)->setReason('5% discount')
+                    ->setFactorMultiplier(5)
+                    ->setBaseAmount(149.0634)
+                    ->markAsPercentage()
+                    ->setAmount(7.45317)
+                    ->setVatRate(21)
+            )
             ->addAttachment((new Attachment)->setId(new Identifier('INV-123', 'ABT')))
             ->addAttachment($externalAttachment)
             ->addAttachment($embeddedAttachment);
@@ -134,7 +141,7 @@ final class UblWriterTest extends TestCase {
     public function testCanGenerateValidCreditNote(): void {
         $invoice = $this->getSampleInvoice();
         $invoice->setType(Invoice::TYPE_CREDIT_NOTE);
-        $invoice->setPayment((new Payment)->setMeansCode('10')->setMeansText('In cash'));
+        $invoice->addPayment((new Payment)->setMeansCode('10')->setMeansText('In cash'));
         $invoice->validate();
         $contents = $this->writer->export($invoice);
         $this->assertTrue($this->validateInvoice($contents, 'credit'));
