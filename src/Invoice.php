@@ -13,8 +13,10 @@ use Einvoicing\Traits\PeriodTrait;
 use Einvoicing\Traits\PrecedingInvoiceReferencesTrait;
 use InvalidArgumentException;
 use OutOfBoundsException;
+use const E_USER_DEPRECATED;
 use function array_splice;
 use function count;
+use function trigger_error;
 use function is_subclass_of;
 use function round;
 
@@ -134,7 +136,7 @@ class Invoice {
     /**
      * Forwarder's invoice discrepancy report
      *
-     * Document/message reporting invoice discrepancies indentified by the forwarder.
+     * Document/message reporting invoice discrepancies identified by the forwarder.
      */
     const TYPE_FORWARDERS_INVOICE_DISCREPANCY_REPORT = 553;
 
@@ -249,12 +251,14 @@ class Invoice {
     protected $issueDate = null;
     protected $dueDate = null;
     protected $taxPointDate = null;
+    /** @var string[] */
     protected $notes = [];
     protected $buyerReference = null;
     protected $purchaseOrderReference = null;
     protected $salesOrderReference = null;
     protected $tenderOrLotReference = null;
     protected $contractReference = null;
+    protected $projectReference = null;
     protected $paidAmount = 0;
     protected $roundingAmount = 0;
     protected $customVatAmount = null;
@@ -262,7 +266,10 @@ class Invoice {
     protected $buyer = null;
     protected $payee = null;
     protected $delivery = null;
-    protected $payment = null;
+    /** @var Payment[] */
+    protected $payments = [];
+    protected $paymentTerms = null;
+    /** @var InvoiceLine[] */
     protected $lines = [];
 
     use AllowanceOrChargeTrait;
@@ -561,6 +568,7 @@ class Invoice {
      * @see Invoice::getNotes()
      */
     public function getNote(): ?string {
+        trigger_error('Invoice::getNote() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
         return $this->notes[0] ?? null;
     }
 
@@ -573,7 +581,7 @@ class Invoice {
      * @see Invoice::addNote()
      */
     public function setNote(?string $note): self {
-        // @phan-suppress-next-line PhanPartialTypeMismatchProperty
+        trigger_error('Invoice::setNote() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
         $this->notes = ($note === null) ? [] : [$note];
         return $this;
     }
@@ -675,6 +683,26 @@ class Invoice {
      */
     public function setContractReference(?string $contractReference): self {
         $this->contractReference = $contractReference;
+        return $this;
+    }
+
+
+    /**
+     * Get project reference
+     * @return string|null Project reference
+     */
+    public function getProjectReference(): ?string {
+        return $this->projectReference;
+    }
+
+
+    /**
+     * Set project reference
+     * @param  string|null $contractReference Project reference
+     * @return self                           Invoice instance
+     */
+    public function setProjectReference(?string $projectReference): self {
+        $this->projectReference = $projectReference;
         return $this;
     }
 
@@ -820,11 +848,62 @@ class Invoice {
 
 
     /**
-     * Get payment information
-     * @return Payment|null Payment instance
+     * Get invoice payments
+     * @return Payment[] Invoice payments
      */
-    public function getPayment(): ?Payment {
-        return $this->payment;
+    public function getPayments(): array {
+        return $this->payments;
+    }
+
+
+    /**
+     * Add invoice payment
+     * @param  Payment $payment Invoice payment
+     * @return self             Invoice instance
+     */
+    public function addPayment(Payment $payment): self {
+        $this->payments[] = $payment;
+        return $this;
+    }
+
+
+    /**
+     * Remove invoice payment
+     * @param  int  $index Invoice payment index
+     * @return self        Invoice instance
+     * @throws OutOfBoundsException if invoice payment index is out of bounds
+     */
+    public function removePayment(int $index): self {
+        if ($index < 0 || $index >= count($this->payments)) {
+            throw new OutOfBoundsException('Could not find invoice payment by index');
+        }
+        array_splice($this->payments, $index, 1);
+        return $this;
+    }
+
+
+    /**
+     * Clear all invoice payments
+     * @return self Invoice instance
+     */
+    public function clearPayments(): self {
+        $this->payments = [];
+        return $this;
+    }
+
+
+    /**
+     * Get payment information
+     * @param  boolean      $internal Whether call comes from the library itself
+     * @return Payment|null           Payment instance
+     * @deprecated 0.2.8
+     * @see Invoice::getPayments()
+     */
+    public function getPayment(bool $internal = false): ?Payment {
+        if (!$internal) {
+            trigger_error('Invoice::getPayment() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
+        }
+        return $this->payments[0] ?? null;
     }
 
 
@@ -832,9 +911,32 @@ class Invoice {
      * Set payment information
      * @param  Payment|null $payment Payment instance
      * @return self                  Invoice instance
+     * @deprecated 0.2.8
+     * @see Invoice::addPayment()
      */
     public function setPayment(?Payment $payment): self {
-        $this->payment = $payment;
+        trigger_error('Invoice::setPayment() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
+        $this->payments = ($payment === null) ? [] : [$payment];
+        return $this;
+    }
+
+
+    /**
+     * Get payment terms
+     * @return string|null Payment terms
+     */
+    public function getPaymentTerms(): ?string {
+        return $this->paymentTerms;
+    }
+
+
+    /**
+     * Set payment terms
+     * @param  string|null $paymentTerms Payment terms
+     * @return self                      Invoice instance
+     */
+    public function setPaymentTerms(?string $paymentTerms): self {
+        $this->paymentTerms = $paymentTerms;
         return $this;
     }
 

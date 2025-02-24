@@ -10,16 +10,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
+        php-version: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
         include:
-          - php-version: '8.2'
+          - php-version: '8.4'
             deploy: ${{ github.ref == 'refs/heads/master' }}
-          - php-version: '8.3'
+          - php-version: '8.5'
             experimental: true
     steps:
       # Download code from repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Setup PHP
       - name: Setup PHP
@@ -36,7 +36,7 @@ jobs:
       # Run static analyzer
       - name: Run static analyzer
         if: ${{ success() && matrix.php-version != '7.1' }}
-        run: vendor/bin/phan --color --no-progress-bar
+        run: vendor/bin/phan --allow-polyfill-parser --color --no-progress-bar
 
       # Run tests
       - name: Run tests

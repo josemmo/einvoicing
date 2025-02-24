@@ -3,7 +3,7 @@ Prior to using this library, there are some key concepts about European e-Invoic
 
 ## EN 16931
 The European e-Invoicing standard (EN 16931) describes the **semantic data model** and business rules of an electronic
-invoice. In other words, this document (specifically [part 1][1]) specificies **what an invoice is** (fields it must/can
+invoice. In other words, this document (specifically [part 1][1]) specifies **what an invoice is** (fields it must/can
 have) and the possible values those fields can contain.
 
 But that's it: it just gives an abstract definition of an invoice without getting into the technical structure (syntax).
@@ -41,5 +41,5 @@ international companies from both public and private sectors.
 
 [1]: https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/Navigating+the+eInvoicing+standard+documentation
 [2]: https://ec.europa.eu/digital-building-blocks/wikis/display/DIGITAL/Required+syntaxes
-[3]: https://ec.europa.eu/digital-building-blocks/wikis/display/EINVCOMMUNITY/Registry+of+CIUS+%28Core+Invoice+Usage+Specifications%29+and+Extensions
+[3]: https://ec.europa.eu/digital-building-blocks/sites/display/EINVCOMMUNITY/Registry+of+CIUS+%28Core+Invoice+Usage+Specifications%29+and+Extensions
 [4]: http://docs.peppol.eu/poacc/billing/3.0/
