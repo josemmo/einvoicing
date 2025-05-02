@@ -299,7 +299,7 @@ class InvoiceLine {
      * @return float|null Net amount before allowances/charges
      */
     public function getNetAmountBeforeAllowancesCharges(): ?float {
-        if ($this->price === null) {
+        if ($this->price === null || $this->baseQuantity > 0) {
             return null;
         }
         return ($this->price / $this->baseQuantity) * $this->quantity;
