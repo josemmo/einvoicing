@@ -1,7 +1,10 @@
 <?php
 namespace Einvoicing\Payments;
 
+use Einvoicing\Traits\NormalizesStringsTrait;
+
 class Transfer {
+    use NormalizesStringsTrait;
     protected $accountId = null;
     protected $accountName = null;
     protected $provider = null;
@@ -41,7 +44,7 @@ class Transfer {
      * @return self                     Transfer instance
      */
     public function setAccountName(?string $accountName): self {
-        $this->accountName = $accountName;
+        $this->accountName = $this->normalizeString($accountName);
         return $this;
     }
 
@@ -61,7 +64,7 @@ class Transfer {
      * @return self                  Transfer instance
      */
     public function setProvider(?string $provider): self {
-        $this->provider = $provider;
+        $this->provider = $this->normalizeString($provider);
         return $this;
     }
 }

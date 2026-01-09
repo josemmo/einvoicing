@@ -5,6 +5,7 @@ use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\AttributesTrait;
 use Einvoicing\Traits\BuyerAccountingReferenceTrait;
 use Einvoicing\Traits\ClassificationIdentifiersTrait;
+use Einvoicing\Traits\NormalizesStringsTrait;
 use Einvoicing\Traits\PeriodTrait;
 use Einvoicing\Traits\VatTrait;
 
@@ -27,6 +28,7 @@ class InvoiceLine {
     use AttributesTrait;
     use BuyerAccountingReferenceTrait;
     use ClassificationIdentifiersTrait;
+    use NormalizesStringsTrait;
     use PeriodTrait;
     use VatTrait;
 
@@ -65,7 +67,7 @@ class InvoiceLine {
      * @return self                   Invoice line instance
      */
     public function setOrderLineReference(?string $reference): self {
-        $this->orderLineReference = $reference;
+        $this->orderLineReference = $this->normalizeString($reference);
         return $this;
     }
 
@@ -105,7 +107,7 @@ class InvoiceLine {
      * @return self                     Invoice line instance
      */
     public function setDescription(?string $description): self {
-        $this->description = $description;
+        $this->description = $this->normalizeString($description);
         return $this;
     }
 
@@ -125,7 +127,7 @@ class InvoiceLine {
      * @return self                       Invoice line instance
      */
     public function setOriginCountry(?string $originCountry): self {
-        $this->originCountry = $originCountry;
+        $this->originCountry = $this->normalizeString($originCountry);
         return $this;
     }
 
@@ -145,7 +147,7 @@ class InvoiceLine {
      * @return self              Invoice line instance
      */
     public function setNote(?string $note): self {
-        $this->note = $note;
+        $this->note = $this->normalizeString($note);
         return $this;
     }
 
@@ -185,7 +187,7 @@ class InvoiceLine {
      * @return self                    Invoice line instance
      */
     public function setBuyerIdentifier(?string $identifier): self {
-        $this->buyerIdentifier = $identifier;
+        $this->buyerIdentifier = $this->normalizeString($identifier);
         return $this;
     }
 
@@ -205,7 +207,7 @@ class InvoiceLine {
      * @return self                    Invoice line instance
      */
     public function setSellerIdentifier(?string $identifier): self {
-        $this->sellerIdentifier = $identifier;
+        $this->sellerIdentifier = $this->normalizeString($identifier);
         return $this;
     }
 

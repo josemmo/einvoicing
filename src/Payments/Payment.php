@@ -1,6 +1,7 @@
 <?php
 namespace Einvoicing\Payments;
 
+use Einvoicing\Traits\NormalizesStringsTrait;
 use OutOfBoundsException;
 use const E_USER_DEPRECATED;
 use function array_splice;
@@ -8,6 +9,7 @@ use function count;
 use function trigger_error;
 
 class Payment {
+    use NormalizesStringsTrait;
     protected $id = null;
     protected $meansCode = null;
     protected $meansText = null;
@@ -31,7 +33,7 @@ class Payment {
      * @return self            Payment instance
      */
     public function setId(?string $id): self {
-        $this->id = $id;
+        $this->id = $this->normalizeString($id);
         return $this;
     }
 
@@ -71,7 +73,7 @@ class Payment {
      * @return self                   Payment instance
      */
     public function setMeansText(?string $meansText): self {
-        $this->meansText = $meansText;
+        $this->meansText = $this->normalizeString($meansText);
         return $this;
     }
 
@@ -103,7 +105,7 @@ class Payment {
         if (!$internal) {
             trigger_error('Payment::setTerms() is deprecated and will be removed in the next version of josemmo/einvoicing', E_USER_DEPRECATED);
         }
-        $this->terms = $terms;
+        $this->terms = $this->normalizeString($terms);
         return $this;
     }
 

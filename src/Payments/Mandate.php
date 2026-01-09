@@ -1,7 +1,10 @@
 <?php
 namespace Einvoicing\Payments;
 
+use Einvoicing\Traits\NormalizesStringsTrait;
+
 class Mandate {
+    use NormalizesStringsTrait;
     protected $reference = null;
     protected $account = null;
 
@@ -20,7 +23,7 @@ class Mandate {
      * @return self                   Mandate instance
      */
     public function setReference(?string $reference): self {
-        $this->reference = $reference;
+        $this->reference = $this->normalizeString($reference);
         return $this;
     }
 
@@ -40,7 +43,7 @@ class Mandate {
      * @return self                 Mandate instance
      */
     public function setAccount(?string $account): self {
-        $this->account = $account;
+        $this->account = $this->normalizeString($account);
         return $this;
     }
 }

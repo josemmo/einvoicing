@@ -2,6 +2,7 @@
 namespace Einvoicing;
 
 use Einvoicing\Traits\IdentifiersTrait;
+use Einvoicing\Traits\NormalizesStringsTrait;
 use Einvoicing\Traits\PostalAddressTrait;
 
 class Party {
@@ -17,6 +18,7 @@ class Party {
     protected $contactEmail = null;
 
     use IdentifiersTrait;
+    use NormalizesStringsTrait;
     use PostalAddressTrait;
 
     /**
@@ -54,7 +56,7 @@ class Party {
      * @return self              Party instance
      */
     public function setName(?string $name): self {
-        $this->name = $name;
+        $this->name = $this->normalizeString($name);
         return $this;
     }
 
@@ -74,7 +76,7 @@ class Party {
      * @return self                     Party instance
      */
     public function setTradingName(?string $tradingName): self {
-        $this->tradingName = $tradingName;
+        $this->tradingName = $this->normalizeString($tradingName);
         return $this;
     }
 
@@ -114,7 +116,7 @@ class Party {
      * @return self                   Party instance
      */
     public function setVatNumber(?string $vatNumber): self {
-        $this->vatNumber = $vatNumber;
+        $this->vatNumber = $this->normalizeString($vatNumber);
         return $this;
     }
 
@@ -154,7 +156,7 @@ class Party {
      * @return self                         Party instance
      */
     public function setLegalInformation(?string $legalInformation): self {
-        $this->legalInformation = $legalInformation;
+        $this->legalInformation = $this->normalizeString($legalInformation);
         return $this;
     }
 
@@ -174,7 +176,7 @@ class Party {
      * @return self                     This instance
      */
     public function setContactName(?string $contactName): self {
-        $this->contactName = $contactName;
+        $this->contactName = $this->normalizeString($contactName);
         return $this;
     }
 
@@ -194,7 +196,7 @@ class Party {
      * @return self                      This instance
      */
     public function setContactPhone(?string $contactPhone): self {
-        $this->contactPhone = $contactPhone;
+        $this->contactPhone = $this->normalizeString($contactPhone);
         return $this;
     }
 
@@ -214,7 +216,7 @@ class Party {
      * @return self                      This instance
      */
     public function setContactEmail(?string $contactEmail): self {
-        $this->contactEmail = $contactEmail;
+        $this->contactEmail = $this->normalizeString($contactEmail);
         return $this;
     }
 

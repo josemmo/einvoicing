@@ -1,7 +1,10 @@
 <?php
 namespace Einvoicing\Payments;
 
+use Einvoicing\Traits\NormalizesStringsTrait;
+
 class Card {
+    use NormalizesStringsTrait;
     protected $pan = null;
     protected $network = null;
     protected $holder = null;
@@ -41,7 +44,7 @@ class Card {
      * @return self                 Card instance
      */
     public function setNetwork(?string $network): self {
-        $this->network = $network;
+        $this->network = $this->normalizeString($network);
         return $this;
     }
 
@@ -61,7 +64,7 @@ class Card {
      * @return self                Card instance
      */
     public function setHolder(?string $holder): self {
-        $this->holder = $holder;
+        $this->holder = $this->normalizeString($holder);
         return $this;
     }
 }

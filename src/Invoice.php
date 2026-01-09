@@ -9,6 +9,7 @@ use Einvoicing\Traits\AllowanceOrChargeTrait;
 use Einvoicing\Traits\AttachmentsTrait;
 use Einvoicing\Traits\BuyerAccountingReferenceTrait;
 use Einvoicing\Traits\InvoiceValidationTrait;
+use Einvoicing\Traits\NormalizesStringsTrait;
 use Einvoicing\Traits\PeriodTrait;
 use Einvoicing\Traits\PrecedingInvoiceReferencesTrait;
 use InvalidArgumentException;
@@ -275,6 +276,7 @@ class Invoice {
     use AllowanceOrChargeTrait;
     use AttachmentsTrait;
     use BuyerAccountingReferenceTrait;
+    use NormalizesStringsTrait;
     use PeriodTrait;
     use InvoiceValidationTrait;
     use PrecedingInvoiceReferencesTrait;
@@ -371,7 +373,7 @@ class Invoice {
      * @return self                         Invoice instance
      */
     public function setBusinessProcess(?string $businessProcess): self {
-        $this->businessProcess = $businessProcess;
+        $this->businessProcess = $this->normalizeString($businessProcess);
         return $this;
     }
 
@@ -451,7 +453,7 @@ class Invoice {
      * @return self                      Invoice instance
      */
     public function setVatCurrency(?string $currencyCode): self {
-        $this->vatCurrency = $currencyCode;
+        $this->vatCurrency = $this->normalizeString($currencyCode);
         return $this;
     }
 
@@ -602,7 +604,7 @@ class Invoice {
      * @return self                        Invoice instance
      */
     public function setBuyerReference(?string $buyerReference): self {
-        $this->buyerReference = $buyerReference;
+        $this->buyerReference = $this->normalizeString($buyerReference);
         return $this;
     }
 
@@ -622,7 +624,7 @@ class Invoice {
      * @return self                                Invoice instance
      */
     public function setPurchaseOrderReference(?string $purchaseOrderReference): self {
-        $this->purchaseOrderReference = $purchaseOrderReference;
+        $this->purchaseOrderReference = $this->normalizeString($purchaseOrderReference);
         return $this;
     }
 
@@ -642,7 +644,7 @@ class Invoice {
      * @return self                             Invoice instance
      */
     public function setSalesOrderReference(?string $salesOrderReference): self {
-        $this->salesOrderReference = $salesOrderReference;
+        $this->salesOrderReference = $this->normalizeString($salesOrderReference);
         return $this;
     }
 
@@ -662,7 +664,7 @@ class Invoice {
      * @return self                              Invoice instance
      */
     public function setTenderOrLotReference(?string $tenderOrLotReference): self {
-        $this->tenderOrLotReference = $tenderOrLotReference;
+        $this->tenderOrLotReference = $this->normalizeString($tenderOrLotReference);
         return $this;
     }
 
@@ -682,7 +684,7 @@ class Invoice {
      * @return self                           Invoice instance
      */
     public function setContractReference(?string $contractReference): self {
-        $this->contractReference = $contractReference;
+        $this->contractReference = $this->normalizeString($contractReference);
         return $this;
     }
 
@@ -702,7 +704,7 @@ class Invoice {
      * @return self                           Invoice instance
      */
     public function setProjectReference(?string $projectReference): self {
-        $this->projectReference = $projectReference;
+        $this->projectReference = $this->normalizeString($projectReference);
         return $this;
     }
 
@@ -936,7 +938,7 @@ class Invoice {
      * @return self                      Invoice instance
      */
     public function setPaymentTerms(?string $paymentTerms): self {
-        $this->paymentTerms = $paymentTerms;
+        $this->paymentTerms = $this->normalizeString($paymentTerms);
         return $this;
     }
 

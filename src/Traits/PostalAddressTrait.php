@@ -5,6 +5,8 @@ use InvalidArgumentException;
 use function count;
 
 trait PostalAddressTrait {
+    use NormalizesStringsTrait;
+
     protected $address = [];
     protected $city = null;
     protected $postalCode = null;
@@ -50,7 +52,7 @@ trait PostalAddressTrait {
      * @return self              This instance
      */
     public function setCity(?string $city): self {
-        $this->city = $city;
+        $this->city = $this->normalizeString($city);
         return $this;
     }
 
@@ -70,7 +72,7 @@ trait PostalAddressTrait {
      * @return self                    This instance
      */
     public function setPostalCode(?string $postalCode): self {
-        $this->postalCode = $postalCode;
+        $this->postalCode = $this->normalizeString($postalCode);
         return $this;
     }
 
@@ -90,7 +92,7 @@ trait PostalAddressTrait {
      * @return self                     This instance
      */
     public function setSubdivision(?string $subdivision): self {
-        $this->subdivision = $subdivision;
+        $this->subdivision = $this->normalizeString($subdivision);
         return $this;
     }
 
@@ -110,7 +112,7 @@ trait PostalAddressTrait {
      * @return self                     This instance
      */
     public function setCountry(?string $countryCode): self {
-        $this->country = $countryCode;
+        $this->country = $this->normalizeString($countryCode);
         return $this;
     }
 }

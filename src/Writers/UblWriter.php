@@ -483,7 +483,7 @@ class UblWriter extends AbstractWriter {
         // Contact point
         if ($party->hasContactInformation()) {
             $contactNode = $xml->add('cac:Contact');
-            
+
             $contactName = $party->getContactName();
             if ($contactName !== null) {
                 $contactNode->add('cbc:Name', $contactName);

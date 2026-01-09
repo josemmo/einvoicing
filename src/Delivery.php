@@ -2,6 +2,7 @@
 namespace Einvoicing;
 
 use DateTime;
+use Einvoicing\Traits\NormalizesStringsTrait;
 use Einvoicing\Traits\PostalAddressTrait;
 
 class Delivery {
@@ -9,6 +10,7 @@ class Delivery {
     protected $date = null;
     protected $locationIdentifier = null;
 
+    use NormalizesStringsTrait;
     use PostalAddressTrait;
 
     /**
@@ -26,7 +28,7 @@ class Delivery {
      * @return self              Delivery instance
      */
     public function setName(?string $name): self {
-        $this->name = $name;
+        $this->name = $this->normalizeString($name);
         return $this;
     }
 
