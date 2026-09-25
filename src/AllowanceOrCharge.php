@@ -8,6 +8,7 @@ class AllowanceOrCharge {
     protected $reason = null;
     protected $amount = 0;
     protected $isPercentage = false;
+    protected $baseAmount = null;
 
     use VatTrait;
 
@@ -101,14 +102,38 @@ class AllowanceOrCharge {
 
 
     /**
+     * Get base amount
+     * @return float|null Base amount to which the percentage applies (BT-93, BT-100, BT-137, BT-142)
+     */
+    public function getBaseAmount(): ?float {
+        return $this->baseAmount;
+    }
+
+
+    /**
+     * Set base amount
+     *
+     * When set, percentage allowances and charges are calculated from this amount instead of the net amount of the
+     * invoice or invoice line they belong to.
+     *
+     * @param  float|null $baseAmount Base amount to which the percentage applies (BT-93, BT-100, BT-137, BT-142)
+     * @return self                   This instance
+     */
+    public function setBaseAmount(?float $baseAmount): self {
+        $this->baseAmount = $baseAmount;
+        return $this;
+    }
+
+
+    /**
      * Get effective amount relative to base amount
-     * @param  float $baseAmount Base amount
+     * @param  float $baseAmount Base amount, ignored when the instance has its own base amount
      * @return float             Effective amount
      */
     public function getEffectiveAmount(float $baseAmount): float {
         $amount = $this->getAmount();
         if ($this->isPercentage()) {
-            $amount = $baseAmount * ($amount / 100);
+            $amount = ($this->getBaseAmount() ?? $baseAmount) * ($amount / 100);
         }
 
         return $amount;

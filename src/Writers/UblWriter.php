@@ -745,9 +745,12 @@ class UblWriter extends AbstractWriter {
         }
 
         // Amount
-        $baseAmount = $atDocumentLevel ?
-            $totals->netAmount :                                 // @phan-suppress-current-line PhanPossiblyUndeclaredProperty
-            $line->getNetAmountBeforeAllowancesCharges() ?? 0.0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+        $baseAmount = $item->getBaseAmount();
+        if ($baseAmount === null) {
+            $baseAmount = $atDocumentLevel ?
+                $totals->netAmount :                                 // @phan-suppress-current-line PhanPossiblyUndeclaredProperty
+                $line->getNetAmountBeforeAllowancesCharges() ?? 0.0; // @phan-suppress-current-line PhanPossiblyNonClassMethodCall
+        }
         $this->addAmountNode(
             $xml,
             'cbc:Amount',
@@ -756,7 +759,7 @@ class UblWriter extends AbstractWriter {
         );
 
         // Base amount
-        if ($item->isPercentage()) {
+        if ($item->isPercentage() || $item->getBaseAmount() !== null) {
             $this->addAmountNode(
                 $xml,
                 'cbc:BaseAmount',

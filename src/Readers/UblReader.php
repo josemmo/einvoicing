@@ -719,6 +719,12 @@ class UblReader extends AbstractReader {
                 ' nodes from allowance/charge');
         }
 
+        // Base amount
+        $baseAmountNode = $xml->get("{{$cbc}}BaseAmount");
+        if ($baseAmountNode !== null) {
+            $allowanceOrCharge->setBaseAmount((float) $baseAmountNode->asText());
+        }
+
         // VAT attributes
         $vatNode = $xml->get("{{$cac}}TaxCategory");
         if ($vatNode !== null) {

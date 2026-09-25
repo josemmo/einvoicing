@@ -66,6 +66,10 @@ final class IntegrationTest extends TestCase {
         $this->importAndExportInvoice(__DIR__ . "/peppol-allowance.xml");
     }
 
+    public function testCanRecreatePeppolAllowanceBaseAmountExample(): void {
+        $this->importAndExportInvoice(__DIR__ . "/peppol-allowance-base-amount.xml");
+    }
+
     public function testCanRecreatePeppolRoundingExample(): void {
         $this->importAndExportInvoice(__DIR__ . "/peppol-rounding.xml");
     }

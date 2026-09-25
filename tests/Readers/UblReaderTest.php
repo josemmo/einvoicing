@@ -10,6 +10,7 @@ use function file_get_contents;
 final class UblReaderTest extends TestCase {
     const INVOICE_PATH = __DIR__ . "/peppol-invoice-example.xml";
     const CREDIT_NOTE_PATH = __DIR__ . "/peppol-credit-note-example.xml";
+    const ALLOWANCE_BASE_AMOUNT_PATH = __DIR__ . "/../Integration/peppol-allowance-base-amount.xml";
 
     /** @var UblReader */
     private $reader;
@@ -37,6 +38,32 @@ final class UblReaderTest extends TestCase {
         $this->assertEquals(1625, $totals->payableAmount);
         $this->assertEquals('S', $totals->vatBreakdown[0]->category);
         $this->assertEquals(25, $totals->vatBreakdown[0]->rate);
+    }
+
+    public function testCanReadAllowanceBaseAmount(): void {
+        $invoice = $this->reader->import(file_get_contents(self::ALLOWANCE_BASE_AMOUNT_PATH));
+        $invoice->validate();
+
+        // Document level: 10% of a base amount of 500, not of the net amount of 1250
+        $allowance = $invoice->getAllowances()[0];
+        $this->assertTrue($allowance->isPercentage());
+        $this->assertEquals(10, $allowance->getAmount());
+        $this->assertEquals(500, $allowance->getBaseAmount());
+        $this->assertNull($invoice->getCharges()[0]->getBaseAmount());
+
+        // Line level: 5% of a base amount of 1000, not of the line net amount of 2800
+        $line = $invoice->getLines()[0];
+        $this->assertEquals(1000, $line->getAllowances()[0]->getBaseAmount());
+        $this->assertEquals(50, $line->getAllowancesAmount());
+        $this->assertEquals(2750, $line->getNetAmount());
+
+        $totals = $invoice->getTotals();
+        $this->assertEquals(1250, $totals->netAmount);
+        $this->assertEquals(50, $totals->allowancesAmount);
+        $this->assertEquals(25, $totals->chargesAmount);
+        $this->assertEquals(1225, $totals->taxExclusiveAmount);
+        $this->assertEquals(306.25, $totals->vatAmount);
+        $this->assertEquals(1531.25, $totals->payableAmount);
     }
 
     public function testCanReadInvoice(): void {
