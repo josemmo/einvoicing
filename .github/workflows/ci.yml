@@ -6,15 +6,22 @@ jobs:
   ci:
     name: Run tests and deploy
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental || false }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
         php-version: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+        build-docs: [false]
+        deploy: [false]
+        experimental: [false]
         include:
           - php-version: '8.5'
+            build-docs: true
             deploy: ${{ github.ref == 'refs/heads/master' }}
+            experimental: false
           - php-version: '8.6'
+            build-docs: true
+            deploy: false
             experimental: true
     steps:
       # Download code from repository
@@ -44,13 +51,14 @@ jobs:
 
       # Build documentation
       - name: Build documentation
+        if: ${{ matrix.build-docs }}
         run: |
           php ./scripts/build-docs.php
           docker run --rm -v ${PWD}:/docs squidfunk/mkdocs-material build
 
        # Deploy documentation
       - name: Deploy documentation
-        if: ${{ matrix.deploy || false }}
+        if: ${{ matrix.deploy }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
