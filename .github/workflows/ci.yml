@@ -5,7 +5,7 @@ on: [push, pull_request]
 jobs:
   ci:
     name: Run tests and deploy
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
