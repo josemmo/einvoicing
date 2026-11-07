@@ -45,4 +45,5 @@ nav:
     - EU e-Invoicing core concepts: getting-started/eu-einvoicing-concepts.md
     - Creating your first invoice: getting-started/your-first-invoice.md
     - Importing, exporting and validating documents: getting-started/importing-exporting-and-validating.md
+    - Sending documents: getting-started/sending-documents.md
     - Creating custom presets: getting-started/creating-custom-presets.md

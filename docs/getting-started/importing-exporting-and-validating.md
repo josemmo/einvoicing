@@ -13,16 +13,6 @@ $document = $writer->export($inv);
 file_put_contents(__DIR__ . "/example.xml", $document);
 ```
 
-### Sending documents over Peppol
-This library creates and reads documents, but it does not deliver them. To send an exported UBL invoice over the
-Peppol network you need a Peppol access point. Free access points run by non-profits and governments exist, such as
-[Let's Peppol](https://letspeppol.org/), and OpenPeppol publishes the
-[list of certified service providers](https://peppol.org/members/peppol-certified-service-providers/).
-
-Some PHP packages send the exported UBL to an access point, for example
-[`getpeppr/getpeppr-php`](https://github.com/zerolooplabs/getpeppr-php) or
-[`tigron/peppyrus-api-php`](https://github.com/tigron/peppyrus-api-php).
-
 ## Importing documents
 Similar to exporting invoices, you need a reader to import a document into an invoice instance:
 ```php
