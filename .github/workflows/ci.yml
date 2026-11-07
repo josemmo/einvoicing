@@ -5,21 +5,21 @@ on: [push, pull_request]
 jobs:
   ci:
     name: Run tests and deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
+        php-version: ['7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
         include:
-          - php-version: '8.4'
-            deploy: ${{ github.ref == 'refs/heads/master' }}
           - php-version: '8.5'
+            deploy: ${{ github.ref == 'refs/heads/master' }}
+          - php-version: '8.6'
             experimental: true
     steps:
       # Download code from repository
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Setup PHP
       - name: Setup PHP
@@ -35,7 +35,7 @@ jobs:
 
       # Run static analyzer
       - name: Run static analyzer
-        if: ${{ success() && matrix.php-version != '7.1' }}
+        if: ${{ matrix.php-version != '7.1' }}
         run: vendor/bin/phan --allow-polyfill-parser --color --no-progress-bar
 
       # Run tests
@@ -44,16 +44,15 @@ jobs:
 
       # Build documentation
       - name: Build documentation
-        if: ${{ success() && matrix.deploy || false }}
         run: |
           php ./scripts/build-docs.php
           docker run --rm -v ${PWD}:/docs squidfunk/mkdocs-material build
 
        # Deploy documentation
       - name: Deploy documentation
-        if: ${{ success() && matrix.deploy || false }}
+        if: ${{ matrix.deploy || false }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: site
-          clean: true # Automatically remove deleted files from the deploy branch
+          clean: true  # Automatically remove deleted files from the deploy branch
